@@ -1,0 +1,30 @@
+<!-- Example steering file for PandoraAnalysis
+     Output root file can be examined using the AnalysePerformance binary -->
+<marlin>
+<execute>
+  <processor name="MyMCPfoMaker"/>
+  <processor name="MyPfoAnalysis"/>
+</execute>
+
+<global>
+  <parameter name="LCIOInputFiles" value="" />
+  <parameter name="MaxRecordNumber" value="10000" /> 
+  <parameter name="SupressCheck" value="false" /> 
+  <parameter name="GearXMLFile" value="" />
+  <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> WARNING </parameter>
+</global>
+
+<processor name="MyMCPfoMaker" type="MCPfoMaker">
+  <parameter name="InputMCParticleCollections" type="string">MCParticle</parameter>
+  <parameter name="OutputMCParticleCollection" type="string">MCPfos</parameter>
+  <parameter name="OutputQuarkParticleCollection" type="string">QuarkPfos</parameter>
+</processor>
+
+<processor name="MyPfoAnalysis" type="PfoAnalysis">
+  <parameter name="InputQuarkParticleCollections" type="string">QuarkPfos</parameter>
+  <parameter name="InputMCParticleCollections" type="string">MCPfos</parameter>
+  <parameter name="InputParticleCollections" type="string">PandoraPFANewPFOs</parameter>
+  <parameter name="RootFile" type="string"></parameter>
+</processor>
+
+</marlin>
