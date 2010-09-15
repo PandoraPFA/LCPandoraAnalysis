@@ -13,8 +13,10 @@
 #include "AnalysePerformance.h"
 
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <limits>
 
 int main(int argc, char **argv)
 {
