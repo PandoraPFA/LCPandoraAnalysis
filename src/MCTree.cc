@@ -9,6 +9,7 @@
 #include "MCTree.h"
 
 #include <cmath>
+#include <cstdlib>
 
 MCTree::MCTree(const EVENT::LCCollection *const pLCCollection)
 {
