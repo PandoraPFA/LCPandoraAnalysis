@@ -51,14 +51,14 @@ public:
      *
      *  @param  pLCEvent the lc event
      */
-    virtual void processEvent(lcio::LCEvent *pLCEvent);
+    virtual void processEvent(EVENT::LCEvent *pLCEvent);
 
     /**
      *  @brief  Checks for event
      *
      *  @param  pLCEvent the lc event
      */
-    virtual void check(lcio::LCEvent *pLCEvent);
+    virtual void check(EVENT::LCEvent *pLCEvent);
 
     /**
      *  @brief  End, called at shutdown
