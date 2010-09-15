@@ -10,7 +10,7 @@
 
 #include <cmath>
 
-MCTree::MCTree(const lcio::LCCollection *const pLCCollection)
+MCTree::MCTree(const EVENT::LCCollection *const pLCCollection)
 {
     if (pLCCollection->getTypeName() != lcio::LCIO::MCPARTICLE)
         throw;
@@ -27,7 +27,7 @@ MCTree::~MCTree()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void MCTree::StoreMCQuarks(const lcio::LCCollection *const pLCCollection)
+void MCTree::StoreMCQuarks(const EVENT::LCCollection *const pLCCollection)
 {
     for (unsigned int i = 0, nParticles = pLCCollection->getNumberOfElements(); i < nParticles; ++i)
     {
@@ -44,7 +44,7 @@ void MCTree::StoreMCQuarks(const lcio::LCCollection *const pLCCollection)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void MCTree::StoreMCPfos(const lcio::LCCollection *const pLCCollection)
+void MCTree::StoreMCPfos(const EVENT::LCCollection *const pLCCollection)
 {
     MCParticleVector usedMCParticles;
 

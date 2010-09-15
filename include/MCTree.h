@@ -27,7 +27,7 @@ public:
      * 
      *  @param  pLCCollection address of the lc collection
      */
-    MCTree(const lcio::LCCollection *const pLCCollection);
+    MCTree(const EVENT::LCCollection *const pLCCollection);
 
     /**
      *  @brief  Destructor
@@ -54,14 +54,14 @@ private:
      * 
      *  @param  pLCCollection address of the lc collection
      */
-    void StoreMCQuarks(const lcio::LCCollection *const pLCCollection);
+    void StoreMCQuarks(const EVENT::LCCollection *const pLCCollection);
 
     /**
      *  @brief  Store mc pfos
      * 
      *  @param  pLCCollection address of the lc collection
      */
-    void StoreMCPfos(const lcio::LCCollection *const pLCCollection);
+    void StoreMCPfos(const EVENT::LCCollection *const pLCCollection);
 
     MCParticleVector        m_mcQuarks;             ///< The mc quark vector
     MCParticleVector        m_mcPFOs;               ///< The mc pfo vector

@@ -127,7 +127,7 @@ void PfoAnalysis::processRunHeader(lcio::LCRunHeader *pLCRunHeader)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void PfoAnalysis::processEvent(lcio::LCEvent *pLCEvent)
+void PfoAnalysis::processEvent(EVENT::LCEvent *pLCEvent)
 {
     m_nEvt++;
     this->Clear();
@@ -199,7 +199,7 @@ void PfoAnalysis::processEvent(lcio::LCEvent *pLCEvent)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void PfoAnalysis::check(lcio::LCEvent *pLCEvent)
+void PfoAnalysis::check(EVENT::LCEvent *pLCEvent)
 {
 }
 
