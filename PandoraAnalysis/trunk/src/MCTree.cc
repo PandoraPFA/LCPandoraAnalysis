@@ -61,7 +61,14 @@ void MCTree::StoreMCPfos(const EVENT::LCCollection *const pLCCollection)
             (pMCParticle->getEndpoint()[1] * pMCParticle->getEndpoint()[1]) +
             (pMCParticle->getEndpoint()[2] * pMCParticle->getEndpoint()[2]) ));
 
-        const float p(std::sqrt(pMCParticle->getEnergy() * pMCParticle->getEnergy() - pMCParticle->getMass() * pMCParticle->getMass()));
+        float p(0.f);
+        const float energySquared(pMCParticle->getEnergy() * pMCParticle->getEnergy());
+        const float massSquared(pMCParticle->getMass() * pMCParticle->getMass());
+
+        if (energySquared > massSquared)
+        {
+            p = std::sqrt(energySquared - massSquared);
+        }
 
         // Cut on momentum and inner/outer radii
         if ((p > 0.01) && (rs < 500) && (re > 500))
@@ -75,8 +82,7 @@ void MCTree::StoreMCPfos(const EVENT::LCCollection *const pLCCollection)
 
             while (!parents.empty())
             {
-                pTemporaryMCParticle = *(parents.begin());
-                parents = pTemporaryMCParticle->getParents();
+                pTemporaryMCParticle = parents[0];
 
                 for (MCParticleVector::const_iterator iter = usedMCParticles.begin(), iterEnd = usedMCParticles.end(); iter != iterEnd; ++iter)
                 {
@@ -86,6 +92,8 @@ void MCTree::StoreMCPfos(const EVENT::LCCollection *const pLCCollection)
                         break;
                     }
                 }
+
+                parents = pTemporaryMCParticle->getParents();
 
                 if (found)
                     break;
