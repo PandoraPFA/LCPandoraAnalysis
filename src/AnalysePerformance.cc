@@ -105,7 +105,9 @@ int main(int argc, char **argv)
 void AnalyseHistograms(TFile* pTFile, const std::string &outputRootFileName)
 {
     float xbins[14] = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.925, 0.95, 0.975, 1.0};
-    TH1F *pEvsCHist = new TH1F("EvsC", "sigmaE/E vs costheta", 13, xbins);
+    TH1F *pEvsCHist = new TH1F("SigmaEvsCosTheta", "#sigma(E) vs cos(#theta)", 13, xbins);
+    pEvsCHist->SetYTitle("#sigma(E)");
+    pEvsCHist->SetXTitle("cos(#theta)");
 
     CalcRms((TH1F*)pTFile->Get("fPFA"));
     CalcRms((TH1F*)pTFile->Get("fPFA1"));  pEvsCHist->SetBinContent( 1, m_sigma); pEvsCHist->SetBinError( 1, m_sigmasigma);
