@@ -11,12 +11,12 @@
 #include <cmath>
 #include <cstdlib>
 
-MCTree::MCTree(const EVENT::LCCollection *const pLCCollection)
+MCTree::MCTree(const EVENT::LCCollection *const pLCCollection, const bool lookForQuarksWithMotherZ)
 {
     if (pLCCollection->getTypeName() != lcio::LCIO::MCPARTICLE)
         throw;
 
-    this->StoreMCQuarks(pLCCollection);
+    this->StoreMCQuarks(pLCCollection, lookForQuarksWithMotherZ);
     this->StoreMCPfos(pLCCollection);
 }
 
@@ -28,7 +28,7 @@ MCTree::~MCTree()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void MCTree::StoreMCQuarks(const EVENT::LCCollection *const pLCCollection)
+void MCTree::StoreMCQuarks(const EVENT::LCCollection *const pLCCollection, const bool lookForQuarksWithMotherZ)
 {
     for (unsigned int i = 0, nParticles = pLCCollection->getNumberOfElements(); i < nParticles; ++i)
     {
@@ -36,9 +36,25 @@ void MCTree::StoreMCQuarks(const EVENT::LCCollection *const pLCCollection)
 
         const int absPdgCode(std::abs(pMCParticle->getPDG()));
 
-        if ((absPdgCode >= 1) && (absPdgCode <= 6) && pMCParticle->getParents().empty())
+        // By default, the primary quarks are the ones without any parents
+        if (lookForQuarksWithMotherZ == false)
         {
-            m_mcQuarks.push_back(pMCParticle);
+            if ((absPdgCode >= 1) && (absPdgCode <= 6) && pMCParticle->getParents().empty())
+            {
+                m_mcQuarks.push_back(pMCParticle);
+            }
+        }
+        else if (lookForQuarksWithMotherZ == true)
+        {
+            // For MC files generated in the SLIC environment, the primary quarks have parents
+            if ((absPdgCode >= 1) && (absPdgCode <= 6))
+            {
+                // The mother should be the Z-boson
+                if ((pMCParticle->getParents().size() == 1) && ((pMCParticle->getParents())[0]->getPDG() == 23))
+                {
+                    m_mcQuarks.push_back(pMCParticle);
+                }
+            }
         }
     }
 }

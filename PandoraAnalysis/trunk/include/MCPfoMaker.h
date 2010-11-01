@@ -73,6 +73,7 @@ private:
     StringVector        m_inputMCParticleCollections;       ///< The names of the input mc particle collections
     std::string         m_outputMCParticleCollection;       ///< The output mc particle collection name
     std::string         m_outputQuarkParticleCollection;    ///< The output quark particle collection name
+    bool                m_lookForQuarksWithMotherZ;         ///< Flag to look for quarks with mother
     MCTree             *m_pMCTree;                          ///< Address of the mc tree
 };
 

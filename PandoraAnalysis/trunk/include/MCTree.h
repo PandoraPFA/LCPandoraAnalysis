@@ -26,8 +26,11 @@ public:
      *  @brief  Constructor
      * 
      *  @param  pLCCollection address of the lc collection
+     *  @param  lookForQuarksWithMother flag to look for quarks with mother (by default, the primary quarks are the ones having
+     *          no parents; but in the SLIC framework, there are no such quarks; enable this flag if you are working with files
+     *          generated in the SLIC environment)
      */
-    MCTree(const EVENT::LCCollection *const pLCCollection);
+    MCTree(const EVENT::LCCollection *const pLCCollection, const bool lookForQuarksWithMotherZ);
 
     /**
      *  @brief  Destructor
@@ -53,8 +56,11 @@ private:
      *  @brief  Store mc quarks
      * 
      *  @param  pLCCollection address of the lc collection
+     *  @param  lookForQuarksWithMother flag to look for quarks with mother (by default, the primary quarks are the ones having
+     *          no parents; but in the SLIC framework, there are no such quarks; enable this flag if you are working with files
+     *          generated in the SLIC environment)
      */
-    void StoreMCQuarks(const EVENT::LCCollection *const pLCCollection);
+    void StoreMCQuarks(const EVENT::LCCollection *const pLCCollection, const bool lookForQuarksWithMotherZ);
 
     /**
      *  @brief  Store mc pfos
