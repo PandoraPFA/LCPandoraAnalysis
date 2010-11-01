@@ -70,30 +70,21 @@ int main(int argc, char **argv)
     }
 
     // Process the files in the list
-    std::string printString = "P";
-
     for (unsigned int i = 0; i < files.size(); ++i)
     {
-        if (files[i].at(0) == printString)
+        std::cout << std::endl << "Processing file: "<< files[i] << std::endl;
+
+        if (!ifstream(files[i].c_str()))
         {
-            std::cout << files[i] << std::endl;
+            std::cerr << "Can't open file : " << files[i] << std::endl;
         }
         else
         {
-            std::cout << std::endl << "Processing file: "<< files[i] << std::endl;
-
-            if (!ifstream(files[i].c_str()))
-            {
-                std::cerr << "Can't open file : " << files[i] << std::endl;
-            }
-            else
-            {
-                TFile *pTFile = new TFile(files[i].c_str(), "READ");
-                AnalyseHistograms(pTFile, outputRootFileName);
-                outputRootFileName.clear();
-                pTFile->Close();
-                delete pTFile;
-            }
+            TFile *pTFile = new TFile(files[i].c_str(), "READ");
+            AnalyseHistograms(pTFile, outputRootFileName);
+            outputRootFileName.clear();
+            pTFile->Close();
+            delete pTFile;
         }
     }
 

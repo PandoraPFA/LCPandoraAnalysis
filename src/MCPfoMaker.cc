@@ -42,6 +42,11 @@ MCPfoMaker::MCPfoMaker() :
                                "Output quark particle collection name",
                                m_outputQuarkParticleCollection,
                                std::string());
+
+    registerProcessorParameter("LookForQuarksWithMotherZ",
+                               "Flag to look for quarks with mother Z",
+                               m_lookForQuarksWithMotherZ,
+                               bool(false));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -74,7 +79,7 @@ void MCPfoMaker::processEvent(EVENT::LCEvent *pLCEvent)
             if (col->getTypeName() != LCIO::MCPARTICLE)
                 throw;
 
-            m_pMCTree = new MCTree(col);
+            m_pMCTree = new MCTree(col, m_lookForQuarksWithMotherZ);
 
             const MCParticleVector &mcPfoVector(m_pMCTree->GetMCPfos());
 
