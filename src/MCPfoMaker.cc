@@ -58,7 +58,7 @@ void MCPfoMaker::init()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void MCPfoMaker::processRunHeader(lcio::LCRunHeader *pLCRunHeader)
+void MCPfoMaker::processRunHeader(lcio::LCRunHeader */*pLCRunHeader*/)
 {
 }
 
@@ -160,7 +160,7 @@ void MCPfoMaker::processEvent(EVENT::LCEvent *pLCEvent)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void MCPfoMaker::check(EVENT::LCEvent *pLCEvent)
+void MCPfoMaker::check(EVENT::LCEvent */*pLCEvent*/)
 {
 }
 
