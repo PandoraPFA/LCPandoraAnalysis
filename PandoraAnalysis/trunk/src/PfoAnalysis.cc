@@ -120,7 +120,7 @@ void PfoAnalysis::init()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void PfoAnalysis::processRunHeader(lcio::LCRunHeader *pLCRunHeader)
+void PfoAnalysis::processRunHeader(lcio::LCRunHeader */*pLCRunHeader*/)
 {
     m_nRun++;
 }
@@ -199,7 +199,7 @@ void PfoAnalysis::processEvent(EVENT::LCEvent *pLCEvent)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void PfoAnalysis::check(EVENT::LCEvent *pLCEvent)
+void PfoAnalysis::check(EVENT::LCEvent */*pLCEvent*/)
 {
 }
 
