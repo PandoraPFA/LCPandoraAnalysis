@@ -47,7 +47,7 @@ int main(int argc, char **argv)
 
     while (getline(infile, line, '\n'))
     {
-        const unsigned int p(line.find("END"));
+        const size_t p(line.find("END"));
 
         if ((p != std::string::npos) && (p < 2))
             break;
