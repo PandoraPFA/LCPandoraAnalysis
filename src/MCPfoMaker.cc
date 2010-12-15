@@ -174,10 +174,6 @@ void MCPfoMaker::end()
 
 void MCPfoMaker::Clear()
 {
-    if (m_pMCTree != NULL)
-    {
-        delete m_pMCTree;
-    }
-
+    delete m_pMCTree;
     m_pMCTree = NULL;
 }
