@@ -14,6 +14,9 @@
 
 #include "lcio.h"
 
+namespace pandora_analysis
+{
+
 typedef std::vector<lcio::MCParticle *> MCParticleVector;
 
 /**
@@ -86,5 +89,7 @@ inline const MCParticleVector &MCTree::GetMCPfos() const
 {
     return m_mcPFOs;
 }
+
+} // namespace pandora_analysis
 
 #endif // #ifndef MC_TREE_H
