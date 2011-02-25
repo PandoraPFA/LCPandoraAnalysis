@@ -11,6 +11,9 @@
 #include <cmath>
 #include <cstdlib>
 
+namespace pandora_analysis
+{
+
 MCTree::MCTree(const EVENT::LCCollection *const pLCCollection, const bool lookForQuarksWithMotherZ)
 {
     if (pLCCollection->getTypeName() != lcio::LCIO::MCPARTICLE)
@@ -134,3 +137,5 @@ void MCTree::StoreMCPfos(const EVENT::LCCollection *const pLCCollection)
         }
     }
 }
+
+} // namespace pandora_analysis

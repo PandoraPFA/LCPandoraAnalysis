@@ -79,9 +79,9 @@ void MCPfoMaker::processEvent(EVENT::LCEvent *pLCEvent)
             if (col->getTypeName() != LCIO::MCPARTICLE)
                 throw;
 
-            m_pMCTree = new MCTree(col, m_lookForQuarksWithMotherZ);
+            m_pMCTree = new pandora_analysis::MCTree(col, m_lookForQuarksWithMotherZ);
 
-            const MCParticleVector &mcPfoVector(m_pMCTree->GetMCPfos());
+            const pandora_analysis::MCParticleVector &mcPfoVector(m_pMCTree->GetMCPfos());
 
             // Make a new vector of particles (MCPFOs)
             LCCollectionVec *mcPfoCol = new LCCollectionVec(LCIO::RECONSTRUCTEDPARTICLE);
@@ -118,7 +118,7 @@ void MCPfoMaker::processEvent(EVENT::LCEvent *pLCEvent)
             // Make a new vector of quarks (MCPFOs)
             LCCollectionVec *mcQuarkCol = new LCCollectionVec(LCIO::RECONSTRUCTEDPARTICLE);
 
-            const MCParticleVector &mcQuarks(m_pMCTree->GetMCQuarks());
+            const pandora_analysis::MCParticleVector &mcQuarks(m_pMCTree->GetMCQuarks());
 
             for (unsigned int i = 0; i < mcQuarks.size(); ++i)
             {
