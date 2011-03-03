@@ -53,7 +53,7 @@ ENDIF()
 ### LIBRARY AND TOOLS #######################################################
 
 #include directories
-INCLUDE_DIRECTORIES( ./include )
+INCLUDE_DIRECTORIES( BEFORE ./include ) # use BEFORE to fix problem on mac osx (case insensitive filesystem)
 INSTALL_DIRECTORY( ./include DESTINATION . FILES_MATCHING PATTERN "*.h" )
 
 ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
