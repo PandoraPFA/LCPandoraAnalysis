@@ -143,6 +143,10 @@ void PfoAnalysis::processEvent(EVENT::LCEvent *pLCEvent)
             for (unsigned int i = 0, nElements = pLCCollection->getNumberOfElements(); i < nElements; ++i)
             {
                 ReconstructedParticle *pReconstructedParticle = dynamic_cast<ReconstructedParticle*>(pLCCollection->getElementAt(i));
+
+                if (NULL == pReconstructedParticle)
+                    throw EVENT::Exception("Collection type mismatch");
+
                 m_quarkpfovec.push_back(pReconstructedParticle);
             }
 
@@ -165,6 +169,10 @@ void PfoAnalysis::processEvent(EVENT::LCEvent *pLCEvent)
             for (unsigned int i = 0, nElements = pLCCollection->getNumberOfElements(); i < nElements; ++i)
             {
                 ReconstructedParticle *pReconstructedParticle = dynamic_cast<ReconstructedParticle*>(pLCCollection->getElementAt(i));
+
+                if (NULL == pReconstructedParticle)
+                    throw EVENT::Exception("Collection type mismatch");
+
                 m_mcpfovec.push_back(pReconstructedParticle);
             }
         }
@@ -185,6 +193,10 @@ void PfoAnalysis::processEvent(EVENT::LCEvent *pLCEvent)
             for (unsigned int i = 0, nElements = pLCCollection->getNumberOfElements(); i < nElements; ++i)
             {
                 ReconstructedParticle *pReconstructedParticle = dynamic_cast<ReconstructedParticle*>(pLCCollection->getElementAt(i));
+
+                if (NULL == pReconstructedParticle)
+                    throw EVENT::Exception("Collection type mismatch");
+
                 m_pfovec.push_back(pReconstructedParticle);
             }
         }
