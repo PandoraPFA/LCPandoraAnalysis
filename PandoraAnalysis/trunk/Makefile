@@ -7,6 +7,7 @@ MARLIN_DIR = YOUR_PATH_HERE
 
 PROJECT_INCLUDE_DIR = $(PROJECT_DIR)/include/
 PROJECT_SOURCE_DIR  = $(PROJECT_DIR)/src/
+PROJECT_TEST_DIR  = $(PROJECT_DIR)/tests/
 PROJECT_LIBRARY_DIR = $(PROJECT_DIR)/lib/
 PROJECT_BINARY_DIR = $(PROJECT_DIR)/
 
@@ -22,7 +23,8 @@ ifdef BUILD_32BIT_COMPATIBLE
     CFLAGS += -m32
 endif
 
-SOURCES = $(PROJECT_SOURCE_DIR)MCPfoMaker.cc $(PROJECT_SOURCE_DIR)MCTree.cc $(PROJECT_SOURCE_DIR)PfoAnalysis.cc
+SOURCES  = $(wildcard $(PROJECT_SOURCE_DIR)/*.cc)
+SOURCES += $(wildcard $(PROJECT_TEST_DIR)/*.cc)
 
 OBJECTS = $(SOURCES:.cc=.o)
 
@@ -37,13 +39,14 @@ LDFLAGS = $(LIBS) -Wl,-rpath
 
 LIBRARY = $(PROJECT_LIBRARY_DIR)/libPandoraAnalysis.so
 
-all: $(SOURCES) $(OBJECTS) analysePerformance
+all: $(SOURCES) $(OBJECTS) AnalysePerformance ReclusterMonitoring
 	$(CC) $(OBJECTS) $(LIBS) -shared -o $(LIBRARY)
 
-analysePerformance:
-	@echo Creating binary: $(PROJECT_BINARY_DIR)analysePerformance
-	$(CC) $(INCLUDES) $(LIBS) $(PROJECT_SOURCE_DIR)AnalysePerformance.cc -o $(PROJECT_BINARY_DIR)analysePerformance
-	@echo Created binary: $(PROJECT_BINARY_DIR)analysePerformance
+AnalysePerformance:
+	$(CC) $(INCLUDES) $(LIBS) $(PROJECT_TEST_DIR)AnalysePerformance.cc -o $(PROJECT_BINARY_DIR)AnalysePerformance
+
+ReclusterMonitoring:
+	$(CC) $(INCLUDES) $(LIBS) $(PROJECT_TEST_DIR)ReclusterMonitoring.cc -o $(PROJECT_BINARY_DIR)ReclusterMonitoring
 
 $(LIBRARY): $(OBJECTS)
 	$(CC) $(LDFLAGS) -fPIC $(OBJECTS) -o $@
@@ -54,4 +57,5 @@ $(LIBRARY): $(OBJECTS)
 clean:
 	rm -f $(OBJECTS)
 	rm -f $(LIBRARY)
-	rm -f analysePerformance
+	rm -f AnalysePerformance
+	rm -f ReclusterMonitoring

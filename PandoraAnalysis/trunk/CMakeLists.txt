@@ -64,16 +64,19 @@ ADD_SHARED_LIBRARY( ${PROJECT_NAME} ${library_sources} )
 INSTALL_SHARED_LIBRARY( ${PROJECT_NAME} DESTINATION lib )
 
 
-# make standalone analysis executable
-ADD_EXECUTABLE( analysePerformance ${PROJECT_SOURCE_DIR}/src/AnalysePerformance.cc ) 
-TARGET_LINK_LIBRARIES( analysePerformance ${PROJECT_NAME} ) 
+# make standalone analysis executables
+SET(PROGRAMS AnalysePerformance ReclusterMonitoring)
 
-# install executable
-INSTALL( TARGETS analysePerformance DESTINATION bin PERMISSIONS
-    OWNER_READ OWNER_WRITE OWNER_EXECUTE
-    GROUP_READ GROUP_EXECUTE
-    WORLD_READ WORLD_EXECUTE )
+FOREACH( program ${PROGRAMS} )
+    ADD_EXECUTABLE( ${program} ${PROJECT_SOURCE_DIR}/tests/${program}.cc )
+    TARGET_LINK_LIBRARIES( ${program} ${PROJECT_NAME} )
 
+    # install executable
+    INSTALL( TARGETS ${program} DESTINATION bin PERMISSIONS
+        OWNER_READ OWNER_WRITE OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE )
+ENDFOREACH( program )
 
 # display some variables and write them to cache
 DISPLAY_STD_VARIABLES()

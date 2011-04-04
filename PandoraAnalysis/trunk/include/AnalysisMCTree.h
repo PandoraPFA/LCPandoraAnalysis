@@ -1,13 +1,13 @@
 /**
- *  @file   PandoraAnalysis/include/MCTree.h
+ *  @file   PandoraAnalysis/include/AnalysisMCTree.h
  * 
- *  @brief  Header file for the mc tree class.
+ *  @brief  Header file for the analysis mc tree class.
  * 
  *  $Log: $
  */
 
-#ifndef MC_TREE_H
-#define MC_TREE_H 1
+#ifndef ANALYSIS_MC_TREE_H
+#define ANALYSIS_MC_TREE_H 1
 
 #include "EVENT/LCCollection.h"
 #include "EVENT/MCParticle.h"
@@ -20,9 +20,9 @@ namespace pandora_analysis
 typedef std::vector<lcio::MCParticle *> MCParticleVector;
 
 /**
- *  @brief  mc tree class
+ *  @brief  analysis mc tree class
  */
-class MCTree
+class AnalysisMCTree
 {
 public:
     /**
@@ -33,12 +33,12 @@ public:
      *          no parents; but in the SLIC framework, there are no such quarks; enable this flag if you are working with files
      *          generated in the SLIC environment)
      */
-    MCTree(const EVENT::LCCollection *const pLCCollection, const bool lookForQuarksWithMotherZ);
+    AnalysisMCTree(const EVENT::LCCollection *const pLCCollection, const bool lookForQuarksWithMotherZ);
 
     /**
      *  @brief  Destructor
      */
-    ~MCTree();
+    ~AnalysisMCTree();
 
     /**
      *  @brief  Get mc quarks
@@ -78,18 +78,18 @@ private:
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline const MCParticleVector &MCTree::GetMCQuarks() const
+inline const MCParticleVector &AnalysisMCTree::GetMCQuarks() const
 {
     return m_mcQuarks;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline const MCParticleVector &MCTree::GetMCPfos() const
+inline const MCParticleVector &AnalysisMCTree::GetMCPfos() const
 {
     return m_mcPFOs;
 }
 
 } // namespace pandora_analysis
 
-#endif // #ifndef MC_TREE_H
+#endif // #ifndef ANALYSIS_MC_TREE_H

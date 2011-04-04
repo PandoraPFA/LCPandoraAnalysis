@@ -12,7 +12,7 @@
 #include "IMPL/LCCollectionVec.h"
 #include "IMPL/ReconstructedParticleImpl.h"
 
-#include "MCTree.h"
+#include "AnalysisMCTree.h"
 #include "MCPfoMaker.h"
 
 #include <cmath>
@@ -23,9 +23,9 @@ MCPfoMaker mcPfoMaker;
 
 MCPfoMaker::MCPfoMaker() :
     Processor("MCPfoMaker"),
-    m_pMCTree(NULL)
+    m_pAnalysisMCTree(NULL)
 {
-    _description = "MCPfoMaker analyses output of PandoraPFA" ;
+    _description = "MCPfoMaker creates mc pfos for comparison with PandoraPFANew output";
 
     registerInputCollections(LCIO::MCPARTICLE,
                              "InputMCParticleCollections", 
@@ -79,77 +79,53 @@ void MCPfoMaker::processEvent(EVENT::LCEvent *pLCEvent)
             if (col->getTypeName() != LCIO::MCPARTICLE)
                 throw;
 
-            m_pMCTree = new pandora_analysis::MCTree(col, m_lookForQuarksWithMotherZ);
+            m_pAnalysisMCTree = new pandora_analysis::AnalysisMCTree(col, m_lookForQuarksWithMotherZ);
 
-            const pandora_analysis::MCParticleVector &mcPfoVector(m_pMCTree->GetMCPfos());
+            const pandora_analysis::MCParticleVector &mcPfoVector(m_pAnalysisMCTree->GetMCPfos());
 
             // Make a new vector of particles (MCPFOs)
-            LCCollectionVec *mcPfoCol = new LCCollectionVec(LCIO::RECONSTRUCTEDPARTICLE);
+            LCCollectionVec *pMCPfoCol = new LCCollectionVec(LCIO::RECONSTRUCTEDPARTICLE);
 
             for (unsigned int i = 0; i < mcPfoVector.size(); ++i)
             {
-                ReconstructedParticleImpl *recoPart = new ReconstructedParticleImpl();
-                float Mom[3];
-                Mom[0] = mcPfoVector[i]->getMomentum()[0];
-                Mom[1] = mcPfoVector[i]->getMomentum()[1];
-                Mom[2] = mcPfoVector[i]->getMomentum()[2];
+                MCParticle *pMCParticle = mcPfoVector[i];
+                ReconstructedParticleImpl *pRecoParticle = new ReconstructedParticleImpl();
 
-                float energy = mcPfoVector[i]->getEnergy();
-                float mass = (energy*energy-Mom[0]*Mom[0]-Mom[1]*Mom[1]-Mom[2]*Mom[2]);
+                const float energy(mcPfoVector[i]->getEnergy());
+                const float mom[3] = {pMCParticle->getMomentum()[0], pMCParticle->getMomentum()[1], pMCParticle->getMomentum()[2]};
+                const float mass(std::sqrt(std::max(0.f, energy * energy - mom[0] * mom[0] - mom[1] * mom[1] - mom[2] * mom[2])));
 
-                if (mass > 0)
-                {
-                    mass=std::sqrt(mass);
-                }
-                else
-                {
-                    mass = 0.;
-                }
-
-                recoPart->setMomentum(Mom);
-                recoPart->setEnergy(energy);
-                recoPart->setMass(mass);
-                recoPart->setType(mcPfoVector[i]->getPDG());
-                mcPfoCol->addElement(recoPart);
+                pRecoParticle->setMomentum(mom);
+                pRecoParticle->setEnergy(energy);
+                pRecoParticle->setMass(mass);
+                pRecoParticle->setType(mcPfoVector[i]->getPDG());
+                pMCPfoCol->addElement(pRecoParticle);
             }
 
-            pLCEvent->addCollection(mcPfoCol, m_outputMCParticleCollection.c_str());
+            pLCEvent->addCollection(pMCPfoCol, m_outputMCParticleCollection.c_str());
 
             // Make a new vector of quarks (MCPFOs)
-            LCCollectionVec *mcQuarkCol = new LCCollectionVec(LCIO::RECONSTRUCTEDPARTICLE);
+            LCCollectionVec *pMCQuarkCol = new LCCollectionVec(LCIO::RECONSTRUCTEDPARTICLE);
 
-            const pandora_analysis::MCParticleVector &mcQuarks(m_pMCTree->GetMCQuarks());
+            const pandora_analysis::MCParticleVector &mcQuarks(m_pAnalysisMCTree->GetMCQuarks());
 
             for (unsigned int i = 0; i < mcQuarks.size(); ++i)
             {
-                MCParticle *quark = mcQuarks[i];
-                ReconstructedParticleImpl *recoPart = new ReconstructedParticleImpl();
+                MCParticle *pQuark = mcQuarks[i];
+                ReconstructedParticleImpl *pRecoParticle = new ReconstructedParticleImpl();
 
-                float Mom[3];
-                Mom[0] = quark->getMomentum()[0];
-                Mom[1] = quark->getMomentum()[1];
-                Mom[2] = quark->getMomentum()[2];
+                const float energy(pQuark->getEnergy());
+                const float mom[3] = {pQuark->getMomentum()[0], pQuark->getMomentum()[1], pQuark->getMomentum()[2]};
+                const float mass(std::sqrt(std::max(0.f, energy * energy - mom[0] * mom[0] - mom[1] * mom[1] - mom[2] * mom[2])));
 
-                float energy = quark->getEnergy();
-                float mass = (energy*energy-Mom[0]*Mom[0]-Mom[1]*Mom[1]-Mom[2]*Mom[2]);
-
-                if(mass>0)
-                {
-                    mass=std::sqrt(mass);
-                }
-                else
-                {
-                    mass = 0.;
-                }
-
-                recoPart->setMomentum(Mom);
-                recoPart->setEnergy(energy);
-                recoPart->setMass(mass);
-                recoPart->setType(quark->getPDG());
-                mcQuarkCol->addElement(recoPart);
+                pRecoParticle->setMomentum(mom);
+                pRecoParticle->setEnergy(energy);
+                pRecoParticle->setMass(mass);
+                pRecoParticle->setType(pQuark->getPDG());
+                pMCQuarkCol->addElement(pRecoParticle);
             }
 
-            pLCEvent->addCollection(mcQuarkCol, m_outputQuarkParticleCollection.c_str());
+            pLCEvent->addCollection(pMCQuarkCol, m_outputQuarkParticleCollection.c_str());
         }
         catch (...)
         {
@@ -174,6 +150,6 @@ void MCPfoMaker::end()
 
 void MCPfoMaker::Clear()
 {
-    delete m_pMCTree;
-    m_pMCTree = NULL;
+    delete m_pAnalysisMCTree;
+    m_pAnalysisMCTree = NULL;
 }
