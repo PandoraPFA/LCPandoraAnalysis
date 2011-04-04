@@ -13,8 +13,8 @@
 
 #include "marlin/Processor.h"
 
-class MCPfo;
 class TH1F;
+class TTree;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -72,97 +72,68 @@ private:
     void Clear();
 
     /**
-     *  @brief  Make quark variables
+     *  @brief  Extract lcio collections
+     * 
+     *  @param  pLCEvent the lc event
      */
-    void MakeQuarkVariables() ;
+    void ExtractCollections(EVENT::LCEvent *pLCEvent);
 
     /**
-     *  @brief  Analyse pfa performance
+     *  @brief  Make quark variables
      */
-    void AnalysePFAPerformance();
+    void MakeQuarkVariables();
+
+    /**
+     *  @brief  Perform pfo analysis
+     */
+    void PerformPfoAnalysis();
 
     typedef std::vector<ReconstructedParticle *> ParticleVector;
     typedef std::vector<std::string> StringVector;
 
+    int                 m_nRun;                                 ///< 
+    int                 m_nEvt;                                 ///< 
+
     StringVector        m_inputQuarkParticleCollections;        ///< 
     StringVector        m_inputMCParticleCollections;           ///< 
     StringVector        m_inputParticleCollections;             ///< 
+    StringVector        m_inputReclusterMonitoringCollections;  ///< 
 
     int                 m_printing;                             ///< 
     std::string         m_rootFile;                             ///< 
 
-    int                 m_nRun;                                 ///< 
-    int                 m_nEvt;                                 ///< 
-
-    float               m_ez;                                   ///< 
-    float               m_eq1;                                  ///< 
-    float               m_eq2;                                  ///< 
-    float               m_mz;                                   ///< 
-
-    float               m_costz;                                ///< 
-    float               m_costq1;                               ///< 
-    float               m_costq2;                               ///< 
-    float               m_thrust;                               ///< 
-    int                 m_qpdg;                                 ///< 
-
     ParticleVector      m_pfovec;                               ///< 
     ParticleVector      m_mcpfovec;                             ///< 
     ParticleVector      m_quarkpfovec;                          ///< 
-    ParticleVector      m_pMcPFOs;                              ///< 
 
-    TH1F               *fNPFO;                                  ///< 
-    TH1F               *fEq;                                    ///< 
-    TH1F               *fPFA;                                   ///< 
-    TH1F               *fPFAnu;                                 ///<
-    TH1F               *fPFAnufwd;                              ///<
-    TH1F               *fPFAuds;                                ///<
-    TH1F               *fPFAudsHP20;                            ///<
-    TH1F               *fPFAudsHP10;                            ///<
-    TH1F               *fPFAudsHM10;                            ///<
-    TH1F               *fPFAudsHM20;                            ///<
-    TH1F               *fPFAFudsHP20;                           ///<
-    TH1F               *fPFAFudsHP10;                           ///<
-    TH1F               *fPFAFudsHM10;                           ///<
-    TH1F               *fPFAFudsHM20;                           ///<
-    TH1F               *fPFAudscb;                              ///<
-    TH1F               *fPFAcb;                                 ///<
-    TH1F               *fPFA1;                                  ///<
-    TH1F               *fPFA2;                                  ///<
-    TH1F               *fPFA3;                                  ///<
-    TH1F               *fPFA4;                                  ///<
-    TH1F               *fPFA5;                                  ///<
-    TH1F               *fPFA6;                                  ///<
-    TH1F               *fPFA7;                                  ///<
-    TH1F               *fPFAL7A;                                ///<
-    TH1F               *fPFAL7Aud;                              ///<
-    TH1F               *fPFAL7As;                               ///<
-    TH1F               *fPFAL7Ac;                               ///<
-    TH1F               *fPFAL7Ab;                               ///<
-    TH1F               *fPFAL7B;                                ///<
-    TH1F               *fPFAFL7A;                               ///<
-    TH1F               *fPFAFL7Aud;                             ///<
-    TH1F               *fPFAFL7As;                              ///<
-    TH1F               *fPFAFL7Ac;                              ///<
-    TH1F               *fPFAFL7Ab;                              ///<
-    TH1F               *fPFA8;                                  ///<
-    TH1F               *fPFA9;                                  ///<
-    TH1F               *fPFA10;                                 ///<
-    TH1F               *fPFA11;                                 ///<
-    TH1F               *fPFA12;                                 ///<
-    TH1F               *fPFA13;                                 ///<
-    TH1F               *fPFA14;                                 ///<
-    TH1F               *fPFAMZ;                                 ///<
-    TH1F               *fPFAMW;                                 ///<
-    TH1F               *fPFAMZa;                                ///<
-    TH1F               *fPFAMWa;                                ///<
-    TH1F               *fPFAQQ;                                 ///<
-    TH1F               *fPFAQQ8;                                ///<
-    TH1F               *fPFADMZ;                                ///<
-    TH1F               *fPFADMZOMZ;                             ///<
-    TH1F               *fPFADMZOMZQQ8;                          ///<
-    TH1F               *fPFADMZ8;                               ///<
-    TH1F               *fPFADMZQQ8;                             ///<
-    TH1F               *fPFADMZP8;                              ///<
+    int                 m_nPfosTotal;                           ///< 
+    int                 m_nPfosNeutralHadrons;                  ///< 
+    int                 m_nPfosPhotons;                         ///< 
+    int                 m_nPfosCharged;                         ///< 
+    float               m_pfoEnergyTotal;                       ///< 
+    float               m_pfoEnergyNeutralHadrons;              ///< 
+    float               m_pfoEnergyPhotons;                     ///< 
+    float               m_pfoEnergyCharged;                     ///< 
+    float               m_pfoMassTotal;                         ///< 
+    float               m_mcEnergyTotal;                        ///< 
+    float               m_mcEnergyENu;                          ///< 
+    float               m_mcEnergyFwd;                          ///< 
+    float               m_eQQ;                                  ///< 
+    float               m_eQ1;                                  ///< 
+    float               m_eQ2;                                  ///< 
+    float               m_costQQ;                               ///< 
+    float               m_costQ1;                               ///< 
+    float               m_costQ2;                               ///< 
+    float               m_mQQ;                                  ///< 
+    float               m_thrust;                               ///< 
+    int                 m_qPdg;                                 ///< 
+    float               m_netEnergyChange;                      ///< 
+    float               m_sumModulusEnergyChanges;              ///< 
+    float               m_sumSquaredEnergyChanges;              ///< 
+
+    TTree              *m_tree;                                 ///< 
+    TH1F               *m_hPfoEnergySum;                        ///< 
+    TH1F               *m_hPfoEnergySumL7A;                     ///<
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

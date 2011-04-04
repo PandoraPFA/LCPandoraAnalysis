@@ -1,12 +1,12 @@
 /**
- *  @file   PandoraAnalysis/src/MCTree.cc
+ *  @file   PandoraAnalysis/src/AnalysisMCTree.cc
  * 
- *  @brief  Implementation of the mc tree class.
+ *  @brief  Implementation of the analysis mc tree class.
  * 
  *  $Log: $
  */
 
-#include "MCTree.h"
+#include "AnalysisMCTree.h"
 
 #include <cmath>
 #include <cstdlib>
@@ -14,7 +14,7 @@
 namespace pandora_analysis
 {
 
-MCTree::MCTree(const EVENT::LCCollection *const pLCCollection, const bool lookForQuarksWithMotherZ)
+AnalysisMCTree::AnalysisMCTree(const EVENT::LCCollection *const pLCCollection, const bool lookForQuarksWithMotherZ)
 {
     if (pLCCollection->getTypeName() != lcio::LCIO::MCPARTICLE)
         throw;
@@ -25,13 +25,13 @@ MCTree::MCTree(const EVENT::LCCollection *const pLCCollection, const bool lookFo
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-MCTree::~MCTree()
+AnalysisMCTree::~AnalysisMCTree()
 {
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void MCTree::StoreMCQuarks(const EVENT::LCCollection *const pLCCollection, const bool lookForQuarksWithMotherZ)
+void AnalysisMCTree::StoreMCQuarks(const EVENT::LCCollection *const pLCCollection, const bool lookForQuarksWithMotherZ)
 {
     try
     {
@@ -68,14 +68,14 @@ void MCTree::StoreMCQuarks(const EVENT::LCCollection *const pLCCollection, const
     }
     catch (EVENT::Exception &exception)
     {
-        std::cout << "MCTree::StoreMCQuarks - Failed to extract mc particle: " << exception.what() << std::endl;
+        std::cout << "AnalysisMCTree::StoreMCQuarks - Failed to extract mc particle: " << exception.what() << std::endl;
         throw exception;
     }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void MCTree::StoreMCPfos(const EVENT::LCCollection *const pLCCollection)
+void AnalysisMCTree::StoreMCPfos(const EVENT::LCCollection *const pLCCollection)
 {
     try
     {
@@ -155,7 +155,7 @@ void MCTree::StoreMCPfos(const EVENT::LCCollection *const pLCCollection)
     }
     catch (EVENT::Exception &exception)
     {
-        std::cout << "MCTree::StoreMCPfos - Failed to extract mc particle: " << exception.what() << std::endl;
+        std::cout << "AnalysisMCTree::StoreMCPfos - Failed to extract mc particle: " << exception.what() << std::endl;
         throw exception;
     }
 }
