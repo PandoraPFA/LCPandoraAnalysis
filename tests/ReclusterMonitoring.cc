@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     if ((nArgs < 1) || (nArgs > 4))
     {
         std::cout << std::endl
-                  << "Usage: ./reclusterMonitoring inputFileName [outputFileName] [nResBins] [maxResValue]" << std::endl << std::endl
+                  << "Usage: ./reclusterMonitoring inputFileName [nResBins] [maxResValue] [outputFileName]" << std::endl << std::endl
                   << "  inputFileName  : file containing pandora pfo analysis tree" << std::endl
                   << "  nResBins       : optional number of bins to cover resolution range, default 20 " << std::endl
                   << "  maxResValue    : optional maximum resolution value to consider, default 500" << std::endl
@@ -85,9 +85,8 @@ void ReclusterMonitoring(TFile *pTFile, const unsigned int nRegionBins, const fl
     const unsigned int nTreeEntries(pTTree->GetEntries());
 
     int qPdg(0);
-    float pfoEnergyTotal(0.f), mcEnergyENu(0.f), thrust(0.f), sumSquaredEnergyChanges(0.f);
+    float pfoEnergyTotal(0.f), thrust(0.f), sumSquaredEnergyChanges(0.f);
     pTTree->SetBranchAddress("pfoEnergyTotal", &pfoEnergyTotal);
-    pTTree->SetBranchAddress("mcEnergyENu", &mcEnergyENu);
     pTTree->SetBranchAddress("qPdg", &qPdg);
     pTTree->SetBranchAddress("thrust", &thrust);
     pTTree->SetBranchAddress("sumSquaredEnergyChanges", &sumSquaredEnergyChanges);
@@ -104,7 +103,7 @@ void ReclusterMonitoring(TFile *pTFile, const unsigned int nRegionBins, const fl
         for (unsigned int i = 0; i < nRegionBins; ++i)
         {
             if ((resolution >= pRegionBinEdges[i]) && (resolution < pRegionBinEdges[i + 1]))
-                pRegionHistograms[i]->Fill(pfoEnergyTotal + mcEnergyENu, 1.);
+                pRegionHistograms[i]->Fill(pfoEnergyTotal, 1.);
         }
     }
 

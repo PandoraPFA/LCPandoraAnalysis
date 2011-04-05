@@ -76,11 +76,11 @@ void PfoAnalysis::init()
     m_tree->Branch("nPfosTotal", &m_nPfosTotal, "nPfosTotal/I");
     m_tree->Branch("nPfosNeutralHadrons", &m_nPfosNeutralHadrons, "nPfosNeutralHadrons/I");
     m_tree->Branch("nPfosPhotons", &m_nPfosPhotons, "nPfosPhotons/I");
-    m_tree->Branch("nPfosCharged", &m_nPfosCharged, "nPfosCharged/I");
+    m_tree->Branch("nPfosTracks", &m_nPfosTracks, "nPfosTracks/I");
     m_tree->Branch("pfoEnergyTotal", &m_pfoEnergyTotal, "pfoEnergyTotal/F");
     m_tree->Branch("pfoEnergyNeutralHadrons", &m_pfoEnergyNeutralHadrons, "pfoEnergyNeutralHadrons/F");
     m_tree->Branch("pfoEnergyPhotons", &m_pfoEnergyPhotons, "pfoEnergyPhotons/F");
-    m_tree->Branch("pfoEnergyCharged", &m_pfoEnergyCharged, "pfoEnergyCharged/F");
+    m_tree->Branch("pfoEnergyTracks", &m_pfoEnergyTracks, "pfoEnergyTracks/F");
     m_tree->Branch("pfoMassTotal", &m_pfoMassTotal, "pfoMassTotal/F");
     m_tree->Branch("mcEnergyTotal", &m_mcEnergyTotal, "mcEnergyTotal/F");
     m_tree->Branch("mcEnergyENu", &m_mcEnergyENu, "mcEnergyENu/F");
@@ -156,11 +156,11 @@ void PfoAnalysis::Clear()
     m_nPfosTotal = 0;
     m_nPfosNeutralHadrons = 0;
     m_nPfosPhotons = 0;
-    m_nPfosCharged = 0;
+    m_nPfosTracks = 0;
     m_pfoEnergyTotal = 0.f;
     m_pfoEnergyNeutralHadrons = 0.f;
     m_pfoEnergyPhotons = 0.f;
-    m_pfoEnergyCharged = 0.f;
+    m_pfoEnergyTracks = 0.f;
     m_pfoMassTotal = 0.f;
     m_mcEnergyTotal = 0.f;
     m_mcEnergyENu = 0.f;
@@ -364,7 +364,7 @@ void PfoAnalysis::PerformPfoAnalysis()
         ++m_nPfosTotal;
         m_pfoEnergyTotal += pPfo->getEnergy();
 
-        if (0 == pPfo->getCharge())
+        if (pPfo->getTracks().empty())
         {
             if (22 == pPfo->getType())
             {
@@ -379,8 +379,8 @@ void PfoAnalysis::PerformPfoAnalysis()
         }
         else
         {
-            ++m_nPfosCharged;
-            m_pfoEnergyCharged += pPfo->getEnergy();
+            ++m_nPfosTracks;
+            m_pfoEnergyTracks += pPfo->getEnergy();
         }
 
         momTot[0] += pPfo->getMomentum()[0];
@@ -419,7 +419,7 @@ void PfoAnalysis::PerformPfoAnalysis()
     if (m_printing > 0)
     {
         std::cout << " EVENT                : " << m_nEvt << std::endl
-                  << " NPFOs                : " << m_nPfosTotal << " (" << m_nPfosCharged << " + " << m_nPfosPhotons + m_nPfosNeutralHadrons << ")" << std::endl
+                  << " NPFOs                : " << m_nPfosTotal << " (" << m_nPfosTracks << " + " << m_nPfosPhotons + m_nPfosNeutralHadrons << ")" << std::endl
                   << " RECONSTRUCTED ENERGY : " << m_pfoEnergyTotal << std::endl
                   << " RECO ENERGY + eNu    : " << m_pfoEnergyTotal + m_mcEnergyENu << std::endl;
     }

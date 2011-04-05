@@ -95,7 +95,7 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
         for (unsigned int i = 0; i < nRegionBins; ++i)
         {
             if ((thrust >= pRegionBinEdges[i]) && (thrust < pRegionBinEdges[i + 1]))
-                pRegionHistograms[i]->Fill(pfoEnergyTotal + mcEnergyENu, 1.);
+                pRegionHistograms[i]->Fill(pfoEnergyTotal, 1.);
         }
     }
 

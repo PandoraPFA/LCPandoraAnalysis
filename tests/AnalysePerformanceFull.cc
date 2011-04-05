@@ -55,19 +55,19 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
     TTree *pTTree = (TTree*)(pTFile->Get("PfoAnalysisTree"));
     const unsigned int nTreeEntries(pTTree->GetEntries());
 
-    int nPfosTotal(0), nPfosNeutralHadrons(0), nPfosPhotons(0), nPfosCharged(0), qPdg(0);
-    float pfoEnergyTotal(0.f), pfoEnergyNeutralHadrons(0.f), pfoEnergyPhotons(0.f), pfoEnergyCharged(0.f), pfoMassTotal(0.f),
+    int nPfosTotal(0), nPfosNeutralHadrons(0), nPfosPhotons(0), nPfosTracks(0), qPdg(0);
+    float pfoEnergyTotal(0.f), pfoEnergyNeutralHadrons(0.f), pfoEnergyPhotons(0.f), pfoEnergyTracks(0.f), pfoMassTotal(0.f),
         mcEnergyTotal(0.f), mcEnergyENu(0.f), mcEnergyFwd(0.f), eQQ(0.f), eQ1(0.f), eQ2(0.f), costQQ(0.f), costQ1(0.f), costQ2(0.f),
         mQQ(0.f), thrust(0.f), netEnergyChange(0.f), sumModulusEnergyChanges(0.f), sumSquaredEnergyChanges(0.f);
 
     pTTree->SetBranchAddress("nPfosTotal", &nPfosTotal);
     pTTree->SetBranchAddress("nPfosNeutralHadrons", &nPfosNeutralHadrons);
     pTTree->SetBranchAddress("nPfosPhotons", &nPfosPhotons);
-    pTTree->SetBranchAddress("nPfosCharged", &nPfosCharged);
+    pTTree->SetBranchAddress("nPfosTracks", &nPfosTracks);
     pTTree->SetBranchAddress("pfoEnergyTotal", &pfoEnergyTotal);
     pTTree->SetBranchAddress("pfoEnergyNeutralHadrons", &pfoEnergyNeutralHadrons);
     pTTree->SetBranchAddress("pfoEnergyPhotons", &pfoEnergyPhotons);
-    pTTree->SetBranchAddress("pfoEnergyCharged", &pfoEnergyCharged);
+    pTTree->SetBranchAddress("pfoEnergyTracks", &pfoEnergyTracks);
     pTTree->SetBranchAddress("pfoMassTotal", &pfoMassTotal);
     pTTree->SetBranchAddress("mcEnergyTotal", &mcEnergyTotal);
     pTTree->SetBranchAddress("mcEnergyENu", &mcEnergyENu);
@@ -87,57 +87,48 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
 
     // Book histograms
     TH1F *pNPFO = new TH1F("fNPFO", "number of pfos ", 200, 0., 200.);
-    TH1F *pPFAMZ = new TH1F("fPFAMZ", "vector boson mass", 200, 50., 150.);
-    TH1F *pPFAMW = new TH1F("fPFAMW", "vector boson mass", 200, 50., 150.);
-    TH1F *pPFAMZa = new TH1F("fPFAMZa", "vector boson mass", 200, 50., 150.);
-    TH1F *pPFAMWa = new TH1F("fPFAMWa", "vector boson mass", 200, 50., 150.);
+    TH1F *pPFA_MZ = new TH1F("fPFA_MZ", "vector boson mass", 200, 50., 150.);
+    TH1F *pPFA_MW = new TH1F("fPFA_MW", "vector boson mass", 200, 50., 150.);
+    TH1F *pPFA_MZa = new TH1F("fPFA_MZa", "vector boson mass", 200, 50., 150.);
+    TH1F *pPFA_MWa = new TH1F("fPFA_MWa", "vector boson mass", 200, 50., 150.);
     TH1F *pPFA = new TH1F("fPFA", "total PFA energy", 10000, 0., 5000.);
-    TH1F *pPFAnu = new TH1F("fPFAnu", "total energy + nu", 10000, 0., 5000.);
-    TH1F *pPFAnufwd = new TH1F("fPFAnufwd", "total energy + nu + fwd", 10000, 0., 5000.);
-    TH1F *pPFAudscb = new TH1F("fPFAudscb", "total energy", 10000, 0., 5000.);
-    TH1F *pPFAuds = new TH1F("fPFAuds", "total energy", 10000, 0., 5000.);
-    TH1F *pPFAudsHM20 = new TH1F("fPFAudsHM20", "total energy", 10000, 0., 5000.);
-    TH1F *pPFAudsHM10 = new TH1F("fPFAudsHM10", "total energy", 10000, 0., 5000.);
-    TH1F *pPFAudsHP10 = new TH1F("fPFAudsHP10", "total energy", 10000, 0., 5000.);
-    TH1F *pPFAudsHP20 = new TH1F("fPFAudsHP20", "total energy", 10000, 0., 5000.);
-    TH1F *pPFAFudsHM20 = new TH1F("fPFAFudsHM20", "total energy",5000, 0., 250.);
-    TH1F *pPFAFudsHM10 = new TH1F("fPFAFudsHM10", "total energy",5000, 0., 250.);
-    TH1F *pPFAFudsHP10 = new TH1F("fPFAFudsHP10", "total energy",5000, 0., 250.);
-    TH1F *pPFAFudsHP20 = new TH1F("fPFAFudsHP20", "total energy",5000, 0., 250.);
-    TH1F *pPFAcb = new TH1F("fPFAcb", "total energy", 10000, 0., 5000.);
-    TH1F *pPFA1 = new TH1F("fPFA1", "total energy 0.0-0.1", 10000, 0., 5000.);
-    TH1F *pPFA2 = new TH1F("fPFA2", "total energy 0.1-0.2", 10000, 0., 5000.);
-    TH1F *pPFA3 = new TH1F("fPFA3", "total energy 0.2-0.3", 10000, 0., 5000.);
-    TH1F *pPFA4 = new TH1F("fPFA4", "total energy 0.3-0.4", 10000, 0., 5000.);
-    TH1F *pPFA5 = new TH1F("fPFA5", "total energy 0.4-0.5", 10000, 0., 5000.);
-    TH1F *pPFA6 = new TH1F("fPFA6", "total energy 0.5-0.6", 10000, 0., 5000.);
-    TH1F *pPFA7 = new TH1F("fPFA7", "total energy 0.6-0.7", 10000, 0., 5000.);
-    TH1F *pPFAL7A = new TH1F("fPFAL7A", "total energy <0.7", 10000, 0., 5000.);
-    TH1F *pPFAL7Aud= new TH1F("fPFAL7Aud", "total energy <0.7 ud", 10000, 0., 5000.);
-    TH1F *pPFAL7As = new TH1F("fPFAL7As", "total energy <0.7 s", 10000, 0., 5000.);
-    TH1F *pPFAL7Ac = new TH1F("fPFAL7Ac", "total energy <0.7 c", 10000, 0., 5000.);
-    TH1F *pPFAL7Ab = new TH1F("fPFAL7Ab", "total energy <0.7 b", 10000, 0., 5000.);
-    TH1F *pPFAL7B = new TH1F("fPFAL7B", "total energy <0.7 - bad", 10000, 0., 5000.);
-    TH1F *pPFAFL7A = new TH1F("fPFAFL7A", "total energy <0.7",5000, 0., 250.);
-    TH1F *pPFAFL7Aud = new TH1F("fPFAFL7Aud", "total energy <0.7 ud",5000, 0., 250.);
-    TH1F *pPFAFL7As = new TH1F("fPFAFL7As", "total energy <0.7 s",5000, 0., 250.);
-    TH1F *pPFAFL7Ac = new TH1F("fPFAFL7Ac", "total energy <0.7 c",5000, 0., 250.);
-    TH1F *pPFAFL7Ab = new TH1F("fPFAFL7Ab", "total energy <0.7 b",5000, 0., 250.);
-    TH1F *pPFAQQ   = new TH1F("fPFAQQ", "total energy - true E", 2000, -500., 500.);
-    TH1F *pPFAQQ8  = new TH1F("fPFAQQ8", "total energy - true E 8", 2000, -500., 500.);
-    TH1F *pPFA8  = new TH1F("fPFA8", "total energy 0.7-0.8", 10000, 0., 5000.);
-    TH1F *pPFA9  = new TH1F("fPFA9", "total energy 0.8-0.9", 10000, 0., 5000.);
-    TH1F *pPFA10 = new TH1F("fPFA10","total energy 0.9-1.0", 10000, 0., 5000.);
-    TH1F *pPFA11 = new TH1F("fPFA11","total energy 0.9-0.925", 10000, 0., 5000.);
-    TH1F *pPFA12 = new TH1F("fPFA12","total energy 0.925-0.95", 10000, 0., 5000.);
-    TH1F *pPFA13 = new TH1F("fPFA13","total energy 0.95-0.975", 10000, 0., 5000.);
-    TH1F *pPFA14 = new TH1F("fPFA14","total energy 0.975-1.0", 10000, 0., 5000.);
-    TH1F *pPFADMZ = new TH1F("fPFADMZ", "Delta Mz", 200, -50., 50.);
-    TH1F *pPFADMZ8 = new TH1F("fPFADMZ8", "Delta Mz", 200, -50., 50.);
-    TH1F *pPFADMZQQ8 = new TH1F("fPFADMZQQ8", "Delta Mz", 200, -50., 50.);
-    TH1F *pPFADMZP8 = new TH1F("fPFADMZP8", "Delta Mz", 200, -50., 50.);
-    TH1F *pPFADMZOMZ = new TH1F("fPFADMZOMZ" , "Delta Mz / Mz", 200, -25., 25.);
-    TH1F *pPFADMZOMZQQ8 = new TH1F("fPFADMZOMZQQ8" , "Delta Mz / Mz", 200, -25., 25.);
+    TH1F *pPFA_nu = new TH1F("fPFA_nu", "total energy + nu", 10000, 0., 5000.);
+    TH1F *pPFA_nufwd = new TH1F("fPFA_nufwd", "total energy + nu + fwd", 10000, 0., 5000.);
+    TH1F *pPFA_udscb = new TH1F("fPFA_udscb", "total energy", 10000, 0., 5000.);
+    TH1F *pPFA_uds = new TH1F("fPFA_uds", "total energy", 10000, 0., 5000.);
+    TH1F *pPFA_udsHM20 = new TH1F("fPFA_udsHM20", "total energy", 10000, 0., 5000.);
+    TH1F *pPFA_udsHM10 = new TH1F("fPFA_udsHM10", "total energy", 10000, 0., 5000.);
+    TH1F *pPFA_udsHP10 = new TH1F("fPFA_udsHP10", "total energy", 10000, 0., 5000.);
+    TH1F *pPFA_udsHP20 = new TH1F("fPFA_udsHP20", "total energy", 10000, 0., 5000.);
+    TH1F *pPFA_cb = new TH1F("fPFA_cb", "total energy", 10000, 0., 5000.);
+    TH1F *pPFA_1 = new TH1F("fPFA_1", "total energy 0.0-0.1", 10000, 0., 5000.);
+    TH1F *pPFA_2 = new TH1F("fPFA_2", "total energy 0.1-0.2", 10000, 0., 5000.);
+    TH1F *pPFA_3 = new TH1F("fPFA_3", "total energy 0.2-0.3", 10000, 0., 5000.);
+    TH1F *pPFA_4 = new TH1F("fPFA_4", "total energy 0.3-0.4", 10000, 0., 5000.);
+    TH1F *pPFA_5 = new TH1F("fPFA_5", "total energy 0.4-0.5", 10000, 0., 5000.);
+    TH1F *pPFA_6 = new TH1F("fPFA_6", "total energy 0.5-0.6", 10000, 0., 5000.);
+    TH1F *pPFA_7 = new TH1F("fPFA_7", "total energy 0.6-0.7", 10000, 0., 5000.);
+    TH1F *pPFA_L7A = new TH1F("fPFA_L7A", "total energy <0.7", 10000, 0., 5000.);
+    TH1F *pPFA_L7Aud= new TH1F("fPFA_L7Aud", "total energy <0.7 ud", 10000, 0., 5000.);
+    TH1F *pPFA_L7As = new TH1F("fPFA_L7As", "total energy <0.7 s", 10000, 0., 5000.);
+    TH1F *pPFA_L7Ac = new TH1F("fPFA_L7Ac", "total energy <0.7 c", 10000, 0., 5000.);
+    TH1F *pPFA_L7Ab = new TH1F("fPFA_L7Ab", "total energy <0.7 b", 10000, 0., 5000.);
+    TH1F *pPFA_L7ANoFwd = new TH1F("fPFA_L7ANoFwd", "total energy <0.7 - bad", 10000, 0., 5000.);
+    TH1F *pPFA_QQ   = new TH1F("fPFA_QQ", "total energy - true E", 2000, -500., 500.);
+    TH1F *pPFA_QQ8  = new TH1F("fPFA_QQ8", "total energy - true E 8", 2000, -500., 500.);
+    TH1F *pPFA_8  = new TH1F("fPFA_8", "total energy 0.7-0.8", 10000, 0., 5000.);
+    TH1F *pPFA_9  = new TH1F("fPFA_9", "total energy 0.8-0.9", 10000, 0., 5000.);
+    TH1F *pPFA_10 = new TH1F("fPFA_10","total energy 0.9-1.0", 10000, 0., 5000.);
+    TH1F *pPFA_11 = new TH1F("fPFA_11","total energy 0.9-0.925", 10000, 0., 5000.);
+    TH1F *pPFA_12 = new TH1F("fPFA_12","total energy 0.925-0.95", 10000, 0., 5000.);
+    TH1F *pPFA_13 = new TH1F("fPFA_13","total energy 0.95-0.975", 10000, 0., 5000.);
+    TH1F *pPFA_14 = new TH1F("fPFA_14","total energy 0.975-1.0", 10000, 0., 5000.);
+    TH1F *pPFA_DMZ = new TH1F("fPFA_DMZ", "Delta Mz", 200, -50., 50.);
+    TH1F *pPFA_DMZ8 = new TH1F("fPFA_DMZ8", "Delta Mz", 200, -50., 50.);
+    TH1F *pPFA_DMZQQ8 = new TH1F("fPFA_DMZQQ8", "Delta Mz", 200, -50., 50.);
+    TH1F *pPFA_DMZP8 = new TH1F("fPFA_DMZP8", "Delta Mz", 200, -50., 50.);
+    TH1F *pPFA_DMZOMZ = new TH1F("fPFA_DMZOMZ" , "Delta Mz / Mz", 200, -25., 25.);
+    TH1F *pPFA_DMZOMZQQ8 = new TH1F("fPFA_DMZOMZQQ8" , "Delta Mz / Mz", 200, -25., 25.);
 
     // Fill histograms with event information
     for (unsigned int iTree = 0; iTree < nTreeEntries; ++iTree)
@@ -145,140 +136,121 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
         pTTree->GetEntry(iTree);
 
         pNPFO->Fill(nPfosTotal);
+        pPFA->Fill(pfoEnergyTotal);
+        pPFA_nu->Fill(pfoEnergyTotal + mcEnergyENu);
+        pPFA_nufwd->Fill(pfoEnergyTotal + mcEnergyENu + mcEnergyFwd);
 
         if (std::fabs(costQQ) < 0.9f)
         {
-            pPFAMWa->Fill(pfoMassTotal);
-            pPFAMZa->Fill(pfoMassTotal);
+            pPFA_MWa->Fill(pfoMassTotal);
+            pPFA_MZa->Fill(pfoMassTotal);
 
             if (std::fabs(mQQ - 80.3) < 4.f)
-                pPFAMW->Fill(pfoMassTotal);
+                pPFA_MW->Fill(pfoMassTotal);
 
             if (std::fabs(mQQ - 91.2f) < 4.f)
-                pPFAMZ->Fill(pfoMassTotal);
+                pPFA_MZ->Fill(pfoMassTotal);
 
             if (mQQ > 0.1f)
             {
-                pPFAQQ->Fill(pfoEnergyTotal - eQQ);
-                pPFADMZ->Fill(pfoMassTotal - mQQ);
+                pPFA_QQ->Fill(pfoEnergyTotal - eQQ);
+                pPFA_DMZ->Fill(pfoMassTotal - mQQ);
 
                 if (mQQ > 75.f)
-                    pPFADMZOMZ->Fill(100.f * (pfoMassTotal - mQQ) / pfoMassTotal);
+                    pPFA_DMZOMZ->Fill(100.f * (pfoMassTotal - mQQ) / pfoMassTotal);
 
                 if (std::fabs(costQQ) < 0.8f)
-                    pPFADMZ8->Fill(pfoMassTotal - mQQ);
+                    pPFA_DMZ8->Fill(pfoMassTotal - mQQ);
 
                 if (std::fabs(costQQ) > 0.8f)
-                    pPFADMZP8->Fill(pfoMassTotal - mQQ);
+                    pPFA_DMZP8->Fill(pfoMassTotal - mQQ);
 
                 if (std::fabs(costQ1) < 0.8f && std::fabs(costQ2) < 0.8f)
                 {
-                    pPFADMZQQ8->Fill(pfoMassTotal - mQQ);
-                    pPFADMZOMZQQ8->Fill(100.f * (pfoMassTotal - mQQ) / pfoMassTotal);
-                    pPFAQQ8->Fill(pfoEnergyTotal - eQQ);
+                    pPFA_DMZQQ8->Fill(pfoMassTotal - mQQ);
+                    pPFA_DMZOMZQQ8->Fill(100.f * (pfoMassTotal - mQQ) / pfoMassTotal);
+                    pPFA_QQ8->Fill(pfoEnergyTotal - eQQ);
                 }
             }
         }
 
-        pPFA->Fill(pfoEnergyTotal);
-        pPFAnu->Fill(pfoEnergyTotal + mcEnergyENu);
-        pPFAnufwd->Fill(pfoEnergyTotal + mcEnergyENu + mcEnergyFwd);
-
         if (qPdg >= 1 && qPdg <= 3)
-            pPFAuds->Fill(pfoEnergyTotal);
+            pPFA_uds->Fill(pfoEnergyTotal);
 
         if (qPdg >= 4 && qPdg <= 5)
-            pPFAcb->Fill(pfoEnergyTotal);
+            pPFA_cb->Fill(pfoEnergyTotal);
 
         if (qPdg >= 1 && qPdg <= 5)
-            pPFAudscb->Fill(pfoEnergyTotal);
+            pPFA_udscb->Fill(pfoEnergyTotal);
 
         if (qPdg >= 1 && qPdg <= 3)
         {
             if (thrust <= 0.1f)
-                pPFA1->Fill(pfoEnergyTotal);
+                pPFA_1->Fill(pfoEnergyTotal);
 
             if (thrust > 0.1f && thrust <= 0.2f)
-                pPFA2->Fill(pfoEnergyTotal);
+                pPFA_2->Fill(pfoEnergyTotal);
 
             if (thrust > 0.2f && thrust <= 0.3f)
-                pPFA3->Fill(pfoEnergyTotal);
+                pPFA_3->Fill(pfoEnergyTotal);
 
             if (thrust > 0.3f && thrust <= 0.4f)
-                pPFA4->Fill(pfoEnergyTotal);
+                pPFA_4->Fill(pfoEnergyTotal);
 
             if (thrust > 0.4f && thrust <= 0.5f)
-                pPFA5->Fill(pfoEnergyTotal);
+                pPFA_5->Fill(pfoEnergyTotal);
 
             if (thrust > 0.5f && thrust <= 0.6f)
-                pPFA6->Fill(pfoEnergyTotal);
+                pPFA_6->Fill(pfoEnergyTotal);
 
             if (thrust <= 0.7f)
             {
-                pPFAL7A->Fill(pfoEnergyTotal + mcEnergyENu);
-                pPFAFL7A->Fill(pfoEnergyTotal + mcEnergyENu);
+                pPFA_L7A->Fill(pfoEnergyTotal + mcEnergyENu);
+
+                if (mcEnergyFwd / pfoEnergyTotal < 0.01f)
+                    pPFA_L7ANoFwd->Fill(pfoEnergyTotal + mcEnergyENu);
 
                 if (qPdg <= 2)
-                    pPFAL7Aud->Fill(pfoEnergyTotal + mcEnergyENu);
+                    pPFA_L7Aud->Fill(pfoEnergyTotal + mcEnergyENu);
 
                 if (qPdg == 3)
-                    pPFAL7As->Fill(pfoEnergyTotal + mcEnergyENu);
+                    pPFA_L7As->Fill(pfoEnergyTotal + mcEnergyENu);
 
                 if (qPdg == 4)
-                    pPFAL7Ac->Fill(pfoEnergyTotal + mcEnergyENu);
+                    pPFA_L7Ac->Fill(pfoEnergyTotal + mcEnergyENu);
 
                 if (qPdg == 5)
-                    pPFAL7Ab->Fill(pfoEnergyTotal + mcEnergyENu);
+                    pPFA_L7Ab->Fill(pfoEnergyTotal + mcEnergyENu);
 
-                if (qPdg <= 2)
-                    pPFAFL7Aud->Fill(pfoEnergyTotal + mcEnergyENu);
-
-                if (qPdg == 3)
-                    pPFAFL7As->Fill(pfoEnergyTotal + mcEnergyENu);
-
-                if (qPdg == 4)
-                    pPFAFL7Ac->Fill(pfoEnergyTotal + mcEnergyENu);
-
-                if (qPdg == 5)
-                    pPFAFL7Ab->Fill(pfoEnergyTotal + mcEnergyENu);
-
-                pPFAudsHM20->Fill(pfoEnergyTotal + mcEnergyENu - pfoEnergyNeutralHadrons * 0.1f);
-                pPFAudsHM10->Fill(pfoEnergyTotal + mcEnergyENu - pfoEnergyNeutralHadrons * 0.05f);
-                pPFAudsHP10->Fill(pfoEnergyTotal + mcEnergyENu + pfoEnergyNeutralHadrons * 0.05f);
-                pPFAudsHP20->Fill(pfoEnergyTotal + mcEnergyENu + pfoEnergyNeutralHadrons * 0.1f);
-
-                pPFAFudsHM20->Fill(pfoEnergyTotal + mcEnergyENu  -pfoEnergyNeutralHadrons * 0.1f);
-                pPFAFudsHM10->Fill(pfoEnergyTotal + mcEnergyENu - pfoEnergyNeutralHadrons * 0.05f);
-                pPFAFudsHP10->Fill(pfoEnergyTotal + mcEnergyENu + pfoEnergyNeutralHadrons * 0.05f);
-                pPFAFudsHP20->Fill(pfoEnergyTotal + mcEnergyENu + pfoEnergyNeutralHadrons * 0.1f);
+                pPFA_udsHM20->Fill(pfoEnergyTotal + mcEnergyENu - pfoEnergyNeutralHadrons * 0.1f);
+                pPFA_udsHM10->Fill(pfoEnergyTotal + mcEnergyENu - pfoEnergyNeutralHadrons * 0.05f);
+                pPFA_udsHP10->Fill(pfoEnergyTotal + mcEnergyENu + pfoEnergyNeutralHadrons * 0.05f);
+                pPFA_udsHP20->Fill(pfoEnergyTotal + mcEnergyENu + pfoEnergyNeutralHadrons * 0.1f);
             }
 
-            if (thrust <= 0.7f && mcEnergyFwd / pfoEnergyTotal < 0.01f)
-                pPFAL7B->Fill(pfoEnergyTotal + mcEnergyENu);
-
             if (thrust > 0.6f && thrust <= 0.7f)
-                pPFA7->Fill(pfoEnergyTotal);
+                pPFA_7->Fill(pfoEnergyTotal);
 
             if (thrust > 0.7f && thrust <= 0.8f)
-                pPFA8->Fill(pfoEnergyTotal);
+                pPFA_8->Fill(pfoEnergyTotal);
 
             if (thrust > 0.8f && thrust <= 0.9f)
-                pPFA9->Fill(pfoEnergyTotal);
+                pPFA_9->Fill(pfoEnergyTotal);
 
             if (thrust > 0.9f)
-                pPFA10->Fill(pfoEnergyTotal);
+                pPFA_10->Fill(pfoEnergyTotal);
 
             if (thrust > 0.9f  && thrust <= 0.925f)
-                pPFA11->Fill(pfoEnergyTotal);
+                pPFA_11->Fill(pfoEnergyTotal);
 
             if (thrust > 0.925f && thrust <= 0.95f)
-                pPFA12->Fill(pfoEnergyTotal);
+                pPFA_12->Fill(pfoEnergyTotal);
 
             if (thrust > 0.95f && thrust <= 0.975f)
-                pPFA13->Fill(pfoEnergyTotal);
+                pPFA_13->Fill(pfoEnergyTotal);
 
             if (thrust > 0.975f)
-                pPFA14->Fill(pfoEnergyTotal);
+                pPFA_14->Fill(pfoEnergyTotal);
         }
     }
 
@@ -290,64 +262,64 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
 
     float sigma(0.f), sigmasigma(0.f);
     AnalysisHelper::CalculatePerformance(pPFA,  sigma, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA1, sigma, sigmasigma);  pEvsCHist->SetBinContent( 1, sigma); pEvsCHist->SetBinError( 1, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA2, sigma, sigmasigma);  pEvsCHist->SetBinContent( 2, sigma); pEvsCHist->SetBinError( 2, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA3, sigma, sigmasigma);  pEvsCHist->SetBinContent( 3, sigma); pEvsCHist->SetBinError( 3, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA4, sigma, sigmasigma);  pEvsCHist->SetBinContent( 4, sigma); pEvsCHist->SetBinError( 4, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA5, sigma, sigmasigma);  pEvsCHist->SetBinContent( 5, sigma); pEvsCHist->SetBinError( 5, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA6, sigma, sigmasigma);  pEvsCHist->SetBinContent( 6, sigma); pEvsCHist->SetBinError( 6, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA7, sigma, sigmasigma);  pEvsCHist->SetBinContent( 7, sigma); pEvsCHist->SetBinError( 7, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA8, sigma, sigmasigma);  pEvsCHist->SetBinContent( 8, sigma); pEvsCHist->SetBinError( 8, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA9, sigma, sigmasigma);  pEvsCHist->SetBinContent( 9, sigma); pEvsCHist->SetBinError( 9, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA11, sigma, sigmasigma); pEvsCHist->SetBinContent(10, sigma); pEvsCHist->SetBinError(10, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA12, sigma, sigmasigma); pEvsCHist->SetBinContent(11, sigma); pEvsCHist->SetBinError(11, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA13, sigma, sigmasigma); pEvsCHist->SetBinContent(12, sigma); pEvsCHist->SetBinError(12, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA14, sigma, sigmasigma); pEvsCHist->SetBinContent(13, sigma); pEvsCHist->SetBinError(13, sigmasigma);
+    AnalysisHelper::CalculatePerformance(pPFA_1, sigma, sigmasigma);  pEvsCHist->SetBinContent( 1, sigma); pEvsCHist->SetBinError( 1, sigmasigma);
+    AnalysisHelper::CalculatePerformance(pPFA_2, sigma, sigmasigma);  pEvsCHist->SetBinContent( 2, sigma); pEvsCHist->SetBinError( 2, sigmasigma);
+    AnalysisHelper::CalculatePerformance(pPFA_3, sigma, sigmasigma);  pEvsCHist->SetBinContent( 3, sigma); pEvsCHist->SetBinError( 3, sigmasigma);
+    AnalysisHelper::CalculatePerformance(pPFA_4, sigma, sigmasigma);  pEvsCHist->SetBinContent( 4, sigma); pEvsCHist->SetBinError( 4, sigmasigma);
+    AnalysisHelper::CalculatePerformance(pPFA_5, sigma, sigmasigma);  pEvsCHist->SetBinContent( 5, sigma); pEvsCHist->SetBinError( 5, sigmasigma);
+    AnalysisHelper::CalculatePerformance(pPFA_6, sigma, sigmasigma);  pEvsCHist->SetBinContent( 6, sigma); pEvsCHist->SetBinError( 6, sigmasigma);
+    AnalysisHelper::CalculatePerformance(pPFA_7, sigma, sigmasigma);  pEvsCHist->SetBinContent( 7, sigma); pEvsCHist->SetBinError( 7, sigmasigma);
+    AnalysisHelper::CalculatePerformance(pPFA_8, sigma, sigmasigma);  pEvsCHist->SetBinContent( 8, sigma); pEvsCHist->SetBinError( 8, sigmasigma);
+    AnalysisHelper::CalculatePerformance(pPFA_9, sigma, sigmasigma);  pEvsCHist->SetBinContent( 9, sigma); pEvsCHist->SetBinError( 9, sigmasigma);
+    AnalysisHelper::CalculatePerformance(pPFA_11, sigma, sigmasigma); pEvsCHist->SetBinContent(10, sigma); pEvsCHist->SetBinError(10, sigmasigma);
+    AnalysisHelper::CalculatePerformance(pPFA_12, sigma, sigmasigma); pEvsCHist->SetBinContent(11, sigma); pEvsCHist->SetBinError(11, sigmasigma);
+    AnalysisHelper::CalculatePerformance(pPFA_13, sigma, sigmasigma); pEvsCHist->SetBinContent(12, sigma); pEvsCHist->SetBinError(12, sigmasigma);
+    AnalysisHelper::CalculatePerformance(pPFA_14, sigma, sigmasigma); pEvsCHist->SetBinContent(13, sigma); pEvsCHist->SetBinError(13, sigmasigma);
 
-    AnalysisHelper::CalculatePerformance(pPFAudsHM20);
-    AnalysisHelper::CalculatePerformance(pPFAudsHM10);
-    AnalysisHelper::CalculatePerformance(pPFAuds);
-    AnalysisHelper::CalculatePerformance(pPFAudsHP10);
-    AnalysisHelper::CalculatePerformance(pPFAudsHP20);
+    AnalysisHelper::CalculatePerformance(pPFA_udsHM20);
+    AnalysisHelper::CalculatePerformance(pPFA_udsHM10);
+    AnalysisHelper::CalculatePerformance(pPFA_uds);
+    AnalysisHelper::CalculatePerformance(pPFA_udsHP10);
+    AnalysisHelper::CalculatePerformance(pPFA_udsHP20);
 
-    TH1F *pPFA1Clone = static_cast<TH1F*>(pPFA1->Clone());
-    pPFA1Clone->Add(pPFA2);
-    pPFA1Clone->Add(pPFA3);
-    pPFA1Clone->Add(pPFA4);
-    pPFA1Clone->Add(pPFA5);  std::cout << " < 0.5 : ";   AnalysisHelper::CalculatePerformance(pPFA1Clone);
-    pPFA1Clone->Add(pPFA6);  std::cout << " < 0.6 : ";   AnalysisHelper::CalculatePerformance(pPFA1Clone);
-    pPFA1Clone->Add(pPFA7);  std::cout << " < 0.7 : ";   AnalysisHelper::CalculatePerformance(pPFA1Clone);
-    pPFA1Clone->Add(pPFA8);  std::cout << " < 0.8 : ";   AnalysisHelper::CalculatePerformance(pPFA1Clone);
-    pPFA1Clone->Add(pPFA9);  std::cout << " < 0.9 : ";   AnalysisHelper::CalculatePerformance(pPFA1Clone);
-    pPFA1Clone->Add(pPFA11); std::cout << " < 0.925 : "; AnalysisHelper::CalculatePerformance(pPFA1Clone);
-    pPFA1Clone->Add(pPFA12); std::cout << " < 0.95 : ";  AnalysisHelper::CalculatePerformance(pPFA1Clone);
-    pPFA1Clone->Add(pPFA13); std::cout << " < 0.975 : "; AnalysisHelper::CalculatePerformance(pPFA1Clone);
-    pPFA1Clone->Add(pPFA14); std::cout << " < 1.0 : ";   AnalysisHelper::CalculatePerformance(pPFA1Clone);
+    TH1F *pPFA_1Clone = static_cast<TH1F*>(pPFA_1->Clone());
+    pPFA_1Clone->Add(pPFA_2);
+    pPFA_1Clone->Add(pPFA_3);
+    pPFA_1Clone->Add(pPFA_4);
+    pPFA_1Clone->Add(pPFA_5);  std::cout << " < 0.5 : ";   AnalysisHelper::CalculatePerformance(pPFA_1Clone);
+    pPFA_1Clone->Add(pPFA_6);  std::cout << " < 0.6 : ";   AnalysisHelper::CalculatePerformance(pPFA_1Clone);
+    pPFA_1Clone->Add(pPFA_7);  std::cout << " < 0.7 : ";   AnalysisHelper::CalculatePerformance(pPFA_1Clone);
+    pPFA_1Clone->Add(pPFA_8);  std::cout << " < 0.8 : ";   AnalysisHelper::CalculatePerformance(pPFA_1Clone);
+    pPFA_1Clone->Add(pPFA_9);  std::cout << " < 0.9 : ";   AnalysisHelper::CalculatePerformance(pPFA_1Clone);
+    pPFA_1Clone->Add(pPFA_11); std::cout << " < 0.925 : "; AnalysisHelper::CalculatePerformance(pPFA_1Clone);
+    pPFA_1Clone->Add(pPFA_12); std::cout << " < 0.95 : ";  AnalysisHelper::CalculatePerformance(pPFA_1Clone);
+    pPFA_1Clone->Add(pPFA_13); std::cout << " < 0.975 : "; AnalysisHelper::CalculatePerformance(pPFA_1Clone);
+    pPFA_1Clone->Add(pPFA_14); std::cout << " < 1.0 : ";   AnalysisHelper::CalculatePerformance(pPFA_1Clone);
 
-    TH1F *pPFA9Clone = static_cast<TH1F*>(pPFA9->Clone());
-    pPFA9Clone->Add(pPFA11);
-    pPFA9Clone->Add(pPFA12); std::cout << " 0.8-0.95 : "; AnalysisHelper::CalculatePerformance(pPFA9Clone);
-    std::cout << " < 0.7 A : ";    AnalysisHelper::CalculatePerformance(pPFAL7A);
-    std::cout << " < 0.7 A ud : "; AnalysisHelper::CalculatePerformance(pPFAL7Aud);
-    std::cout << " < 0.7 A s : ";  AnalysisHelper::CalculatePerformance(pPFAL7As);
-    std::cout << " < 0.7 B : ";    AnalysisHelper::CalculatePerformance(pPFAL7B);
+    TH1F *pPFA_9Clone = static_cast<TH1F*>(pPFA_9->Clone());
+    pPFA_9Clone->Add(pPFA_11);
+    pPFA_9Clone->Add(pPFA_12); std::cout << " 0.8-0.95 : "; AnalysisHelper::CalculatePerformance(pPFA_9Clone);
+    std::cout << " < 0.7 A : ";    AnalysisHelper::CalculatePerformance(pPFA_L7A);
+    std::cout << " < 0.7 A ud : "; AnalysisHelper::CalculatePerformance(pPFA_L7Aud);
+    std::cout << " < 0.7 A s : ";  AnalysisHelper::CalculatePerformance(pPFA_L7As);
+    std::cout << " < 0.7 A NoFwd : ";    AnalysisHelper::CalculatePerformance(pPFA_L7ANoFwd);
 
-    AnalysisHelper::CalculatePerformance(pPFAMZ);
-    AnalysisHelper::CalculatePerformance(pPFAMW);
-    AnalysisHelper::CalculatePerformance(pPFAMZa);
-    AnalysisHelper::CalculatePerformance(pPFAMWa);
-    AnalysisHelper::CalculatePerformance(pPFAnu);
-    AnalysisHelper::CalculatePerformance(pPFAnufwd);
-    AnalysisHelper::CalculatePerformance(pPFAudscb);
-    AnalysisHelper::CalculatePerformance(pPFAcb);
-    AnalysisHelper::CalculatePerformance(pPFAQQ, false);
-    AnalysisHelper::CalculatePerformance(pPFAQQ8, false);
-    AnalysisHelper::CalculatePerformance(pPFADMZQQ8, false);
-    AnalysisHelper::CalculatePerformance(pPFADMZOMZQQ8, false);
-    AnalysisHelper::CalculatePerformance(pPFADMZ, false);
-    AnalysisHelper::CalculatePerformance(pPFADMZOMZ, false);
-    AnalysisHelper::CalculatePerformance(pPFADMZ8, false);
-    AnalysisHelper::CalculatePerformance(pPFADMZP8, false);
+    AnalysisHelper::CalculatePerformance(pPFA_MZ);
+    AnalysisHelper::CalculatePerformance(pPFA_MW);
+    AnalysisHelper::CalculatePerformance(pPFA_MZa);
+    AnalysisHelper::CalculatePerformance(pPFA_MWa);
+    AnalysisHelper::CalculatePerformance(pPFA_nu);
+    AnalysisHelper::CalculatePerformance(pPFA_nufwd);
+    AnalysisHelper::CalculatePerformance(pPFA_udscb);
+    AnalysisHelper::CalculatePerformance(pPFA_cb);
+    AnalysisHelper::CalculatePerformance(pPFA_QQ, false);
+    AnalysisHelper::CalculatePerformance(pPFA_QQ8, false);
+    AnalysisHelper::CalculatePerformance(pPFA_DMZQQ8, false);
+    AnalysisHelper::CalculatePerformance(pPFA_DMZOMZQQ8, false);
+    AnalysisHelper::CalculatePerformance(pPFA_DMZ, false);
+    AnalysisHelper::CalculatePerformance(pPFA_DMZOMZ, false);
+    AnalysisHelper::CalculatePerformance(pPFA_DMZ8, false);
+    AnalysisHelper::CalculatePerformance(pPFA_DMZP8, false);
 
     // Write out histograms
     if (!outputRootFileName.empty())
@@ -357,115 +329,97 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
         pTOutputFile->cd();
         pEvsCHist->Write();
         pNPFO->Write();
-        pPFAMZ->Write();
-        pPFAMW->Write();
-        pPFAMZa->Write();
-        pPFAMWa->Write();
+        pPFA_MZ->Write();
+        pPFA_MW->Write();
+        pPFA_MZa->Write();
+        pPFA_MWa->Write();
         pPFA->Write();
-        pPFAnu->Write();
-        pPFAnufwd->Write();
-        pPFAudscb->Write();
-        pPFAuds->Write();
-        pPFAudsHM20->Write();
-        pPFAudsHM10->Write();
-        pPFAudsHP10->Write();
-        pPFAudsHP20->Write();
-        pPFAFudsHM20->Write();
-        pPFAFudsHM10->Write();
-        pPFAFudsHP10->Write();
-        pPFAFudsHP20->Write();
-        pPFAcb->Write();
-        pPFA1->Write();
-        pPFA2->Write();
-        pPFA3->Write();
-        pPFA4->Write();
-        pPFA5->Write();
-        pPFA6->Write();
-        pPFA7->Write();
-        pPFAL7A->Write();
-        pPFAL7Aud->Write();
-        pPFAL7As->Write();
-        pPFAL7Ac->Write();
-        pPFAL7Ab->Write();
-        pPFAL7B->Write();
-        pPFAFL7A->Write();
-        pPFAFL7Aud->Write();
-        pPFAFL7As->Write();
-        pPFAFL7Ac->Write();
-        pPFAFL7Ab->Write();
-        pPFAQQ->Write();
-        pPFAQQ8->Write();
-        pPFA8->Write();
-        pPFA9->Write();
-        pPFA10->Write();
-        pPFA11->Write();
-        pPFA12->Write();
-        pPFA13->Write();
-        pPFA14->Write();
-        pPFADMZ->Write();
-        pPFADMZ8->Write();
-        pPFADMZQQ8->Write();
-        pPFADMZP8->Write();
-        pPFADMZOMZ->Write();
-        pPFADMZOMZQQ8->Write();
+        pPFA_nu->Write();
+        pPFA_nufwd->Write();
+        pPFA_udscb->Write();
+        pPFA_uds->Write();
+        pPFA_udsHM20->Write();
+        pPFA_udsHM10->Write();
+        pPFA_udsHP10->Write();
+        pPFA_udsHP20->Write();
+        pPFA_cb->Write();
+        pPFA_1->Write();
+        pPFA_2->Write();
+        pPFA_3->Write();
+        pPFA_4->Write();
+        pPFA_5->Write();
+        pPFA_6->Write();
+        pPFA_7->Write();
+        pPFA_L7A->Write();
+        pPFA_L7Aud->Write();
+        pPFA_L7As->Write();
+        pPFA_L7Ac->Write();
+        pPFA_L7Ab->Write();
+        pPFA_L7ANoFwd->Write();
+        pPFA_QQ->Write();
+        pPFA_QQ8->Write();
+        pPFA_8->Write();
+        pPFA_9->Write();
+        pPFA_10->Write();
+        pPFA_11->Write();
+        pPFA_12->Write();
+        pPFA_13->Write();
+        pPFA_14->Write();
+        pPFA_DMZ->Write();
+        pPFA_DMZ8->Write();
+        pPFA_DMZQQ8->Write();
+        pPFA_DMZP8->Write();
+        pPFA_DMZOMZ->Write();
+        pPFA_DMZOMZQQ8->Write();
         pTOutputFile->Close();
         delete pTOutputFile;
     }
 
     // Tidy up
     delete pNPFO;
-    delete pPFAMZ;
-    delete pPFAMW;
-    delete pPFAMZa;
-    delete pPFAMWa;
+    delete pPFA_MZ;
+    delete pPFA_MW;
+    delete pPFA_MZa;
+    delete pPFA_MWa;
     delete pPFA;
-    delete pPFAnu;
-    delete pPFAnufwd;
-    delete pPFAudscb;
-    delete pPFAuds;
-    delete pPFAudsHM20;
-    delete pPFAudsHM10;
-    delete pPFAudsHP10;
-    delete pPFAudsHP20;
-    delete pPFAFudsHM20;
-    delete pPFAFudsHM10;
-    delete pPFAFudsHP10;
-    delete pPFAFudsHP20;
-    delete pPFAcb;
-    delete pPFA1;
-    delete pPFA2;
-    delete pPFA3;
-    delete pPFA4;
-    delete pPFA5;
-    delete pPFA6;
-    delete pPFA7;
-    delete pPFAL7A;
-    delete pPFAL7Aud;
-    delete pPFAL7As;
-    delete pPFAL7Ac;
-    delete pPFAL7Ab;
-    delete pPFAL7B;
-    delete pPFAFL7A;
-    delete pPFAFL7Aud;
-    delete pPFAFL7As;
-    delete pPFAFL7Ac;
-    delete pPFAFL7Ab;
-    delete pPFAQQ;
-    delete pPFAQQ8;
-    delete pPFA8;
-    delete pPFA9;
-    delete pPFA10;
-    delete pPFA11;
-    delete pPFA12;
-    delete pPFA13;
-    delete pPFA14;
-    delete pPFADMZ;
-    delete pPFADMZ8;
-    delete pPFADMZQQ8;
-    delete pPFADMZP8;
-    delete pPFADMZOMZ;
-    delete pPFADMZOMZQQ8;
-    delete pPFA1Clone;
-    delete pPFA9Clone;
+    delete pPFA_nu;
+    delete pPFA_nufwd;
+    delete pPFA_udscb;
+    delete pPFA_uds;
+    delete pPFA_udsHM20;
+    delete pPFA_udsHM10;
+    delete pPFA_udsHP10;
+    delete pPFA_udsHP20;
+    delete pPFA_cb;
+    delete pPFA_1;
+    delete pPFA_2;
+    delete pPFA_3;
+    delete pPFA_4;
+    delete pPFA_5;
+    delete pPFA_6;
+    delete pPFA_7;
+    delete pPFA_L7A;
+    delete pPFA_L7Aud;
+    delete pPFA_L7As;
+    delete pPFA_L7Ac;
+    delete pPFA_L7Ab;
+    delete pPFA_L7ANoFwd;
+    delete pPFA_QQ;
+    delete pPFA_QQ8;
+    delete pPFA_8;
+    delete pPFA_9;
+    delete pPFA_10;
+    delete pPFA_11;
+    delete pPFA_12;
+    delete pPFA_13;
+    delete pPFA_14;
+    delete pPFA_DMZ;
+    delete pPFA_DMZ8;
+    delete pPFA_DMZQQ8;
+    delete pPFA_DMZP8;
+    delete pPFA_DMZOMZ;
+    delete pPFA_DMZOMZQQ8;
+    delete pPFA_1Clone;
+    delete pPFA_9Clone;
     delete pEvsCHist;
 }
