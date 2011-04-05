@@ -26,12 +26,28 @@ public:
      *  @brief  Calculate performance figures for an energy spectrum provided in form of a root th1f
      * 
      *  @param  pTH1F
+     *  @param  fixDistributionCentre
+     */
+    static void CalculatePerformance(const TH1F *const pTH1F, bool fixDistributionCentre = true);
+
+    /**
+     *  @brief  Calculate performance figures for an energy spectrum provided in form of a root th1f
+     * 
+     *  @param  pTH1F
      *  @param  sigma
      *  @param  sigmasigma
      *  @param  fixDistributionCentre
      */
     static void CalculatePerformance(const TH1F *const pTH1F, float &sigma, float &sigmasigma, bool fixDistributionCentre = true);
 };
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline void AnalysisHelper::CalculatePerformance(const TH1F *const pTH1F, bool fixDistributionCentre)
+{
+    float sigma(0.f), sigmasigma(0.f);
+    return CalculatePerformance(pTH1F, sigma, sigmasigma, fixDistributionCentre);
+}
 
 } // namespace pandora_analysis
 

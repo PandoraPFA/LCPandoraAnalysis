@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     if ((nArgs < 1) || (nArgs > 4))
     {
         std::cout << std::endl
-                  << "Usage: ./reclusterMonitoring inputFileName [outputFileName] [nResBins] [maxResValue] [resType]" << std::endl << std::endl
+                  << "Usage: ./reclusterMonitoring inputFileName [outputFileName] [nResBins] [maxResValue]" << std::endl << std::endl
                   << "  inputFileName  : file containing pandora pfo analysis tree" << std::endl
                   << "  nResBins       : optional number of bins to cover resolution range, default 20 " << std::endl
                   << "  maxResValue    : optional maximum resolution value to consider, default 500" << std::endl
@@ -113,7 +113,6 @@ void ReclusterMonitoring(TFile *pTFile, const unsigned int nRegionBins, const fl
 
     for (unsigned int i = 0; i < nRegionBins; ++i)
     {
-        std::cout << "Range " << pRegionBinEdges[i] << "-" << pRegionBinEdges[i + 1] << "\t:";
         sigma = 0.f; sigmasigma = 0.f;
         AnalysisHelper::CalculatePerformance(pRegionHistograms[i], sigma, sigmasigma);
         pEvsRHist->SetBinContent(i + 1, sigma); pEvsRHist->SetBinError(i + 1, sigmasigma);

@@ -416,7 +416,7 @@ void PfoAnalysis::PerformPfoAnalysis()
             m_mcEnergyFwd += pMCPfo->getEnergy();
     }
 
-    if (m_printing > -1)
+    if (m_printing > 0)
     {
         std::cout << " EVENT                : " << m_nEvt << std::endl
                   << " NPFOs                : " << m_nPfosTotal << " (" << m_nPfosCharged << " + " << m_nPfosPhotons + m_nPfosNeutralHadrons << ")" << std::endl
