@@ -91,7 +91,6 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
     TH1F *pPFAMW = new TH1F("fPFAMW", "vector boson mass", 200, 50., 150.);
     TH1F *pPFAMZa = new TH1F("fPFAMZa", "vector boson mass", 200, 50., 150.);
     TH1F *pPFAMWa = new TH1F("fPFAMWa", "vector boson mass", 200, 50., 150.);
-    TH1F *pEQ = new TH1F("fEQ", "EQ", 200, 0., 1000.);
     TH1F *pPFA = new TH1F("fPFA", "total PFA energy", 10000, 0., 5000.);
     TH1F *pPFAnu = new TH1F("fPFAnu", "total energy + nu", 10000, 0., 5000.);
     TH1F *pPFAnufwd = new TH1F("fPFAnufwd", "total energy + nu + fwd", 10000, 0., 5000.);
@@ -106,7 +105,7 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
     TH1F *pPFAFudsHP10 = new TH1F("fPFAFudsHP10", "total energy",5000, 0., 250.);
     TH1F *pPFAFudsHP20 = new TH1F("fPFAFudsHP20", "total energy",5000, 0., 250.);
     TH1F *pPFAcb = new TH1F("fPFAcb", "total energy", 10000, 0., 5000.);
-    TH1F *pPFA1 = new TH1F("fPFA1", "total energy 0.-0.1", 10000, 0., 5000.);
+    TH1F *pPFA1 = new TH1F("fPFA1", "total energy 0.0-0.1", 10000, 0., 5000.);
     TH1F *pPFA2 = new TH1F("fPFA2", "total energy 0.1-0.2", 10000, 0., 5000.);
     TH1F *pPFA3 = new TH1F("fPFA3", "total energy 0.2-0.3", 10000, 0., 5000.);
     TH1F *pPFA4 = new TH1F("fPFA4", "total energy 0.3-0.4", 10000, 0., 5000.);
@@ -128,11 +127,11 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
     TH1F *pPFAQQ8  = new TH1F("fPFAQQ8", "total energy - true E 8", 2000, -500., 500.);
     TH1F *pPFA8  = new TH1F("fPFA8", "total energy 0.7-0.8", 10000, 0., 5000.);
     TH1F *pPFA9  = new TH1F("fPFA9", "total energy 0.8-0.9", 10000, 0., 5000.);
-    TH1F *pPFA10 = new TH1F("fPFA10","total energy 0.9-1.", 10000, 0., 5000.);
+    TH1F *pPFA10 = new TH1F("fPFA10","total energy 0.9-1.0", 10000, 0., 5000.);
     TH1F *pPFA11 = new TH1F("fPFA11","total energy 0.9-0.925", 10000, 0., 5000.);
     TH1F *pPFA12 = new TH1F("fPFA12","total energy 0.925-0.95", 10000, 0., 5000.);
     TH1F *pPFA13 = new TH1F("fPFA13","total energy 0.95-0.975", 10000, 0., 5000.);
-    TH1F *pPFA14 = new TH1F("fPFA14","total energy 0.975-1.", 10000, 0., 5000.);
+    TH1F *pPFA14 = new TH1F("fPFA14","total energy 0.975-1.0", 10000, 0., 5000.);
     TH1F *pPFADMZ = new TH1F("fPFADMZ", "Delta Mz", 200, -50., 50.);
     TH1F *pPFADMZ8 = new TH1F("fPFADMZ8", "Delta Mz", 200, -50., 50.);
     TH1F *pPFADMZQQ8 = new TH1F("fPFADMZQQ8", "Delta Mz", 200, -50., 50.);
@@ -146,8 +145,6 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
         pTTree->GetEntry(iTree);
 
         pNPFO->Fill(nPfosTotal);
-        pEQ->Fill(eQ1);
-        pEQ->Fill(eQ2);
 
         if (std::fabs(costQQ) < 0.9f)
         {
@@ -313,20 +310,23 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
     AnalysisHelper::CalculatePerformance(pPFAudsHP10);
     AnalysisHelper::CalculatePerformance(pPFAudsHP20);
 
-    pPFA1->Add(pPFA2);
-    pPFA1->Add(pPFA3);
-    pPFA1->Add(pPFA4);
-    pPFA1->Add(pPFA5);  std::cout << " < 0.5 : ";   AnalysisHelper::CalculatePerformance(pPFA1);
-    pPFA1->Add(pPFA6);  std::cout << " < 0.6 : ";   AnalysisHelper::CalculatePerformance(pPFA1);
-    pPFA1->Add(pPFA7);  std::cout << " < 0.7 : ";   AnalysisHelper::CalculatePerformance(pPFA1);
-    pPFA1->Add(pPFA8);  std::cout << " < 0.8 : ";   AnalysisHelper::CalculatePerformance(pPFA1);
-    pPFA1->Add(pPFA9);  std::cout << " < 0.9 : ";   AnalysisHelper::CalculatePerformance(pPFA1);
-    pPFA1->Add(pPFA11); std::cout << " < 0.925 : "; AnalysisHelper::CalculatePerformance(pPFA1);
-    pPFA1->Add(pPFA12); std::cout << " < 0.95 : ";  AnalysisHelper::CalculatePerformance(pPFA1);
-    pPFA1->Add(pPFA13); std::cout << " < 0.975 : "; AnalysisHelper::CalculatePerformance(pPFA1);
-    pPFA1->Add(pPFA14); std::cout << " < 1.0 : ";   AnalysisHelper::CalculatePerformance(pPFA1);
-    pPFA9->Add(pPFA11);
-    pPFA9->Add(pPFA12); std::cout << " 0.8-0.95 : "; AnalysisHelper::CalculatePerformance(pPFA9);
+    TH1F *pPFA1Clone = static_cast<TH1F*>(pPFA1->Clone());
+    pPFA1Clone->Add(pPFA2);
+    pPFA1Clone->Add(pPFA3);
+    pPFA1Clone->Add(pPFA4);
+    pPFA1Clone->Add(pPFA5);  std::cout << " < 0.5 : ";   AnalysisHelper::CalculatePerformance(pPFA1Clone);
+    pPFA1Clone->Add(pPFA6);  std::cout << " < 0.6 : ";   AnalysisHelper::CalculatePerformance(pPFA1Clone);
+    pPFA1Clone->Add(pPFA7);  std::cout << " < 0.7 : ";   AnalysisHelper::CalculatePerformance(pPFA1Clone);
+    pPFA1Clone->Add(pPFA8);  std::cout << " < 0.8 : ";   AnalysisHelper::CalculatePerformance(pPFA1Clone);
+    pPFA1Clone->Add(pPFA9);  std::cout << " < 0.9 : ";   AnalysisHelper::CalculatePerformance(pPFA1Clone);
+    pPFA1Clone->Add(pPFA11); std::cout << " < 0.925 : "; AnalysisHelper::CalculatePerformance(pPFA1Clone);
+    pPFA1Clone->Add(pPFA12); std::cout << " < 0.95 : ";  AnalysisHelper::CalculatePerformance(pPFA1Clone);
+    pPFA1Clone->Add(pPFA13); std::cout << " < 0.975 : "; AnalysisHelper::CalculatePerformance(pPFA1Clone);
+    pPFA1Clone->Add(pPFA14); std::cout << " < 1.0 : ";   AnalysisHelper::CalculatePerformance(pPFA1Clone);
+
+    TH1F *pPFA9Clone = static_cast<TH1F*>(pPFA9->Clone());
+    pPFA9Clone->Add(pPFA11);
+    pPFA9Clone->Add(pPFA12); std::cout << " 0.8-0.95 : "; AnalysisHelper::CalculatePerformance(pPFA9Clone);
     std::cout << " < 0.7 A : ";    AnalysisHelper::CalculatePerformance(pPFAL7A);
     std::cout << " < 0.7 A ud : "; AnalysisHelper::CalculatePerformance(pPFAL7Aud);
     std::cout << " < 0.7 A s : ";  AnalysisHelper::CalculatePerformance(pPFAL7As);
@@ -361,7 +361,6 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
         pPFAMW->Write();
         pPFAMZa->Write();
         pPFAMWa->Write();
-        pEQ->Write();
         pPFA->Write();
         pPFAnu->Write();
         pPFAnufwd->Write();
@@ -419,7 +418,6 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
     delete pPFAMW;
     delete pPFAMZa;
     delete pPFAMWa;
-    delete pEQ;
     delete pPFA;
     delete pPFAnu;
     delete pPFAnufwd;
@@ -467,5 +465,7 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
     delete pPFADMZP8;
     delete pPFADMZOMZ;
     delete pPFADMZOMZQQ8;
+    delete pPFA1Clone;
+    delete pPFA9Clone;
     delete pEvsCHist;
 }
