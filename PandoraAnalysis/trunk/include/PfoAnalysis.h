@@ -109,11 +109,11 @@ private:
     int                 m_nPfosTotal;                           ///< 
     int                 m_nPfosNeutralHadrons;                  ///< 
     int                 m_nPfosPhotons;                         ///< 
-    int                 m_nPfosCharged;                         ///< 
+    int                 m_nPfosTracks;                          ///< 
     float               m_pfoEnergyTotal;                       ///< 
     float               m_pfoEnergyNeutralHadrons;              ///< 
     float               m_pfoEnergyPhotons;                     ///< 
-    float               m_pfoEnergyCharged;                     ///< 
+    float               m_pfoEnergyTracks;                      ///< 
     float               m_pfoMassTotal;                         ///< 
     float               m_mcEnergyTotal;                        ///< 
     float               m_mcEnergyENu;                          ///< 
