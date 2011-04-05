@@ -13,7 +13,6 @@
 #include "AnalysisHelper.h"
 
 #include <cmath>
-#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <sstream>
@@ -54,9 +53,9 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
 {
     // Define regions for which to create and investigate pfo energy spectra
     const unsigned int nRegionBins(13);
-    float regionBinEdges[nRegionBins + 1] = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.925, 0.95, 0.975, 1.0};
+    float pRegionBinEdges[nRegionBins + 1] = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.925, 0.95, 0.975, 1.0};
 
-    TH1F *pEvsRHist = new TH1F("SigmaEvsCosTheta", "#sigma(E) vs cos(#theta)", nRegionBins, regionBinEdges);
+    TH1F *pEvsRHist = new TH1F("SigmaEvsCosTheta", "#sigma(E) vs cos(#theta)", nRegionBins, pRegionBinEdges);
     pEvsRHist->SetYTitle("#sigma(E)");
     pEvsRHist->SetXTitle("cos(#theta)");
 
@@ -68,7 +67,7 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
     {
         std::ostringstream name, title;
         name << "fPFA_" << i;
-        title << "TotalEnergy_" << regionBinEdges[i] << "-" << regionBinEdges[i + 1];
+        title << "TotalEnergy_" << pRegionBinEdges[i] << "-" << pRegionBinEdges[i + 1];
         pRegionHistograms[i] = new TH1F(name.str().c_str(), title.str().c_str(), 10000, 0., 5000.);
     }
 
@@ -95,19 +94,17 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
 
         for (unsigned int i = 0; i < nRegionBins; ++i)
         {
-            if ((thrust >= regionBinEdges[i]) && (thrust < regionBinEdges[i + 1]))
+            if ((thrust >= pRegionBinEdges[i]) && (thrust < pRegionBinEdges[i + 1]))
                 pRegionHistograms[i]->Fill(pfoEnergyTotal + mcEnergyENu, 1.);
         }
     }
 
     // Extract performance figures from energy spectra histograms
-    std::cout << "Range < 0.7 A\t:";
     float sigma(0.f), sigmasigma(0.f);
     AnalysisHelper::CalculatePerformance(pPFAL7A, sigma, sigmasigma);
 
     for (unsigned int i = 0; i < nRegionBins; ++i)
     {
-        std::cout << "Range " << regionBinEdges[i] << "-" << regionBinEdges[i + 1] << "\t:";
         sigma = 0.f; sigmasigma = 0.f;
         AnalysisHelper::CalculatePerformance(pRegionHistograms[i], sigma, sigmasigma);
         pEvsRHist->SetBinContent(i + 1, sigma); pEvsRHist->SetBinError(i + 1, sigmasigma);
@@ -119,6 +116,7 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
         std::cout << "Will write histograms to file : " << outputRootFileName << std::endl;
         TFile *pTOutputFile = new TFile(outputRootFileName.c_str(), "RECREATE");
         pTOutputFile->cd();
+        pEvsRHist->GetYaxis()->SetRangeUser(0.f, 1.f);
         pEvsRHist->Write();
         pPFAL7A->Write();
 

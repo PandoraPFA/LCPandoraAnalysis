@@ -39,11 +39,14 @@ LDFLAGS = $(LIBS) -Wl,-rpath
 
 LIBRARY = $(PROJECT_LIBRARY_DIR)/libPandoraAnalysis.so
 
-all: $(SOURCES) $(OBJECTS) AnalysePerformance ReclusterMonitoring
+all: $(SOURCES) $(OBJECTS) AnalysePerformance AnalysePerformanceFull ReclusterMonitoring
 	$(CC) $(OBJECTS) $(LIBS) -shared -o $(LIBRARY)
 
 AnalysePerformance:
 	$(CC) $(INCLUDES) $(LIBS) $(PROJECT_TEST_DIR)AnalysePerformance.cc -o $(PROJECT_BINARY_DIR)AnalysePerformance
+
+AnalysePerformanceFull:
+	$(CC) $(INCLUDES) $(LIBS) $(PROJECT_TEST_DIR)AnalysePerformanceFull.cc -o $(PROJECT_BINARY_DIR)AnalysePerformanceFull
 
 ReclusterMonitoring:
 	$(CC) $(INCLUDES) $(LIBS) $(PROJECT_TEST_DIR)ReclusterMonitoring.cc -o $(PROJECT_BINARY_DIR)ReclusterMonitoring
@@ -58,4 +61,5 @@ clean:
 	rm -f $(OBJECTS)
 	rm -f $(LIBRARY)
 	rm -f AnalysePerformance
+	rm -f AnalysePerformanceFull
 	rm -f ReclusterMonitoring

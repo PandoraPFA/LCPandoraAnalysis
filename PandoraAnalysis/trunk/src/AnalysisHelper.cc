@@ -27,7 +27,7 @@ void AnalysisHelper::CalculatePerformance(const TH1F *const pTH1F, float &sigma,
 
     if (5 > pTH1F->GetEntries())
     {
-        std::cout << "  Only " << pTH1F->GetEntries() << " entries, skip " << pTH1F->GetName() << std::endl;
+        std::cout << pTH1F->GetName() << " (" << pTH1F->GetEntries() << " entries) - skipped" << std::endl;
         return;
     }
 
@@ -139,14 +139,9 @@ void AnalysisHelper::CalculatePerformance(const TH1F *const pTH1F, float &sigma,
         }
     }
 
-    std::cout << "  entries:" << pTH1F->GetEntries()
-              << "\trawrms: " << rawRms
-              << "\trms90: " << rmsmin
-              << "\t(" << low << "-" << high << ")"
-              << "\tmean: " << mean
-              << "\tsigma: " << sigma << "+-" << sigmasigma;
-
-    (fixDistributionCentre) ? (std::cout << "\tsE/E: " << frac << "+-" << efrac << std::endl) : (std::cout << std::endl);
+    std::cout << pTH1F->GetName() << " (" << pTH1F->GetEntries() << " entries), rawrms: " << rawRms << ", rms90: " << rmsmin
+              << " (" << low << "-" << high << "), mean: " << mean << ", sigma: " << sigma << "+-" << sigmasigma;
+    (fixDistributionCentre) ? (std::cout << ", sE/E: " << frac << "+-" << efrac << std::endl) : (std::cout << std::endl);
 }
 
 } // namespace pandora_analysis

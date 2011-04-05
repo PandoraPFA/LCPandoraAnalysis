@@ -65,7 +65,7 @@ INSTALL_SHARED_LIBRARY( ${PROJECT_NAME} DESTINATION lib )
 
 
 # make standalone analysis executables
-SET(PROGRAMS AnalysePerformance ReclusterMonitoring)
+SET( PROGRAMS AnalysePerformance AnalysePerformanceFull ReclusterMonitoring )
 
 FOREACH( program ${PROGRAMS} )
     ADD_EXECUTABLE( ${program} ${PROJECT_SOURCE_DIR}/tests/${program}.cc )
