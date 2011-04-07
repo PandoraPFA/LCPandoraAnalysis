@@ -16,8 +16,8 @@ INCLUDES += -I$(LCIO_DIR)/include/
 INCLUDES += -I$(MARLIN_DIR)/include/
 INCLUDES += -I$(shell $(ROOTSYS)/bin/root-config --incdir)
 
-CC = gcc
-CFLAGS = -c -Wall -g -w -fPIC -m32
+CC = g++
+CFLAGS = -c -Wall -g -w -fPIC -O2
 CFLAGS += $(INCLUDES)
 ifdef BUILD_32BIT_COMPATIBLE
     CFLAGS += -m32
