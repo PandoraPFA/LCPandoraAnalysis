@@ -1,0 +1,38 @@
+************************************************************************
+TAG V00-02 FOR ILCSOFT USAGE
+************************************************************************
+Divided pfos into those containing tracks, those identified as photons and those remaining as neutral hadrons.
+Modified PfoAnalysis processor to writes just a root TTree containing quantities from which all analysis histograms can be recreated.
+Moved source for binaries to separate tests directory.
+Renamed MCTree to AnalysisMCTree (to avoid conflicts with e.g. identically named header file in MarlinUtil).
+Moved calculation of performance figures to analysis helper class.
+Modified AnalysePerformance binary, so that it examines only on performance as a function of cos(theta).
+Added ReclusterMonitoring binary, which examines performance as a function of energy changes that occur during pandora reclustering.
+Added AnalysePerformanceFull binary, which reproduces previous behaviour.
+Removed some unnecessary histograms from AnalysePerformanceFull, renamed others.
+Altered use of mc neutrino energy so only included in selected histograms; marked with 'nu' or 'A' or used to assess neutral hadron calibration.
+Updated standalone Makefile: changed default compiler to g++ and added -O2 optimization flag.
+
+************************************************************************
+TAG V00-01 FOR ILCSOFT USAGE
+************************************************************************
+Updated CMake files to use new ILCUTIL package.
+Addressed CppCheck (static analysis package) warnings.
+
+************************************************************************
+CREATE CLIC_CDR BRANCH
+************************************************************************
+Added flag to look for quarks with mother. By default, primary quarks are those with no parents (this is not the case for files generated in SLIC environment).
+Corrected histogram name, title and axis labels.
+Set BUILD_32BIT_COMPATIBLE to OFF by default.
+Corrected installation of analysePerformance binary.
+Removed streamlog dependency specified for apple plaforms.
+Addressed gcc pedantic and extra warning messages. 
+Provided a gnu makefile.
+
+************************************************************************
+LCD_WG2_VALIDATION_3 TAG
+************************************************************************
+Improved error checking.
+Added missing header file includes, required for gcc 4.4 compilation.
+Created pandora analysis package, which brings together a number of marlin processors and simple binaries to analyse particle flow performance.
