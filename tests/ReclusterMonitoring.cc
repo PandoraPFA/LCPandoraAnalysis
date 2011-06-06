@@ -47,6 +47,14 @@ int main(int argc, char **argv)
     const std::string outputRootFileName((nArgs == 4) ? argv[4] : "");
 
     TFile *pTFile = new TFile(inputFileName.c_str(), "READ");
+
+    if (pTFile->IsZombie())
+    {
+        std::cout << "Error opening file " << inputFileName << std::endl;
+        delete pTFile;
+        return 1;
+    }
+
     ReclusterMonitoring(pTFile, nResBins, maxResValue, outputRootFileName);
     pTFile->Close();
 

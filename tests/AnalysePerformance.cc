@@ -41,6 +41,14 @@ int main(int argc, char **argv)
     const std::string outputRootFileName((nArgs == 2) ? argv[2] : "");
 
     TFile *pTFile = new TFile(inputFileName.c_str(), "READ");
+
+    if (pTFile->IsZombie())
+    {
+        std::cout << "Error opening file " << inputFileName << std::endl;
+        delete pTFile;
+        return 1;
+    }
+
     AnalysePerformance(pTFile, outputRootFileName);
     pTFile->Close();
 
