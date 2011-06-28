@@ -80,7 +80,15 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
     }
 
     // Loop over entries in pfo analysis tree, creating energy spectra for specified regions
-    TTree *pTTree = (TTree*)(pTFile->Get("PfoAnalysisTree"));
+    TTree *pTTree = NULL;
+    pTFile->GetObject("PfoAnalysisTree", pTTree);
+
+    if (!pTTree)
+    {
+        std::cout << "Error opening root tree: PfoAnalysisTree " << std::endl;
+        return;
+    }
+
     const unsigned int nTreeEntries(pTTree->GetEntries());
 
     int qPdg(0);
