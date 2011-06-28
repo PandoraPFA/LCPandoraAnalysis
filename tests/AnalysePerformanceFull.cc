@@ -60,7 +60,15 @@ int main(int argc, char **argv)
 void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
 {
     // Pfo analysis tree details
-    TTree *pTTree = (TTree*)(pTFile->Get("PfoAnalysisTree"));
+    TTree *pTTree = NULL;
+    pTFile->GetObject("PfoAnalysisTree", pTTree);
+
+    if (!pTTree)
+    {
+        std::cout << "Error opening root tree: PfoAnalysisTree " << std::endl;
+        return;
+    }
+
     const unsigned int nTreeEntries(pTTree->GetEntries());
 
     int nPfosTotal(0), nPfosNeutralHadrons(0), nPfosPhotons(0), nPfosTracks(0), qPdg(0);
