@@ -1,6 +1,7 @@
 <!-- Example steering file for PandoraAnalysis
      Output root file can be examined using the AnalysePerformance binary -->
 <marlin>
+
 <execute>
   <processor name="MyMCPfoMaker"/>
   <processor name="MyPfoAnalysis"/>
@@ -8,23 +9,43 @@
 
 <global>
   <parameter name="LCIOInputFiles" value="" />
-  <parameter name="MaxRecordNumber" value="10000" /> 
-  <parameter name="SupressCheck" value="false" /> 
+  <parameter name="SkipNEvents" value="0" />
+  <parameter name="MaxRecordNumber" value="10000" />
+  <parameter name="SupressCheck" value="false" />
   <parameter name="GearXMLFile" value="" />
   <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> WARNING </parameter>
 </global>
 
 <processor name="MyMCPfoMaker" type="MCPfoMaker">
-  <parameter name="InputMCParticleCollections" type="string">MCParticle</parameter>
-  <parameter name="OutputMCParticleCollection" type="string">MCPfos</parameter>
-  <parameter name="OutputQuarkParticleCollection" type="string">QuarkPfos</parameter>
+  <!--MCPfoMaker creates mc pfos for comparison with PandoraPFANew output-->
+  <!--Names of input mc particle collections-->
+  <parameter name="InputMCParticleCollections" type="StringVec" lcioInType="MCParticle">MCParticle </parameter>
+  <!--Flag to look for quarks with mother Z-->
+  <parameter name="LookForQuarksWithMotherZ" type="bool">false </parameter>
+  <!--Output mc particle collection name-->
+  <parameter name="OutputMCParticleCollection" type="string">MCPFOs </parameter>
+  <!--Output quark particle collection name-->
+  <parameter name="OutputQuarkParticleCollection" type="string">QuarkPFOs </parameter>
+  <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+  <!--parameter name="Verbosity" type="string">DEBUG </parameter-->
 </processor>
 
 <processor name="MyPfoAnalysis" type="PfoAnalysis">
-  <parameter name="InputQuarkParticleCollections" type="string">QuarkPfos</parameter>
-  <parameter name="InputMCParticleCollections" type="string">MCPfos</parameter>
-  <parameter name="InputParticleCollections" type="string">PandoraPFANewPFOs</parameter>
-  <parameter name="RootFile" type="string"></parameter>
+  <!--PfoAnalysis analyses output of PandoraPFANew-->
+  <!--Names of input mc particle collections-->
+  <parameter name="InputMCParticleCollections" type="StringVec" lcioInType="ReconstructedParticle">MCPFOs </parameter>
+  <!--Names of input reconstructed particle collections-->
+  <parameter name="InputParticleCollections" type="StringVec" lcioInType="ReconstructedParticle">PandoraPFANewPFOs </parameter>
+  <!--Names of input quark particle collections-->
+  <parameter name="InputQuarkParticleCollections" type="StringVec" lcioInType="ReconstructedParticle">QuarkPFOs </parameter>
+  <!--Names of input recluster monitoring collections-->
+  <parameter name="InputReclusterMonitoringCollections" type="StringVec" lcioInType="LCGenericObject">PandoraPFANewReclusterMonitoring </parameter>
+  <!--Set the debug print level-->
+  <parameter name="Printing" type="int">0 </parameter>
+  <!--Name of the output root file-->
+  <parameter name="RootFile" type="string">PFOAnalysis.root </parameter>
+  <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+  <!--parameter name="Verbosity" type="string">DEBUG </parameter-->
 </processor>
 
 </marlin>

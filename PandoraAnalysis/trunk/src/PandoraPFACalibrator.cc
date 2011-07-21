@@ -44,7 +44,7 @@ PandoraPFACalibrator aPandoraPFACalibrator;
 PandoraPFACalibrator::PandoraPFACalibrator() : Processor("PandoraPFACalibrator") 
 {  
   // modify processor description
-  _description = "PandoraPFACalibrator for calibration of of PandoraPFA" ;
+  _description = "PandoraPFACalibrator for calibration of PandoraPFA" ;
   
   // register steering parameters: name, description, class-variable, default value
   registerProcessorParameter( "RootFile" , 
@@ -53,7 +53,7 @@ PandoraPFACalibrator::PandoraPFACalibrator() : Processor("PandoraPFACalibrator")
 			      std::string("PandoraPFACalibrator.root") ) ;
 
   LCStrVec inputMCParticleCollections;
-  inputMCParticleCollections.push_back("McPFOs");
+  inputMCParticleCollections.push_back("MCPFOs");
   registerInputCollections(LCIO::RECONSTRUCTEDPARTICLE,
 			   "InputMCParticleCollections",
 			   "Names of input mc particle collections",
@@ -82,7 +82,9 @@ PandoraPFACalibrator::PandoraPFACalibrator() : Processor("PandoraPFACalibrator")
 			   ecalEndCapCollections ) ;
 
   LCStrVec hcalCollections;
-  hcalCollections.push_back(std::string("HCAL"));
+  hcalCollections.push_back(std::string("HCALBarrel"));
+  hcalCollections.push_back(std::string("HCALEndcap"));
+  hcalCollections.push_back(std::string("HCALOther"));
   registerInputCollections( LCIO::CALORIMETERHIT,
 			   "HCALcollections" , 
 			   "Name of the HCAL collection used to form clusters"  ,

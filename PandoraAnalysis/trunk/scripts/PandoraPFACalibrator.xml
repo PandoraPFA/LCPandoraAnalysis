@@ -1,0 +1,75 @@
+<!-- Example steering file for PandoraPFACalibrator --><marlin><execute>  <processor name="MyMCPfoMaker"/>  <processor name="MyPandoraPFACalibrator"/>  <processor name="MyPfoAnalysis"/></execute><global>
+  <parameter name="LCIOInputFiles" value="" />  <parameter name="SkipNEvents" value="0" />
+  <parameter name="MaxRecordNumber" value="10000" />
+  <parameter name="SupressCheck" value="false" />
+  <parameter name="GearXMLFile" value="" />
+  <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> WARNING </parameter>
+</global><processor name="MyMCPfoMaker" type="MCPfoMaker">
+  <!--MCPfoMaker creates mc pfos for comparison with PandoraPFANew output-->
+  <!--Names of input mc particle collections-->
+  <parameter name="InputMCParticleCollections" type="StringVec" lcioInType="MCParticle">MCParticle </parameter>
+  <!--Flag to look for quarks with mother Z-->
+  <parameter name="LookForQuarksWithMotherZ" type="bool">false </parameter>
+  <!--Output mc particle collection name-->
+  <parameter name="OutputMCParticleCollection" type="string">MCPFOs </parameter>
+  <!--Output quark particle collection name-->
+  <parameter name="OutputQuarkParticleCollection" type="string">QuarkPFOs </parameter>
+  <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+  <!--parameter name="Verbosity" type="string">DEBUG </parameter-->
+</processor><processor name="MyPandoraPFACalibrator" type="PandoraPFACalibrator">
+  <!--PandoraPFACalibrator for calibration of PandoraPFA-->
+  <!--Name of the BCAL collection used to form clusters-->
+  <parameter name="BCALcollections" type="StringVec" lcioInType="CalorimeterHit">BCAL </parameter>
+  <!--Name of the ECAL barrel collection used to form clusters-->
+  <parameter name="ECALBarrelcollections" type="StringVec" lcioInType="CalorimeterHit">ECALBarrel </parameter>
+  <!--Name of the ECAL EndCap collection used to form clusters-->
+  <parameter name="ECALEndCapcollections" type="StringVec" lcioInType="CalorimeterHit">ECALEndCap </parameter>
+  <!--ECAL Threshold in MIPS-->
+  <parameter name="ECalMipThreshold" type="float">0.5 </parameter>
+  <!--Calibration from deposited ECAL MIP to EM energy-->
+  <parameter name="ECalToEMGeVCalibration" type="float">1 </parameter>
+  <!--Calibration from deposited ECAL barrel MIP to Hadronic energy-->
+  <parameter name="ECalToHadGeVCalibrationBarrel" type="float">1.03 </parameter>
+  <!--Calibration from deposited ECAL endcap MIP to Hadronic energy-->
+  <parameter name="ECalToHadGeVCalibrationEndCap" type="float">1.16 </parameter>
+  <!--Calibration from deposited ECAL energy to MIP-->
+  <parameter name="ECalToMipCalibration" type="float">160 </parameter>
+  <!--Name of the HCAL collection used to form clusters-->
+  <parameter name="HCALcollections" type="StringVec" lcioInType="CalorimeterHit">HCALBarrel HCALEndcap HCALOther </parameter>
+  <!--HCAL Threshold in MIPS-->
+  <parameter name="HCalMipThreshold" type="float">0.5 </parameter>
+  <!--Calibration from deposited HCAL MIP to EM energy-->
+  <parameter name="HCalToEMGeVCalibration" type="float">1 </parameter>
+  <!--Calibration from deposited HCAL MIP to Hadronic energy-->
+  <parameter name="HCalToHadGeVCalibration" type="float">1 </parameter>
+  <!--Calibration from deposited HCAL energy to MIP-->
+  <parameter name="HCalToMipCalibration" type="float">34.8 </parameter>
+  <!--Names of input mc particle collections-->
+  <parameter name="InputMCParticleCollections" type="StringVec" lcioInType="ReconstructedParticle">MCPFOs </parameter>
+  <!--Particle Collection Name -->
+  <parameter name="InputParticleCollectionName" type="string">PandoraPFANewPFOs </parameter>
+  <!--Name of the LCAL collection used to form clusters-->
+  <parameter name="LCALcollections" type="StringVec" lcioInType="CalorimeterHit">LCAL </parameter>
+  <!--Name of the LHCAL collection used to form clusters-->
+  <parameter name="LHCALcollections" type="StringVec" lcioInType="CalorimeterHit">LHCAL </parameter>
+  <!--Name of the Track collection used for clustering-->
+  <parameter name="RootFile" type="string">PandoraPFACalibrator.root </parameter>
+  <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+  <!--parameter name="Verbosity" type="string">DEBUG </parameter-->
+</processor><processor name="MyPfoAnalysis" type="PfoAnalysis">
+  <!--PfoAnalysis analyses output of PandoraPFANew-->
+  <!--Names of input mc particle collections-->
+  <parameter name="InputMCParticleCollections" type="StringVec" lcioInType="ReconstructedParticle">MCPFOs </parameter>
+  <!--Names of input reconstructed particle collections-->
+  <parameter name="InputParticleCollections" type="StringVec" lcioInType="ReconstructedParticle">PandoraPFANewPFOs </parameter>
+  <!--Names of input quark particle collections-->
+  <parameter name="InputQuarkParticleCollections" type="StringVec" lcioInType="ReconstructedParticle">QuarkPFOs </parameter>
+  <!--Names of input recluster monitoring collections-->
+  <parameter name="InputReclusterMonitoringCollections" type="StringVec" lcioInType="LCGenericObject">PandoraPFANewReclusterMonitoring </parameter>
+  <!--Set the debug print level-->
+  <parameter name="Printing" type="int">0 </parameter>
+  <!--Name of the output root file-->
+  <parameter name="RootFile" type="string">PFOAnalysis.root </parameter>
+  <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+  <!--parameter name="Verbosity" type="string">DEBUG </parameter-->
+</processor></marlin>
