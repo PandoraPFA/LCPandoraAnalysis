@@ -11,7 +11,7 @@
 
 #include "marlin/Processor.h"
 
-class MCTree;
+namespace pandora_analysis {class AnalysisMCTree;}
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
