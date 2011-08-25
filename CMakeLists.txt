@@ -54,7 +54,7 @@ ENDIF()
 
 #include directories
 INCLUDE_DIRECTORIES( BEFORE ./include ) # use BEFORE to fix problem on mac osx (case insensitive filesystem)
-INSTALL_DIRECTORY( ./include DESTINATION . FILES_MATCHING PATTERN "*.h" )
+#INSTALL_DIRECTORY( ./include DESTINATION . FILES_MATCHING PATTERN "*.h" )
 
 ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
 ADD_DEFINITIONS( "-Wno-long-long" )
