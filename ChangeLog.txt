@@ -1,4 +1,14 @@
 ************************************************************************
+TAG V00-03 FOR ILCSOFT USAGE
+************************************************************************
+Added new PandoraPFACalibrator processor, courtesy of A. Lucaci-Timoce.
+Added example steering file for PandoraPFACalibrator.
+Updated PandoraAnalysis example steering file.
+Updated to deal with missing trees more gracefully.
+Updated to deal with zombie root files more gracefully.
+Included <cstdlib> header to allow use of atoi and atof functions under gcc4.3 onwards.
+
+************************************************************************
 TAG V00-02 FOR ILCSOFT USAGE
 ************************************************************************
 Divided pfos into those containing tracks, those identified as photons and those remaining as neutral hadrons.
