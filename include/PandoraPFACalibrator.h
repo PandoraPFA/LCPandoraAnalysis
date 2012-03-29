@@ -1,17 +1,12 @@
 #ifndef PandoraPFACalibrator_h
 #define PandoraPFACalibrator_h
 
+#include "marlin/Processor.h"
+
 #include <vector>
 
-#include "marlin/Processor.h"
-#include "lcio.h"
-#include "EVENT/LCIO.h"
-#include "EVENT/ReconstructedParticle.h"
-#include "EVENT/Track.h"
-
-#include "TFile.h"
-#include "TH1F.h"
-#include "TH2F.h"
+class TH1F;
+class TH2F;
 
 using namespace lcio;
 using namespace marlin;
@@ -24,7 +19,6 @@ There are three sets of constants that need to be calibrated:
 iii) PandoraPFA MIP equivalent -> PFO energy
 One might expect that factor iii) is the reciprocal of factor ii). However,
 due to the isolation cuts used in PandoraPFA this is not quite the case.
-
 
 MC Samples:
 ===========
@@ -69,105 +63,122 @@ iii) PandoraPFA ECAL/HCAL calibration
   o Using the sample of KLs do that same to obtain 
    <parameter name="HCALEMMIPToGeV" type="float">0.023  </parameter>
    <parameter name="HCALHadMIPToGeV" type="float">0.023  </parameter>
-</pre>    
+</pre>
 */
-class PandoraPFACalibrator : public Processor {
-  
- public:
-  
-  virtual Processor*  newProcessor() { return new PandoraPFACalibrator ; }
-  
-  
-  PandoraPFACalibrator() ;
-  
-  /** Called at the begin of the job before anything is read.
-   * Use to initialize the processor, e.g. book histograms.
-   */
-  virtual void init() ;
-  
-  /** Called for every run.
-   */
-  virtual void processRunHeader( LCRunHeader* run ) ;
+class PandoraPFACalibrator : public Processor
+{
+public:
+    virtual Processor*  newProcessor()
+    {
+        return new PandoraPFACalibrator;
+    }
 
-  
-  /** Called for every event - the working horse.
-   */
-  virtual void processEvent( LCEvent * evt ) ; 
-  
-  
-  virtual void check( LCEvent * evt ) ; 
-  
-  
-  /** Called after data processing for clean up.
-   */
-  virtual void end() ;
-  
-  
-  
+    PandoraPFACalibrator() ;
 
- private:
-  
-  std::vector<std::string> _inputMCParticleCollections;
-  std::vector<std::string> _ecalBarrelCollections;
-  std::vector<std::string> _ecalEndCapCollections;
-  std::vector<std::string> _hcalCollections;
-  std::vector<std::string> _lcalCollections;
-  std::vector<std::string> _bcalCollections;
-  std::vector<std::string> _lhcalCollections;
-  std::string _particleCollectionName;
-  std::string _rootFile;
+    /**
+     *   @brief Called at the begin of the job before anything is read. Use to initialize the processor, e.g. book histograms.
+     */
+    virtual void init() ;
 
-  int _nRun ;
-  int _nEvt ;
-  int   _digitalHcal;
-  float _ecalToMIP;
-  float _hcalToMIP;
-  float _ecalMIPThreshold;
-  float _hcalMIPThreshold;
-  float _ecalEMMIPToGeV;
-  float _hcalEMMIPToGeV;
-  float _ecalBarrelHadMIPToGeV;
-  float _ecalEndCapHadMIPToGeV;
-  float _hcalHadMIPToGeV;
-  float _zOfEndCap;
-  float _cosTheta;
-  float _cosThetaR;
-  float _cosThetaX;
-  float _zCoG;
-  float _x;
-  float _y;
-  float _zmean;
-  std::string _detectorName;
+    /**
+     *  @brief  Called for every run.
+     */
+    virtual void processRunHeader( LCRunHeader* run ) ;
 
-  TH1F* fPFA;
-  TH1F* fPFAB;
-  TH1F* fCalEnergy;
-  TH1F* fCalEnergyH;
-  TH2F* fCalEnergyVsCosTheta;
-  TH2F* fCalEnergyVsCosThetaR;
-  TH2F* fPFAVsCosTheta;
-  TH2F* fPFAVsCosThetaX;
-  TH2F* fPFAVsCosThetaR;
-  TH2F* fPFAVsZCoG;
-  TH2F* fXvsY;
-  TH1F* fPFAH;
-  TH1F* fEcalEnergy;
-  TH2F* fEcalBarrelHcalEnergy;
-  TH2F* fEcalEndCapHcalEnergy;
-  TH1F* fHcalEnergy;
-  TH1F* fLcalEnergy;
-  TH1F* fEcalBarrelMIP;
-  TH1F* fEcalEndCapMIP;
-  TH1F* fEcal1MIP;
-  TH1F* fHcalMIP;
-  TH1F* fCosT;
-  TH1F* fPhotonCosT;
-  TH1F* fEcalBarrelMIPcorr;
-  TH1F* fEcalEndCapMIPcorr;
-  TH1F* fHcalMIPcorr;
-  TH1F* fEcalBarrelEnergyByLayer;
-  TH1F* fEcalEndCapEnergyByLayer;
+    /**
+     *  @brief  Called for every event - the working horse.
+     */
+    virtual void processEvent( LCEvent * evt ) ; 
 
-} ;
+    /**
+     *  @brief  Check
+     */
+    virtual void check( LCEvent * evt ) ; 
+
+    /**
+     *  @brief  Called after data processing for clean up.
+     */
+    virtual void end() ;
+
+private:
+    std::vector<std::string> _inputMCParticleCollections;
+    std::vector<std::string> _ecalBarrelCollections;
+    std::vector<std::string> _ecalEndCapCollections;
+    std::vector<std::string> _hcalCollections;
+    std::vector<std::string> _muonCollections;
+    std::vector<std::string> _lcalCollections;
+    std::vector<std::string> _bcalCollections;
+    std::vector<std::string> _lhcalCollections;
+    std::string _particleCollectionName;
+    std::string _rootFile;
+
+    int _nRun ;
+    int _nEvt ;
+    int   _digitalHcal;
+    float _ecalToMIP;
+    float _hcalToMIP;
+    float _muonToMIP;
+    float _ecalMIPThreshold;
+    float _hcalMIPThreshold;
+    float _ecalEMMIPToGeV;
+    float _hcalEMMIPToGeV;
+    float _ecalBarrelHadMIPToGeV;
+    float _ecalEndCapHadMIPToGeV;
+    float _hcalHadMIPToGeV;
+    float _zOfEndCap;
+    float _cosTheta;
+    float _cosThetaR;
+    float _cosThetaX;
+    float _zCoG;
+    float _x;
+    float _y;
+    float _zmean;
+    std::string _detectorName;
+
+    TH1F* fPFA;
+    TH1F* fPFAB;
+    TH2F* fPFAVsCosTheta;
+    TH2F* fPFAVsCosThetaR;
+    TH2F* fPFAVsZCoG;
+    TH2F* fPFAVsCosThetaX;
+
+    TH1F* fPFAE;
+    TH1F* fPFAH;
+    TH1F* fPFAM;
+
+    TH2F* fXvsY;
+
+    TH1F* fEcalEnergy;
+    TH1F* fHcalEnergy;
+    TH1F* fMuonEnergy;
+    TH1F* fLcalEnergy;
+    TH1F* fCalEnergy;
+
+    TH2F* fEcalBarrelHcalEnergy;
+    TH2F* fEcalEndCapHcalEnergy;
+
+    TH1F* fCalEnergyE;
+    TH1F* fCalEnergyH;
+    TH1F* fCalEnergyM;
+
+    TH2F* fCalEnergyVsCosTheta;
+    TH2F* fCalEnergyVsCosThetaR;
+
+    TH1F* fEcalBarrelEnergyByLayer;
+    TH1F* fEcalEndCapEnergyByLayer;
+
+    TH1F* fEcalBarrelMIP;
+    TH1F* fEcalEndCapMIP;
+    TH1F* fHcalMIP;
+    TH1F* fMuonMIP;
+
+    TH1F* fEcalBarrelMIPcorr;
+    TH1F* fEcalEndCapMIPcorr;
+    TH1F* fHcalMIPcorr;
+    TH1F* fMuonMIPcorr;
+
+    TH1F* fCosT;
+    TH1F* fPhotonCosT;
+};
 
 #endif
