@@ -17,7 +17,7 @@
 namespace pandora_analysis
 {
 
-void AnalysisHelper::CalculatePerformance(const TH1F *const pTH1F, float &sigma, float &sigmasigma, bool fixDistributionCentre)
+void AnalysisHelper::CalculatePerformance(const TH1F *const pTH1F, float &sigma, float &sigmasigma, bool fixDistributionCentre, bool print)
 {
     static const float FLOAT_MAX(std::numeric_limits<float>::max());
     sigma = sigmasigma = FLOAT_MAX;
@@ -139,9 +139,14 @@ void AnalysisHelper::CalculatePerformance(const TH1F *const pTH1F, float &sigma,
         }
     }
 
-    std::cout << pTH1F->GetName() << " (" << pTH1F->GetEntries() << " entries), rawrms: " << rawRms << ", rms90: " << rmsmin
-              << " (" << low << "-" << high << "), mean: " << mean << ", sigma: " << sigma << "+-" << sigmasigma;
-    (fixDistributionCentre) ? (std::cout << ", sE/E: " << frac << "+-" << efrac << std::endl) : (std::cout << std::endl);
+    if (print)
+    {
+        std::cout << pTH1F->GetName() << " (" << pTH1F->GetEntries() << " entries), rawrms: " << rawRms << ", rms90: " << rmsmin
+                  << " (" << low << "-" << high << "), mean: " << mean << ", sigma: " << sigma << "+-" << sigmasigma;
+        (fixDistributionCentre) ? (std::cout << ", sE/E: " << frac << "+-" << efrac << std::endl) : (std::cout << std::endl);
+    }
+
+    sigma = frac;
 }
 
 } // namespace pandora_analysis

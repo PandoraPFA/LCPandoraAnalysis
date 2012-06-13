@@ -25,18 +25,17 @@ INCLUDE( ilcsoft_default_settings )
 
 
 FIND_PACKAGE( Marlin 1.0 REQUIRED )
+FIND_PACKAGE( MarlinUtil REQUIRED )
 FIND_PACKAGE( LCIO REQUIRED )
 FIND_PACKAGE( ROOT REQUIRED )
 
-FOREACH( pkg Marlin LCIO ROOT )
+FOREACH( pkg Marlin MarlinUtil LCIO ROOT )
     IF( ${pkg}_FOUND )
         INCLUDE_DIRECTORIES( ${${pkg}_INCLUDE_DIRS} )
         LINK_LIBRARIES( ${${pkg}_LIBRARIES} )
         ADD_DEFINITIONS ( ${${pkg}_DEFINITIONS} )
     ENDIF()
 ENDFOREACH()
-
-
 
 ### DOCUMENTATION ############################################################
 OPTION( INSTALL_DOC "Set to OFF to skip build/install Documentation" OFF )
@@ -65,7 +64,7 @@ INSTALL_SHARED_LIBRARY( ${PROJECT_NAME} DESTINATION lib )
 
 
 # make standalone analysis executables
-SET( PROGRAMS AnalysePerformance AnalysePerformanceFull ReclusterMonitoring )
+SET( PROGRAMS AnalysePerformance AnalysePerformanceFull Calibrate ReclusterMonitoring )
 
 FOREACH( program ${PROGRAMS} )
     ADD_EXECUTABLE( ${program} ${PROJECT_SOURCE_DIR}/tests/${program}.cc )

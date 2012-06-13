@@ -9,6 +9,8 @@
 #include "EVENT/LCCollection.h"
 #include "EVENT/LCGenericObject.h"
 
+#include "CalorimeterHitType.h"
+
 #include "TLorentzVector.h"
 #include "TFile.h"
 #include "TH1F.h"
@@ -81,6 +83,12 @@ void PfoAnalysis::init()
     m_tree->Branch("pfoEnergyNeutralHadrons", &m_pfoEnergyNeutralHadrons, "pfoEnergyNeutralHadrons/F");
     m_tree->Branch("pfoEnergyPhotons", &m_pfoEnergyPhotons, "pfoEnergyPhotons/F");
     m_tree->Branch("pfoEnergyTracks", &m_pfoEnergyTracks, "pfoEnergyTracks/F");
+    m_tree->Branch("pfoECalToEmEnergy", &m_pfoECalToEmEnergy, "pfoECalToEmEnergy/F");
+    m_tree->Branch("pfoECalToHadEnergy", &m_pfoECalToHadEnergy, "pfoECalToHadEnergy/F");
+    m_tree->Branch("pfoHCalToEmEnergy", &m_pfoHCalToEmEnergy, "pfoHCalToEmEnergy/F");
+    m_tree->Branch("pfoHCalToHadEnergy", &m_pfoHCalToHadEnergy, "pfoHCalToHadEnergy/F");
+    m_tree->Branch("pfoOtherEnergy", &m_pfoOtherEnergy, "pfoOtherEnergy/F");
+    m_tree->Branch("pfoMuonToEnergy", &m_pfoMuonToEnergy, "pfoMuonToEnergy/F");
     m_tree->Branch("pfoMassTotal", &m_pfoMassTotal, "pfoMassTotal/F");
     m_tree->Branch("mcEnergyTotal", &m_mcEnergyTotal, "mcEnergyTotal/F");
     m_tree->Branch("mcEnergyENu", &m_mcEnergyENu, "mcEnergyENu/F");
@@ -160,7 +168,15 @@ void PfoAnalysis::Clear()
     m_pfoEnergyTotal = 0.f;
     m_pfoEnergyNeutralHadrons = 0.f;
     m_pfoEnergyPhotons = 0.f;
+
     m_pfoEnergyTracks = 0.f;
+    m_pfoECalToEmEnergy = 0.f;
+    m_pfoECalToHadEnergy = 0.f;
+    m_pfoHCalToEmEnergy = 0.f;
+    m_pfoHCalToHadEnergy = 0.f;
+    m_pfoMuonToEnergy = 0.f;
+    m_pfoOtherEnergy = 0.f;
+
     m_pfoMassTotal = 0.f;
     m_mcEnergyTotal = 0.f;
     m_mcEnergyENu = 0.f;
@@ -364,23 +380,115 @@ void PfoAnalysis::PerformPfoAnalysis()
         ++m_nPfosTotal;
         m_pfoEnergyTotal += pPfo->getEnergy();
 
-        if (pPfo->getTracks().empty())
+        if (!pPfo->getTracks().empty())
         {
-            if (22 == pPfo->getType())
-            {
-                ++m_nPfosPhotons;
-                m_pfoEnergyPhotons += pPfo->getEnergy();
-            }
-            else
-            {
-                ++m_nPfosNeutralHadrons;
-                m_pfoEnergyNeutralHadrons += pPfo->getEnergy();
-            }
+            // Charged pfos
+            ++m_nPfosTracks;
+            m_pfoEnergyTracks += pPfo->getEnergy();
         }
         else
         {
-            ++m_nPfosTracks;
-            m_pfoEnergyTracks += pPfo->getEnergy();
+            // Neutral pfos
+            float cellEnergySum(0.f);
+            const ClusterVec &clusterVec = pPfo->getClusters();
+
+            for (ClusterVec::const_iterator iter = clusterVec.begin(), iterEnd = clusterVec.end(); iter != iterEnd; ++iter)
+            {
+                const CalorimeterHitVec &calorimeterHitVec = (*iter)->getCalorimeterHits();
+
+                for (CalorimeterHitVec::const_iterator hitIter = calorimeterHitVec.begin(), hitIterEnd = calorimeterHitVec.end(); hitIter != hitIterEnd; ++hitIter)
+                {
+                    EVENT::CalorimeterHit *pCalorimeterHit = *hitIter;
+                    cellEnergySum += pCalorimeterHit->getEnergy();
+                }
+            }
+
+            //if (cellEnergySum < std::numeric_limits<float>::epsilon())
+            //{
+            //    std::cout << "Error, pfo found with neither tracks nor clusters... " << std::endl;
+            //    throw;
+            //}
+
+            const float correctionFactor((cellEnergySum < std::numeric_limits<float>::epsilon()) ? 0.f : pPfo->getEnergy() / cellEnergySum);
+
+            if (22 == pPfo->getType())
+            {
+                // Photons
+                ++m_nPfosPhotons;
+                m_pfoEnergyPhotons += pPfo->getEnergy();
+
+                for (ClusterVec::const_iterator iter = clusterVec.begin(), iterEnd = clusterVec.end(); iter != iterEnd; ++iter)
+                {
+                    const CalorimeterHitVec &calorimeterHitVec = (*iter)->getCalorimeterHits();
+
+                    for (CalorimeterHitVec::const_iterator hitIter = calorimeterHitVec.begin(), hitIterEnd = calorimeterHitVec.end(); hitIter != hitIterEnd; ++hitIter)
+                    {
+                        EVENT::CalorimeterHit *pCalorimeterHit = *hitIter;
+
+                        const float hitEnergy(correctionFactor * pCalorimeterHit->getEnergy());
+                        CHT cht(pCalorimeterHit->getType());
+
+                        //std::cout << "EM, type: " << pCalorimeterHit->getType() << ", energy: " << pCalorimeterHit->getEnergy() << " correction " << correctionFactor << std::endl;
+                        //std::cout << " cht.is(CHT::ecal) " << cht.is(CHT::ecal) << " cht.is(CHT::hcal) " << cht.is(CHT::hcal) << " cht.is(CHT::muon) " << cht.is(CHT::muon) << std::endl;
+
+                        if (cht.is(CHT::ecal))
+                        {
+                            m_pfoECalToEmEnergy += hitEnergy;
+                        }
+                        else if (cht.is(CHT::hcal))
+                        {
+                            m_pfoHCalToEmEnergy += hitEnergy;
+                        }
+                        else if (cht.is(CHT::muon))
+                        {
+                            m_pfoMuonToEnergy += hitEnergy;
+                        }
+                        else
+                        {
+                            m_pfoOtherEnergy += hitEnergy;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Neutral hadrons
+                ++m_nPfosNeutralHadrons;
+                m_pfoEnergyNeutralHadrons += pPfo->getEnergy();
+
+                for (ClusterVec::const_iterator iter = clusterVec.begin(), iterEnd = clusterVec.end(); iter != iterEnd; ++iter)
+                {
+                    const CalorimeterHitVec &calorimeterHitVec = (*iter)->getCalorimeterHits();
+
+                    for (CalorimeterHitVec::const_iterator hitIter = calorimeterHitVec.begin(), hitIterEnd = calorimeterHitVec.end(); hitIter != hitIterEnd; ++hitIter)
+                    {
+                        EVENT::CalorimeterHit *pCalorimeterHit = *hitIter;
+
+                        const float hitEnergy(correctionFactor * pCalorimeterHit->getEnergy());
+                        CHT cht(pCalorimeterHit->getType());
+
+                        //std::cout << "HAD, type: " << pCalorimeterHit->getType() << ", energy: " << pCalorimeterHit->getEnergy() << " correction " << correctionFactor << std::endl;
+                        //std::cout << " cht.is(CHT::ecal) " << cht.is(CHT::ecal) << " cht.is(CHT::hcal) " << cht.is(CHT::hcal) << " cht.is(CHT::muon) " << cht.is(CHT::muon) << std::endl;
+
+                        if (cht.is(CHT::ecal))
+                        {
+                            m_pfoECalToHadEnergy += hitEnergy;
+                        }
+                        else if (cht.is(CHT::hcal))
+                        {
+                            m_pfoHCalToHadEnergy += hitEnergy;
+                        }
+                        else if (cht.is(CHT::muon))
+                        {
+                            m_pfoMuonToEnergy += hitEnergy;
+                        }
+                        else
+                        {
+                            m_pfoOtherEnergy += hitEnergy;
+                        }
+                    }
+                }
+            }
         }
 
         momTot[0] += pPfo->getMomentum()[0];

@@ -32,7 +32,7 @@ int main(int argc, char **argv)
     if ((nArgs < 1) || (nArgs > 4))
     {
         std::cout << std::endl
-                  << "Usage: ./reclusterMonitoring inputFileName [nResBins] [maxResValue] [outputFileName]" << std::endl << std::endl
+                  << "Usage: ./ReclusterMonitoring inputFileName [nResBins] [maxResValue] [outputFileName]" << std::endl << std::endl
                   << "  inputFileName  : file containing pandora pfo analysis tree" << std::endl
                   << "  nResBins       : optional number of bins to cover resolution range, default 20 " << std::endl
                   << "  maxResValue    : optional maximum resolution value to consider, default 500" << std::endl

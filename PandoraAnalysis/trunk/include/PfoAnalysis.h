@@ -113,8 +113,17 @@ private:
     float               m_pfoEnergyTotal;                       ///< 
     float               m_pfoEnergyNeutralHadrons;              ///< 
     float               m_pfoEnergyPhotons;                     ///< 
+
     float               m_pfoEnergyTracks;                      ///< 
+    float               m_pfoECalToEmEnergy;                    ///< 
+    float               m_pfoECalToHadEnergy;                   ///< 
+    float               m_pfoHCalToEmEnergy;                    ///< 
+    float               m_pfoHCalToHadEnergy;                   ///< 
+    float               m_pfoMuonToEnergy;                      ///< 
+    float               m_pfoOtherEnergy;                       ///< 
+
     float               m_pfoMassTotal;                         ///< 
+
     float               m_mcEnergyTotal;                        ///< 
     float               m_mcEnergyENu;                          ///< 
     float               m_mcEnergyFwd;                          ///< 

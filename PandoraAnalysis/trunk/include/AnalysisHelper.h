@@ -37,8 +37,9 @@ public:
      *  @param  sigma
      *  @param  sigmasigma
      *  @param  fixDistributionCentre
+     *  @param  print
      */
-    static void CalculatePerformance(const TH1F *const pTH1F, float &sigma, float &sigmasigma, bool fixDistributionCentre = true);
+    static void CalculatePerformance(const TH1F *const pTH1F, float &sigma, float &sigmasigma, bool fixDistributionCentre = true, bool print = true);
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
