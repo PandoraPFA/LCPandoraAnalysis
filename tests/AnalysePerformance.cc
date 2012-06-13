@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     if ((nArgs < 1) || (nArgs > 2))
     {
         std::cout << std::endl
-                  << "Usage: ./analysePerformance inputFileName [outputFileName]" << std::endl << std::endl
+                  << "Usage: ./AnalysePerformance inputFileName [outputFileName]" << std::endl << std::endl
                   << "  inputFileName  : file containing pandora pfo analysis tree" << std::endl
                   << "  outputFileName : optional output root file, for histogram output" << std::endl << std::endl;
         return 1;
@@ -63,8 +63,8 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
     const unsigned int nRegionBins(13);
     float pRegionBinEdges[nRegionBins + 1] = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.925, 0.95, 0.975, 1.0};
 
-    TH1F *pEvsRHist = new TH1F("SigmaEvsCosTheta", "#sigma(E) vs cos(#theta)", nRegionBins, pRegionBinEdges);
-    pEvsRHist->SetYTitle("#sigma(E)");
+    TH1F *pEvsRHist = new TH1F("SigmaEvsCosTheta", "RMS_{90}(E) / Mean_{90}(E) vs cos(#theta)", nRegionBins, pRegionBinEdges);
+    pEvsRHist->SetYTitle("RMS_{90}(E) / Mean_{90}(E) (%)");
     pEvsRHist->SetXTitle("cos(#theta)");
 
     // Book histograms

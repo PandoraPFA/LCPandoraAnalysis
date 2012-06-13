@@ -27,8 +27,8 @@
 #include <cmath>
 #include <limits>
 
-using namespace lcio ;
-using namespace marlin ;
+using namespace lcio;
+using namespace marlin;
 
 PandoraPFACalibrator aPandoraPFACalibrator;
 
@@ -36,88 +36,83 @@ PandoraPFACalibrator aPandoraPFACalibrator;
 
 PandoraPFACalibrator::PandoraPFACalibrator() : Processor("PandoraPFACalibrator") 
 {
-    // modify processor description
-    _description = "PandoraPFACalibrator for calibration of PandoraPFA" ;
+    _description = "PandoraPFACalibrator for calibration of PandoraPFA";
 
-    // register steering parameters: name, description, class-variable, default value
-    registerProcessorParameter( "RootFile" , 
-                  "Name of the Track collection used for clustering"  ,
-                  _rootFile,
-                  std::string("PandoraPFACalibrator.root") ) ;
+    registerProcessorParameter("RootFile",
+        "Output root file name",
+        m_rootFile,
+        std::string("PandoraPFACalibrator.root"));
 
     LCStrVec inputMCParticleCollections;
     inputMCParticleCollections.push_back("MCPFOs");
     registerInputCollections(LCIO::RECONSTRUCTEDPARTICLE,
-               "InputMCParticleCollections",
-               "Names of input mc particle collections",
-               _inputMCParticleCollections,
-                            inputMCParticleCollections);
+        "InputMCParticleCollections",
+        "Names of input mc particle collections",
+        m_inputMCParticleCollections,
+        inputMCParticleCollections);
 
-    registerProcessorParameter( "InputParticleCollectionName" , 
-                  "Particle Collection Name "  ,
-                  _particleCollectionName,
-                  std::string("PandoraPFANewPFOs"));
+    registerProcessorParameter("InputParticleCollectionName",
+        "Particle Collection Name ",
+        m_particleCollectionName,
+        std::string("PandoraPFANewPFOs"));
 
     LCStrVec ecalBarrelCollections;
     ecalBarrelCollections.push_back(std::string("ECALBarrel"));
-    registerInputCollections( LCIO::CALORIMETERHIT,
-               "ECALBarrelcollections" , 
-               "Name of the ECAL barrel collection used to form clusters"  ,
-               _ecalBarrelCollections,
-               ecalBarrelCollections ) ;
+    registerInputCollections(LCIO::CALORIMETERHIT,
+        "ECALBarrelcollections", 
+        "Name of the ECAL barrel collection used to form clusters",
+        m_ecalBarrelCollections,
+        ecalBarrelCollections);
 
     LCStrVec ecalEndCapCollections;
     ecalEndCapCollections.push_back(std::string("ECALEndCap"));
-    registerInputCollections( LCIO::CALORIMETERHIT,
-               "ECALEndCapcollections" , 
-               "Name of the ECAL EndCap collection used to form clusters"  ,
-               _ecalEndCapCollections,
-               ecalEndCapCollections ) ;
+    registerInputCollections(LCIO::CALORIMETERHIT,
+        "ECALEndCapcollections", 
+        "Name of the ECAL EndCap collection used to form clusters",
+        m_ecalEndCapCollections,
+        ecalEndCapCollections);
 
     LCStrVec hcalCollections;
     hcalCollections.push_back(std::string("HCALBarrel"));
     hcalCollections.push_back(std::string("HCALEndcap"));
     hcalCollections.push_back(std::string("HCALOther"));
-    registerInputCollections( LCIO::CALORIMETERHIT,
-               "HCALcollections" , 
-               "Name of the HCAL collection used to form clusters"  ,
-               _hcalCollections,
-               hcalCollections ) ;
+    registerInputCollections(LCIO::CALORIMETERHIT,
+        "HCALcollections", 
+        "Name of the HCAL collection used to form clusters",
+        m_hcalCollections,
+        hcalCollections);
 
     LCStrVec muonCollections;
     muonCollections.push_back(std::string("MUON"));
-    registerInputCollections( LCIO::CALORIMETERHIT,
-               "MUONcollections" , 
-               "Name of the MUON collection used to form clusters"  ,
-               _muonCollections,
-               muonCollections ) ;
+    registerInputCollections(LCIO::CALORIMETERHIT,
+        "MUONcollections", 
+        "Name of the MUON collection used to form clusters",
+        m_muonCollections,
+        muonCollections);
 
     LCStrVec bcalCollections;
     bcalCollections.push_back(std::string("BCAL"));
-    registerInputCollections( LCIO::CALORIMETERHIT,
-               "BCALcollections" , 
-               "Name of the BCAL collection used to form clusters"  ,
-               _bcalCollections,
-               bcalCollections ) ;
-
+    registerInputCollections(LCIO::CALORIMETERHIT,
+        "BCALcollections", 
+        "Name of the BCAL collection used to form clusters",
+        m_bcalCollections,
+        bcalCollections);
 
     LCStrVec lhcalCollections;
     lhcalCollections.push_back(std::string("LHCAL"));
-    registerInputCollections( LCIO::CALORIMETERHIT,
-               "LHCALcollections" , 
-               "Name of the LHCAL collection used to form clusters"  ,
-               _lhcalCollections,
-               lhcalCollections ) ;
-
+    registerInputCollections(LCIO::CALORIMETERHIT,
+        "LHCALcollections", 
+        "Name of the LHCAL collection used to form clusters",
+        m_lhcalCollections,
+        lhcalCollections);
 
     LCStrVec lcalCollections;
     lcalCollections.push_back(std::string("LCAL"));
-    registerInputCollections( LCIO::CALORIMETERHIT,
-               "LCALcollections" , 
-               "Name of the LCAL collection used to form clusters"  ,
-               _lcalCollections,
-               lcalCollections ) ;
-
+    registerInputCollections(LCIO::CALORIMETERHIT,
+        "LCALcollections", 
+        "Name of the LCAL collection used to form clusters",
+        m_lcalCollections,
+        lcalCollections);
 
     //********************************************************************
     //**************************** Calibration ***************************
@@ -129,56 +124,50 @@ PandoraPFACalibrator::PandoraPFACalibrator() : Processor("PandoraPFACalibrator")
     // Thresholds are applied at the MIP level
     // MIP equivalent signals are converted to EM or Hadronic energy 
     //   i.e. different calibrations for EM and hadronic showers
+    registerProcessorParameter("ECalToMipCalibration",
+        "Calibration from deposited ECAL energy to MIP",
+        m_ecalToMIP,
+        (float)160.0);
 
-    registerProcessorParameter( "ECalToMipCalibration" , 
-                  "Calibration from deposited ECAL energy to MIP"  ,
-                  _ecalToMIP,
-                   (float)160.0 ) ;
+    registerProcessorParameter("HCalToMipCalibration",
+        "Calibration from deposited HCAL energy to MIP",
+        m_hcalToMIP,
+        (float)34.8);
 
-    registerProcessorParameter( "HCalToMipCalibration" , 
-                  "Calibration from deposited HCAL energy to MIP"  ,
-                  _hcalToMIP,
-                   (float)34.8 ) ;
+    registerProcessorParameter("MuonToMipCalibration",
+        "Calibration from deposited MUON energy to MIP",
+        m_muonToMIP,
+        (float)1.0);
 
-    registerProcessorParameter( "MuonToMipCalibration" , 
-                  "Calibration from deposited MUON energy to MIP"  ,
-                  _muonToMIP,
-                   (float)1.0 ) ;
+    registerProcessorParameter("ECalToEMGeVCalibration",
+        "Calibration from deposited ECAL to EM energy",
+        m_ecalToEMGeVCalibration,
+        (float)1.0);
 
-    registerProcessorParameter( "ECalMipThreshold" , 
-                  "ECAL Threshold in MIPS"  ,
-                  _ecalMIPThreshold,
-                   (float)0.5 ) ;
+    registerProcessorParameter("HCalToHadGeVCalibration",
+        "Calibration from deposited HCAL to Hadronic energy",
+        m_hcalToHadGeVCalibration,
+        (float)1.0);
 
-    registerProcessorParameter( "HCalMipThreshold" , 
-                  "HCAL Threshold in MIPS"  ,
-                  _hcalMIPThreshold,
-                   (float)0.5 ) ;
+    registerProcessorParameter("ECalToHadGeVCalibrationBarrel",
+        "Calibration from deposited ECAL barrel to Hadronic energy",
+        m_ecalToHadGeVCalibrationBarrel,
+        (float)1.03);
 
-    registerProcessorParameter( "HCalToEMGeVCalibration" , 
-                  "Calibration from deposited HCAL MIP to EM energy"  ,
-                  _hcalEMMIPToGeV,
-                   (float)1.0 ) ;
+    registerProcessorParameter("ECalToHadGeVCalibrationEndCap",
+        "Calibration from deposited ECAL endcap to Hadronic energy",
+        m_ecalToHadGeVCalibrationEndCap,
+        (float)1.16);
 
-    registerProcessorParameter( "HCalToHadGeVCalibration" , 
-                  "Calibration from deposited HCAL MIP to Hadronic energy"  ,
-                  _hcalHadMIPToGeV,
-                   (float)1.0 ) ;
+    registerProcessorParameter("HCalToEMGeVCalibration",
+        "Calibration from deposited HCAL to EM energy",
+        m_hcalToEMGeVCalibration,
+        (float)1.0);
 
-    registerProcessorParameter( "ECalToEMGeVCalibration" , 
-                  "Calibration from deposited ECAL MIP to EM energy"  ,
-                  _ecalEMMIPToGeV,
-                   (float)1.0 ) ;
-
-    registerProcessorParameter( "ECalToHadGeVCalibrationBarrel" , 
-                  "Calibration from deposited ECAL barrel MIP to Hadronic energy"  ,
-                  _ecalBarrelHadMIPToGeV,
-                   (float)1.03 ) ;
-
-    registerProcessorParameter( "ECalToHadGeVCalibrationEndCap" , 
-                  "Calibration from deposited ECAL endcap MIP to Hadronic energy"  ,
-                  _ecalEndCapHadMIPToGeV,
-                   (float)1.16 ) ;
+    registerProcessorParameter("MaxHCalHitHadronicEnergy",
+        "The maximum hadronic energy allowed for a single hcal hit",
+        m_maxHCalHitHadronicEnergy,
+        (float)1.0);
 
     CellIDDecoder<CalorimeterHit>::setDefaultEncoding("M:3,S-1:3,I:9,J:9,K-1:6");
 }
@@ -188,347 +177,302 @@ PandoraPFACalibrator::PandoraPFACalibrator() : Processor("PandoraPFACalibrator")
 void PandoraPFACalibrator::init() 
 {
     // usually a good idea to
-    printParameters() ;
+    printParameters();
 
-    _nRun = 0 ;
-    _nEvt = 0 ;
+    m_nRun = 0;
+    m_nEvt = 0;
 
     // PFA total energy
-    fPFA            = new TH1F("fPFAtot", "total energy",1000, 0., 250.0);
-    fPFAB           = new TH1F("fPFAB", "total energy barrel",1000, 0., 250.0);
-    fPFAVsCosTheta  = new TH2F("fPFAVsCosTheta", "total energy vs CosTheta",500,0.,1.,1000, 0., 250.0);
-    fPFAVsCosThetaR = new TH2F("fPFAVsCosThetaR", "total energy vs CosThetaReco",500,0.,1.,1000, 0., 250.0);
-    fPFAVsZCoG      = new TH2F("fPFAVsZCoG", "total energy vs zCog",600,0.,3000.,1000, 0., 200.0);
-    fPFAVsCosThetaX = new TH2F("fPFAVsCosThetaX", "total energy vs CosTheta",200,-1.,1.,1000, 0., 250.0);
+    m_PFA = new TH1F("fPFAtot", "total energy", 1000, 0., 250.);
+    m_PFAB = new TH1F("fPFAB", "total energy barrel", 1000, 0., 250.);
+    m_PFAVsCosTheta = new TH2F("fPFAVsCosTheta", "total energy vs CosTheta", 500, 0., 1., 1000, 0., 250.);
+    m_PFAVsCosThetaR = new TH2F("fPFAVsCosThetaR", "total energy vs CosThetaReco", 500, 0., 1., 1000, 0., 250.);
+    m_PFAVsZCoG = new TH2F("fPFAVsZCoG", "total energy vs zCog", 600, 0., 3000., 1000, 0., 200.);
+    m_PFAVsCosThetaX = new TH2F("fPFAVsCosThetaX", "total energy vs CosTheta", 200, -1., 1., 1000, 0., 250.);
 
-    fPFAE    = new TH1F("fPFAE", "total energy ECAL only events",1000, 0., 250.0);
-    fPFAH    = new TH1F("fPFAH", "total energy HCAL only events",1000, 0., 250.0);
-    fPFAM    = new TH1F("fPFAM", "total energy MUON only events",1000, 0., 250.0);
+    m_PFAE = new TH1F("fPFAE", "total energy ECAL only events", 1000, 0., 250.);
+    m_PFAH = new TH1F("fPFAH", "total energy HCAL only events", 1000, 0., 250.);
+    m_PFAM = new TH1F("fPFAM", "total energy MUON only events", 1000, 0., 250.);
 
-    fXvsY    = new TH2F("fXvsY", "x vs y",1000,-2500.,2500.,1000, -2500., 2500.0);
+    m_XvsY = new TH2F("fXvsY", "x vs y", 1000, -2500., 2500., 1000, -2500., 2500.);
 
     // ECAL total energy
-    fEcalEnergy           = new TH1F("fEcalEnergy", "total ecal energy",1000, 0., 250.0);
-    fHcalEnergy           = new TH1F("fHcalEnergy", "total hcal energy",1000, 0., 250.0);
-    fMuonEnergy           = new TH1F("fMuonEnergy", "total muon energy",1000, 0., 250.0);
-    fLcalEnergy           = new TH1F("fLcalEnergy", "total lcal energy",1000, 0., 250.0);
-    fCalEnergy            = new TH1F("fCalEnergy" , "total cal energy",1000, 0., 250.0);
+    m_EcalEnergy = new TH1F("fEcalEnergy", "total ecal energy", 1000, 0., 250.);
+    m_HcalEnergy = new TH1F("fHcalEnergy", "total hcal energy", 1000, 0., 250.);
+    m_MuonEnergy = new TH1F("fMuonEnergy", "total muon energy", 1000, 0., 250.);
+    m_LcalEnergy = new TH1F("fLcalEnergy", "total lcal energy", 1000, 0., 250.);
+    m_CalEnergy  = new TH1F("fCalEnergy", "total cal energy", 1000, 0., 250.);
 
-    fEcalBarrelHcalEnergy = new TH2F("fEcalBarrelHcalEnergy", "ecal barrel vs hcal energy",1000, 0., 250.0,1000,0.,250.);
-    fEcalEndCapHcalEnergy = new TH2F("fEcalEndCapHcalEnergy", "ecal endcap vs hcal energy",1000, 0., 250.0,1000,0.,250.);
+    m_EcalBarrelHcalEnergyEM = new TH2F("fEcalBarrelHcalEnergyEM", "ecal barrel vs hcal energy EM", 1000, 0., 250., 1000, 0., 250.);
+    m_EcalEndCapHcalEnergyEM = new TH2F("fEcalEndCapHcalEnergyEM", "ecal endcap vs hcal energy EM", 1000, 0., 250., 1000, 0., 250.);
+    m_EcalBarrelHcalEnergyHAD = new TH2F("fEcalBarrelHcalEnergyHAD", "ecal barrel vs hcal energy HAD", 1000, 0., 250., 1000, 0., 250.);
+    m_EcalEndCapHcalEnergyHAD = new TH2F("fEcalEndCapHcalEnergyHAD", "ecal endcap vs hcal energy HAD", 1000, 0., 250., 1000, 0., 250.);
 
-    fCalEnergyE           = new TH1F("fCalEnergyE" , "total cal energy E",1000, 0., 250.0);
-    fCalEnergyH           = new TH1F("fCalEnergyH" , "total cal energy H",1000, 0., 250.0);
-    fCalEnergyM           = new TH1F("fCalEnergyM" , "total cal energy M",1000, 0., 250.0);
+    m_CalEnergyE = new TH1F("fCalEnergyE", "total cal energy E", 1000, 0., 250.);
+    m_CalEnergyH = new TH1F("fCalEnergyH", "total cal energy H", 1000, 0., 250.);
+    m_CalEnergyM = new TH1F("fCalEnergyM", "total cal energy M", 1000, 0., 250.);
 
-    fCalEnergyVsCosTheta  = new TH2F("fCalEnergyVsCosTheta" , "total cal energy vs cos theta",500,0.,1.,1000, 0., 250.0);
-    fCalEnergyVsCosThetaR = new TH2F("fCalEnergyVsCosThetaR" , "total cal energy vs cos theta reco",500,0.,1.,1000, 0., 250.0);
+    m_CalEnergyVsCosTheta = new TH2F("fCalEnergyVsCosTheta", "total cal energy vs cos theta", 500, 0., 1., 1000, 0., 250.);
+    m_CalEnergyVsCosThetaR = new TH2F("fCalEnergyVsCosThetaR", "total cal energy vs cos theta reco", 500, 0., 1.,1000, 0., 250.);
 
-    fEcalBarrelEnergyByLayer = new TH1F("fEcalBarrelEnergyByLayer", "ecal barrel energy profile",100, 0., 100.0);
-    fEcalEndCapEnergyByLayer = new TH1F("fEcalEndCapEnergyByLayer", "ecal endcap energy profile",100, 0., 100.0);
+    m_EcalBarrelEnergyByLayer = new TH1F("fEcalBarrelEnergyByLayer", "ecal barrel energy profile", 100, 0., 100.);
+    m_EcalEndCapEnergyByLayer = new TH1F("fEcalEndCapEnergyByLayer", "ecal endcap energy profile", 100, 0., 100.);
 
     // MIP Calibration
-    fEcalBarrelMIP = new TH1F("fEcalBarrelMIP", "ecal barrel MIP peak ",100, 0., 5.0);
-    fEcalEndCapMIP = new TH1F("fEcalEndCapMIP", "ecal endcap MIP peak ",100, 0., 5.0);
-    fHcalMIP       = new TH1F("fHcalMIP", "hcal MIP peak ",100, 0., 5.0);
-    fMuonMIP       = new TH1F("fMuonMIP", "muon MIP peak ",1000, 0., 50.0);
+    m_EcalBarrelMIP = new TH1F("fEcalBarrelMIP", "ecal barrel MIP peak ", 100, 0., 5.);
+    m_EcalEndCapMIP = new TH1F("fEcalEndCapMIP", "ecal endcap MIP peak ", 100, 0., 5.);
+    m_HcalMIP = new TH1F("fHcalMIP", "hcal MIP peak ", 100, 0., 5.);
+    m_MuonMIP = new TH1F("fMuonMIP", "muon MIP peak ", 100, 0., 5.);
 
-    fEcalBarrelMIPcorr  = new TH1F("fEcalBarrelMIPcorr", "ecal barrel MIP peak ",100, 0., 5.0);
-    fEcalEndCapMIPcorr  = new TH1F("fEcalEndCapMIPcorr", "ecal endcap MIP peak ",100, 0., 5.0);
-    fHcalMIPcorr  = new TH1F("fHcalMIPcorr", "hcal MIP peak ",100, 0., 5.0);
-    fMuonMIPcorr  = new TH1F("fMuonMIPcorr", "muon MIP peak ",1000, 0., 50.0);
+    m_EcalBarrelMIPcorr = new TH1F("fEcalBarrelMIPcorr", "ecal barrel MIP peak ", 100, 0., 5.);
+    m_EcalEndCapMIPcorr = new TH1F("fEcalEndCapMIPcorr", "ecal endcap MIP peak ", 100, 0., 5.);
+    m_HcalMIPcorr = new TH1F("fHcalMIPcorr", "hcal MIP peak ", 100, 0., 5.);
+    m_MuonMIPcorr = new TH1F("fMuonMIPcorr", "muon MIP peak ", 100, 0., 5.);
 
-    fCosT       = new TH1F("fCosT", "cosTheta ",100, 0., 1.0);
-    fPhotonCosT = new TH1F("fPhotonCosT", "cosTheta Photon",100, 0., 1.0);
+    m_CosT = new TH1F("fCosT", "cosTheta ", 100, 0., 1.);
+    m_PhotonCosT = new TH1F("fPhotonCosT", "cosTheta Photon", 100, 0., 1.0);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 void PandoraPFACalibrator::processRunHeader(LCRunHeader *run)
 {
-    _nRun++ ;
-    _detectorName = run->getDetectorName();
+    m_nRun++;
+    m_detectorName = run->getDetectorName();
 
-    std::cout << " DETECTOR : " << _detectorName << std::endl;
+    std::cout << " DETECTOR : " << m_detectorName << std::endl;
 
     const gear::CalorimeterParameters& pEcalEndcap = Global::GEAR->getEcalEndcapParameters();
-    _zOfEndCap = static_cast<float>(pEcalEndcap.getExtent()[2]);
+    m_zOfEndCap = static_cast<float>(pEcalEndcap.getExtent()[2]);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void PandoraPFACalibrator::processEvent( LCEvent * evt ) 
+void PandoraPFACalibrator::processEvent(LCEvent *evt)
 {
-    _nEvt ++ ;
+    m_nEvt ++;
     float ecalBarrelEnergy = 0, ecalEndCapEnergy = 0;
-    float hcalEnergy  = 0.;
-    float muonEnergy  = 0.;
-    float lcalEnergy  = 0.;
-    float bcalEnergy  = 0.;
+    float hcalEnergy = 0.;
+    float muonEnergy = 0.;
+    float lcalEnergy = 0.;
+    float bcalEnergy = 0.;
     float lhcalEnergy = 0.;
-    float totEnergy   = 0.;
-    float pfoEnergy   = 0.;
+    float totEnergy = 0.;
+    float pfoEnergy = 0.;
 
     // read MCParticle collection
-    for (unsigned int i = 0; i < _inputMCParticleCollections.size(); ++i) 
+    for (unsigned int i = 0; i < m_inputMCParticleCollections.size(); ++i) 
     {
         try
         {
-            LCCollection * col = evt->getCollection( _inputMCParticleCollections.at(i).c_str() );
-            int nelem = col->getNumberOfElements();
+            LCCollection * col = evt->getCollection(m_inputMCParticleCollections.at(i).c_str());
 
-            m_out(DEBUG)<<"\n MCParticle collection "<<_inputMCParticleCollections.at(i)<<" with "<<nelem<<" elements"<<std::endl;
-
-            for(int iMC = 0; iMC < nelem; iMC++)
+            if (col != 0)
             {
-                ReconstructedParticle *part =  dynamic_cast<ReconstructedParticle*>( col->getElementAt(0) );
-                float x =  part->getMomentum()[0];
-                float y =  part->getMomentum()[1];
-                float z =  part->getMomentum()[2];
-                float p =  sqrt(x*x+y*y+z*z);
+                const int nelem(col->getNumberOfElements());
+                m_out(DEBUG) << std::endl << "MCParticle collection " << m_inputMCParticleCollections.at(i) << " with "<< nelem << " elements" << std::endl;
 
-                _cosTheta = 0;
-                _x = 0.;
-                _y = 0.;
-
-                if (p > 0)
+                for (int iMC = 0; iMC < nelem; ++iMC)
                 {
-                    _cosThetaX = z / sqrt(x*x+y*y+z*z);
-                    _cosTheta = std::fabs(z) / std::sqrt(x*x+y*y+z*z);
+                    ReconstructedParticle *part =  dynamic_cast<ReconstructedParticle*>(col->getElementAt(0));
+                    const float x(part->getMomentum()[0]);
+                    const float y(part->getMomentum()[1]);
+                    const float z(part->getMomentum()[2]);
+                    const float p(std::sqrt(x * x + y * y + z * z));
 
-                    if (std::fabs(z) > 0)
+                    m_cosTheta = 0;
+                    m_x = 0.;
+                    m_y = 0.;
+
+                    if (p > 0)
                     {
-                        _x = _zOfEndCap * x / z;
-                        _y = _zOfEndCap * y / z;
-                    }
-                }
+                        m_cosThetaX = z / std::sqrt(x * x + y * y + z * z);
+                        m_cosTheta = std::fabs(z) / std::sqrt(x * x + y * y + z * z);
 
-                float energy = part->getEnergy();
-                m_out(DEBUG) << " First MC Particle : " << energy << " GeV " << " at " << x << "," << y << "," << z << " (|cosTheta| = " << _cosTheta << ")" << std::endl;
-            }/*end loop over iQuark*/      
+                        if (std::fabs(z) > 0)
+                        {
+                            m_x = m_zOfEndCap * x / z;
+                            m_y = m_zOfEndCap * y / z;
+                        }
+                    }
+
+                    const float energy(part->getEnergy());
+                    m_out(DEBUG) << " First MC Particle : " << energy << " GeV " << " at " << x << "," << y << "," << z << " (|cosTheta| = " << m_cosTheta << ")" << std::endl;
+                }
+            }
         }
-        catch(DataNotAvailableException &e)
+        catch (DataNotAvailableException &)
         {
-            m_out(DEBUG) << "No Collection : " << _inputMCParticleCollections.at(i) << std::endl;
+            m_out(DEBUG) << "No Collection : " << m_inputMCParticleCollections.at(i) << std::endl;
         }
-    } /*end loop over i*/
+    }
 
     // read ECAL BARREL hits
-    _zmean = 0;
-
-    for (unsigned int i = 0; i < _ecalBarrelCollections.size(); ++i) 
+    for (unsigned int i = 0; i < m_ecalBarrelCollections.size(); ++i) 
     {
         try
         {
-            LCCollection * col = evt->getCollection( _ecalBarrelCollections.at(i).c_str() );
+            LCCollection * col = evt->getCollection(m_ecalBarrelCollections.at(i).c_str());
 
-            if (col != 0) 
+            if (col != 0)
             {
-                CellIDDecoder<CalorimeterHit> id( col ) ;
-                int nelem = col->getNumberOfElements();
+                CellIDDecoder<CalorimeterHit> id(col);
+                const int nelem(col->getNumberOfElements());
 
-                for(int ihit = 0; ihit < nelem; ihit++)
+                for (int ihit = 0; ihit < nelem; ++ihit)
                 {
                     CalorimeterHit * hit = dynamic_cast<CalorimeterHit*>(col->getElementAt(ihit));
                     float hitEnergy = hit->getEnergy();
                     ecalBarrelEnergy += hitEnergy;
-                    int layerNumber = id( hit )["K-1"] + 1 ;
+                    int layerNumber = id(hit)["K-1"] + 1;
 
-                    fEcalBarrelEnergyByLayer->Fill(layerNumber,hitEnergy);
-
-                    float scale = 1.0;
-
-                    if(hit->getType() == 1) // Not sure this still works: that's what enums are for...
-                        scale = 2.0;
+                    m_EcalBarrelEnergyByLayer->Fill(layerNumber,hitEnergy);
 
                     float energyInMips=0;
-                    float x = hit->getPosition()[0];
-                    float y = hit->getPosition()[1];
-                    float z = hit->getPosition()[2];
-                    float r = sqrt(x*x+y*y+z*z);
-                    _zmean += z;
-                    //         nz    +=1.;
-                    float correction = 1.;
+                    const float x(hit->getPosition()[0]);
+                    const float y(hit->getPosition()[1]);
+                    const float z(hit->getPosition()[2]);
+                    const float r(std::sqrt(x*x+y*y+z*z));
+                    const float correction((std::fabs(z) < m_zOfEndCap) ? r / std::sqrt(x*x+y*y) : r / z);
 
-                    if(fabs(z) < _zOfEndCap)
-                    {
-                        correction = r / std::sqrt(x*x+y*y);
-                    }
-                    else
-                    {
-                        correction = r / z;
-                    }
-
-                    energyInMips = hit->getEnergy() * _ecalToMIP / scale;
-                    fEcalBarrelMIP->Fill(energyInMips);
-                    fEcalBarrelMIPcorr->Fill(energyInMips / correction);
+                    energyInMips = hit->getEnergy() * m_ecalToMIP;
+                    m_EcalBarrelMIP->Fill(energyInMips);
+                    m_EcalBarrelMIPcorr->Fill(energyInMips / correction);
                 }
                 m_out(DEBUG)<< " ECAL BARREL hits : " << nelem << " energy = " << ecalBarrelEnergy << std::endl;
             }
         }
-        catch(DataNotAvailableException &e)
+        catch (DataNotAvailableException &)
         {
-            m_out(DEBUG) << "No Collection : " <<  _ecalBarrelCollections[i] << std::endl;
+            m_out(DEBUG) << "No Collection : " <<  m_ecalBarrelCollections[i] << std::endl;
         }
     }
 
     // read ECAL ENDCAP hits
-    _zmean = 0;
-
-    for (unsigned int i = 0; i < _ecalEndCapCollections.size(); ++i) 
+    for (unsigned int i = 0; i < m_ecalEndCapCollections.size(); ++i) 
     {
         try
         {
-            LCCollection * col = evt->getCollection( _ecalEndCapCollections.at(i).c_str() );
+            LCCollection * col = evt->getCollection(m_ecalEndCapCollections.at(i).c_str());
 
-            if (col != 0) 
+            if (col != 0)
             {
-                CellIDDecoder<CalorimeterHit> id( col ) ;
-                int nelem = col->getNumberOfElements();
+                CellIDDecoder<CalorimeterHit> id(col);
+                const int nelem(col->getNumberOfElements());
 
-                for(int ihit = 0; ihit < nelem; ihit++)
+                for (int ihit = 0; ihit < nelem; ++ihit)
                 {
                     CalorimeterHit * hit = dynamic_cast<CalorimeterHit*>(col->getElementAt(ihit));
                     float hitEnergy = hit->getEnergy();
                     ecalEndCapEnergy += hitEnergy;
-                    int layerNumber = id( hit )["K-1"] + 1 ;
+                    int layerNumber = id(hit)["K-1"] + 1;
 
-                    fEcalEndCapEnergyByLayer->Fill(layerNumber,hitEnergy);
-
-                    float scale = 1.0;
-                    if (hit->getType() == 1) // Not sure this still works: that's what enums are for...
-                        scale =2.0;
+                    m_EcalEndCapEnergyByLayer->Fill(layerNumber,hitEnergy);
 
                     float energyInMips=0;
-                    float x = hit->getPosition()[0];
-                    float y = hit->getPosition()[1];
-                    float z = hit->getPosition()[2];
-                    float r = sqrt(x*x+y*y+z*z);
-                    _zmean += z;
-                    float correction = 1.;
+                    const float x(hit->getPosition()[0]);
+                    const float y(hit->getPosition()[1]);
+                    const float z(hit->getPosition()[2]);
+                    const float r(std::sqrt(x * x + y * y + z * z));
+                    const float correction((std::fabs(z) < m_zOfEndCap) ? r / std::sqrt(x*x+y*y) : r / z);
 
-                    if(fabs(z) < _zOfEndCap)
-                    {
-                        correction = r / std::sqrt(x*x+y*y);
-                    }
-                    else
-                    {
-                        correction = r / z;
-                    }
-
-                    energyInMips = hit->getEnergy()*_ecalToMIP / scale;
-                    fEcalEndCapMIP->Fill(energyInMips);
-                    fEcalEndCapMIPcorr->Fill(energyInMips / correction);
+                    energyInMips = hit->getEnergy() * m_ecalToMIP;
+                    m_EcalEndCapMIP->Fill(energyInMips);
+                    m_EcalEndCapMIPcorr->Fill(energyInMips / correction);
                 }
                 m_out(DEBUG) << " ECAL ENDCAP hits : " << nelem << " energy = " << ecalEndCapEnergy << std::endl;
             }
         }
-        catch(DataNotAvailableException &e)
+        catch(DataNotAvailableException &)
         {
-            m_out(DEBUG) << "No Collection : " <<  _ecalEndCapCollections[i] << std::endl;
+            m_out(DEBUG) << "No Collection : " <<  m_ecalEndCapCollections[i] << std::endl;
         }
     }
 
     // read HCAL hits
-    for (unsigned int i = 0; i < _hcalCollections.size(); ++i) 
+    for (unsigned int i = 0; i < m_hcalCollections.size(); ++i) 
     {
         try
         {
-            LCCollection * col = evt->getCollection( _hcalCollections.at(i).c_str() );
+            LCCollection * col = evt->getCollection(m_hcalCollections.at(i).c_str());
 
-            if (col != 0) 
+            if (col != 0)
             {
-                int nelem = col->getNumberOfElements();
+                const int nelem(col->getNumberOfElements());
 
-                for(int ihit = 0; ihit < nelem; ihit++)
+                for (int ihit = 0; ihit < nelem; ++ihit)
                 {
                     CalorimeterHit * hit = dynamic_cast<CalorimeterHit*>(col->getElementAt(ihit));
-                    hcalEnergy += hit->getEnergy();
+
+                    const float hitEnergy(std::min(hit->getEnergy(), m_maxHCalHitHadronicEnergy));
+                    hcalEnergy += hitEnergy;
                     float energyInMips=0;
-                    float x = hit->getPosition()[0];
-                    float y = hit->getPosition()[1];
-                    float z = hit->getPosition()[2];
-                    float r = sqrt(x*x+y*y+z*z);
-                    float correction = 1.;
+                    const float x(hit->getPosition()[0]);
+                    const float y(hit->getPosition()[1]);
+                    const float z(hit->getPosition()[2]);
+                    const float r(std::sqrt(x * x + y * y + z * z));
+                    const float correction((std::fabs(z) < m_zOfEndCap) ? r / std::sqrt(x*x+y*y) : r / z);
 
-                    if(fabs(z) < _zOfEndCap)
-                    {
-                        correction = r / std::sqrt(x*x+y*y);
-                    }
-                    else
-                    {
-                        correction = r / z;
-                    }
-
-                    energyInMips = hit->getEnergy() * _hcalToMIP;
-                    fHcalMIP->Fill(energyInMips);
-                    fHcalMIPcorr->Fill(energyInMips / correction);
+                    energyInMips = hitEnergy * m_hcalToMIP;
+                    m_HcalMIP->Fill(energyInMips);
+                    m_HcalMIPcorr->Fill(energyInMips / correction);
                 }
                 m_out(DEBUG) << " HCAL hits : " << nelem << " energy = " << hcalEnergy << std::endl;
             }
         }
-        catch(DataNotAvailableException &e)
+        catch(DataNotAvailableException &)
         {
-            m_out(DEBUG) << "No Collection : " <<  _hcalCollections[i] << std::endl;
+            m_out(DEBUG) << "No Collection : " <<  m_hcalCollections[i] << std::endl;
         }
     }
 
     // read MUON hits
-    for (unsigned int i = 0; i < _muonCollections.size(); ++i) 
+    for (unsigned int i = 0; i < m_muonCollections.size(); ++i) 
     {
         try
         {
-            LCCollection * col = evt->getCollection( _muonCollections.at(i).c_str() );
+            LCCollection * col = evt->getCollection(m_muonCollections.at(i).c_str());
 
             if (col != 0) 
             {
-                int nelem = col->getNumberOfElements();
+                const int nelem(col->getNumberOfElements());
 
-                for(int ihit = 0; ihit < nelem; ihit++)
+                for (int ihit = 0; ihit < nelem; ++ihit)
                 {
                     CalorimeterHit * hit = dynamic_cast<CalorimeterHit*>(col->getElementAt(ihit));
                     muonEnergy += hit->getEnergy();
                     float energyInMips=0;
-                    float x = hit->getPosition()[0];
-                    float y = hit->getPosition()[1];
-                    float z = hit->getPosition()[2];
-                    float r = sqrt(x*x+y*y+z*z);
-                    float correction = 1.;
+                    const float x(hit->getPosition()[0]);
+                    const float y(hit->getPosition()[1]);
+                    const float z(hit->getPosition()[2]);
+                    const float r(std::sqrt(x * x + y * y + z * z));
+                    const float correction((std::fabs(z) < m_zOfEndCap) ? r / std::sqrt(x*x+y*y) : r / z);
 
-                    if(fabs(z) < _zOfEndCap)
-                    {
-                        correction = r / std::sqrt(x*x+y*y);
-                    }
-                    else
-                    {
-                        correction = r / z;
-                    }
-//std::cout << "muon hit x: " << hit->getPosition()[0] << ", y: " << hit->getPosition()[1] << ", z: " << hit->getPosition()[2] << ", E: " << hit->getEnergy() << ", t: " << hit->getTime() << std::endl;
-                    energyInMips = hit->getEnergy() * _muonToMIP;
-                    fMuonMIP->Fill(energyInMips);
-                    fMuonMIPcorr->Fill(energyInMips / correction);
+                    energyInMips = hit->getEnergy() * m_muonToMIP;
+                    m_MuonMIP->Fill(energyInMips);
+                    m_MuonMIPcorr->Fill(energyInMips / correction);
                 }
                 m_out(DEBUG) << " MUON hits : " << nelem << " energy = " << muonEnergy << std::endl;
             }
         }
-        catch(DataNotAvailableException &e)
+        catch(DataNotAvailableException &)
         {
-            m_out(DEBUG) << "No Collection : " <<  _muonCollections[i] << std::endl;
+            m_out(DEBUG) << "No Collection : " <<  m_muonCollections[i] << std::endl;
         }
     }
 
     // read LCAL hits
-    for (unsigned int i = 0; i < _lcalCollections.size(); ++i) 
+    for (unsigned int i = 0; i < m_lcalCollections.size(); ++i) 
     {
         try
         {
-            LCCollection * col = evt->getCollection( _lcalCollections.at(i).c_str() );
+            LCCollection * col = evt->getCollection(m_lcalCollections.at(i).c_str());
 
-            if (col != 0) 
+            if (col != 0)
             {
-                int nelem = col->getNumberOfElements();
+                const int nelem(col->getNumberOfElements());
 
-                for(int ihit = 0; ihit < nelem; ihit++)
+                for (int ihit = 0; ihit < nelem; ++ihit)
                 {
                     CalorimeterHit * hit = dynamic_cast<CalorimeterHit*>(col->getElementAt(ihit));
                     lcalEnergy += hit->getEnergy();
@@ -536,24 +480,24 @@ void PandoraPFACalibrator::processEvent( LCEvent * evt )
                 m_out(DEBUG) << " LCAL hits : " << nelem << " energy = " << lcalEnergy << std::endl;
             }
         }
-        catch(DataNotAvailableException &e)
+        catch(DataNotAvailableException &)
         {
-            m_out(DEBUG) << "No Collection : " <<  _lcalCollections[i] << std::endl;
+            m_out(DEBUG) << "No Collection : " <<  m_lcalCollections[i] << std::endl;
         }
     }
 
     // read BCAL hits
-    for (unsigned int i = 0; i < _bcalCollections.size(); ++i) 
+    for (unsigned int i = 0; i < m_bcalCollections.size(); ++i) 
     {
         try
         {
-            LCCollection * col = evt->getCollection( _bcalCollections.at(i).c_str() );
+            LCCollection * col = evt->getCollection(m_bcalCollections.at(i).c_str());
 
-            if (col != 0) 
+            if (col != 0)
             {
-                int nelem = col->getNumberOfElements();
+                const int nelem(col->getNumberOfElements());
 
-                for(int ihit = 0; ihit < nelem; ihit++)
+                for (int ihit = 0; ihit < nelem; ++ihit)
                 {
                     CalorimeterHit * hit = dynamic_cast<CalorimeterHit*>(col->getElementAt(ihit));
                     bcalEnergy += hit->getEnergy();
@@ -561,24 +505,24 @@ void PandoraPFACalibrator::processEvent( LCEvent * evt )
                 m_out(DEBUG) << " BCAL hits : " << nelem << " energy = " << bcalEnergy << std::endl;
             }
         }
-        catch(DataNotAvailableException &e)
+        catch(DataNotAvailableException &)
         {
-            m_out(DEBUG) << "No Collection : " <<  _bcalCollections[i] << std::endl;
+            m_out(DEBUG) << "No Collection : " <<  m_bcalCollections[i] << std::endl;
         }
     }
 
     // read LHCAL hits
-    for (unsigned int i=0; i < _lhcalCollections.size(); ++i) 
+    for (unsigned int i = 0 ; i < m_lhcalCollections.size(); ++i) 
     {
         try
         {
-            LCCollection * col = evt->getCollection( _lhcalCollections.at(i).c_str() );
+            LCCollection * col = evt->getCollection(m_lhcalCollections.at(i).c_str());
 
-            if (col != 0) 
+            if (col != 0)
             {
-                int nelem = col->getNumberOfElements();
+                const int nelem(col->getNumberOfElements());
 
-                for(int ihit = 0; ihit < nelem; ihit++)
+                for (int ihit = 0; ihit < nelem; ++ihit)
                 {
                     CalorimeterHit * hit = dynamic_cast<CalorimeterHit*>(col->getElementAt(ihit));
                     lhcalEnergy += hit->getEnergy();
@@ -586,9 +530,9 @@ void PandoraPFACalibrator::processEvent( LCEvent * evt )
                 m_out(DEBUG) << " LHCAL hits : " << nelem << " energy = " << lhcalEnergy << std::endl;
             }
         }
-        catch(DataNotAvailableException &e)
+        catch(DataNotAvailableException &)
         {
-            m_out(DEBUG) << "No Collection : " <<  _lhcalCollections[i] << std::endl;
+            m_out(DEBUG) << "No Collection : " <<  m_lhcalCollections[i] << std::endl;
         }
     }
 
@@ -596,114 +540,124 @@ void PandoraPFACalibrator::processEvent( LCEvent * evt )
     totEnergy = ecalBarrelEnergy + ecalEndCapEnergy + hcalEnergy + muonEnergy + lcalEnergy + bcalEnergy + lhcalEnergy;
     m_out(DEBUG) << " Total Calorimetric Energy : " << totEnergy << std::endl;
 
-    if (_cosTheta < 0.95)
+    if (m_cosTheta < 0.95)
     {
-        fEcalEnergy->Fill(ecalBarrelEnergy + ecalEndCapEnergy,1.);
-        fEcalBarrelHcalEnergy->Fill((ecalBarrelEnergy * _ecalBarrelHadMIPToGeV) / _ecalEMMIPToGeV, hcalEnergy, 1.);
-        fEcalEndCapHcalEnergy->Fill((ecalEndCapEnergy * _ecalEndCapHadMIPToGeV) / _ecalEMMIPToGeV, hcalEnergy, 1.);
-        fHcalEnergy->Fill(hcalEnergy,1.);
-        fMuonEnergy->Fill(muonEnergy,1.);
-        fLcalEnergy->Fill(lcalEnergy,1.);
-        fCalEnergy->Fill(totEnergy,1.);
+        m_EcalEnergy->Fill(ecalBarrelEnergy + ecalEndCapEnergy,1.);
+
+        m_EcalBarrelHcalEnergyEM->Fill(ecalBarrelEnergy, hcalEnergy * m_hcalToEMGeVCalibration, 1.);
+        m_EcalEndCapHcalEnergyEM->Fill(ecalEndCapEnergy, hcalEnergy * m_hcalToEMGeVCalibration, 1.);
+
+        m_EcalBarrelHcalEnergyHAD->Fill((ecalBarrelEnergy * m_ecalToHadGeVCalibrationBarrel), hcalEnergy, 1.);
+        m_EcalEndCapHcalEnergyHAD->Fill((ecalEndCapEnergy * m_ecalToHadGeVCalibrationEndCap), hcalEnergy, 1.);
+
+        m_HcalEnergy->Fill(hcalEnergy,1.);
+        m_MuonEnergy->Fill(muonEnergy,1.);
+        m_LcalEnergy->Fill(lcalEnergy,1.);
+        m_CalEnergy->Fill(totEnergy,1.);
+
         if (totEnergy > 0 && (ecalBarrelEnergy + ecalEndCapEnergy) / totEnergy > 0.95)
-            fCalEnergyE->Fill(totEnergy);
+            m_CalEnergyE->Fill(totEnergy);
+
         if (totEnergy > 0 && hcalEnergy / totEnergy > 0.95)
-            fCalEnergyH->Fill(totEnergy);
+            m_CalEnergyH->Fill(totEnergy);
+
         if (totEnergy > 0 && muonEnergy / totEnergy > 0.95)
-            fCalEnergyM->Fill(totEnergy);
+            m_CalEnergyM->Fill(totEnergy);
     }
-    fCalEnergyVsCosTheta->Fill(_cosTheta,totEnergy,1.);
+
+    m_CalEnergyVsCosTheta->Fill(m_cosTheta, totEnergy, 1.);
 
     // Read reconstructed PFOs
     try
     {
-        LCCollection * col = evt->getCollection( _particleCollectionName.c_str() );
+        LCCollection * col = evt->getCollection(m_particleCollectionName.c_str());
 
         if (col != 0) 
         {
-            int nelem = col->getNumberOfElements();
+            const int nelem(col->getNumberOfElements());
             bool check=true;
             float photonE = 0;
             float p[3] = {0.,0.,0.};
-            _zCoG=0.;
+            m_zCoG=0.;
             float esum = 0;
 
-            for(int j = 0; j < nelem; j++)
+            for (int j = 0; j < nelem; ++j)
             {
                 ReconstructedParticle* recoPart = dynamic_cast<ReconstructedParticle*>(col->getElementAt(j));
                 pfoEnergy+=recoPart->getEnergy();
 
                 TrackVec tracks = recoPart->getTracks();
 
-                if (tracks.size()!= 0)
+                if (tracks.size() != 0)
                     check = false;
 
-                if (recoPart->getType()== 22)
+                if (recoPart->getType() == 22)
                     photonE += recoPart->getEnergy();
 
                 p[0] += recoPart->getMomentum()[0];
                 p[1] += recoPart->getMomentum()[1];
                 p[2] += recoPart->getMomentum()[2];
 
-                ClusterVec clusters = recoPart->getClusters();
-                for(unsigned int icluster = 0; icluster < clusters.size(); icluster++)
+                const ClusterVec &clusters = recoPart->getClusters();
+
+                for (ClusterVec::const_iterator iter = clusters.begin(), iterEnd = clusters.end(); iter != iterEnd; ++iter)
                 {
-                    _zCoG+= clusters[icluster]->getPosition()[2]*clusters[icluster]->getEnergy();
-                    esum += clusters[icluster]->getEnergy();
+                    m_zCoG += (*iter)->getPosition()[2] * (*iter)->getEnergy();
+                    esum += (*iter)->getEnergy();
                 }
-            }/*end loop over j*/
+            }
 
             if (esum > 0)
             {
-                _zCoG = _zCoG / esum;
+                m_zCoG = m_zCoG / esum;
             }
             else
             {
-                _zCoG = std::numeric_limits<float>::max();
+                m_zCoG = std::numeric_limits<float>::max();
             }
 
-            _cosThetaR = std::fabs(p[2]) / std::sqrt(p[0]*p[0]+p[1]*p[1]+p[2]*p[2]);
+            m_cosThetaR = std::fabs(p[2]) / std::sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
             m_out(DEBUG) << " PFO objects : " << nelem << " energy = " << pfoEnergy << std::endl;
 
-            if(check)
+            if (check)
             {
-                fCosT->Fill(_cosTheta,1.);
+                m_CosT->Fill(m_cosTheta,1.);
 
                 if (pfoEnergy > 0 && photonE > 0.5*pfoEnergy)
-                    fPhotonCosT->Fill(_cosTheta,1.);
+                    m_PhotonCosT->Fill(m_cosTheta,1.);
             }
 
-            fPFAVsCosTheta->Fill(_cosTheta,pfoEnergy,1.);
-            fPFAVsCosThetaR->Fill(_cosThetaR,pfoEnergy,1.);
-            fPFAVsZCoG->Fill(fabs(_zCoG),pfoEnergy,1.);
-            fPFAVsCosThetaX->Fill(_cosThetaX,pfoEnergy,1.);
+            m_PFAVsCosTheta->Fill(m_cosTheta,pfoEnergy,1.);
+            m_PFAVsCosThetaR->Fill(m_cosThetaR,pfoEnergy,1.);
+            m_PFAVsZCoG->Fill(fabs(m_zCoG),pfoEnergy,1.);
+            m_PFAVsCosThetaX->Fill(m_cosThetaX,pfoEnergy,1.);
 
-            if (_cosTheta < 0.95)
+            if (m_cosTheta < 0.95)
             {
-                fPFA->Fill(pfoEnergy,1.);
+                m_PFA->Fill(pfoEnergy,1.);
 
-                if (_cosTheta < 0.7)
-                    fPFAB->Fill(pfoEnergy,1.);
+                if (m_cosTheta < 0.7)
+                    m_PFAB->Fill(pfoEnergy,1.);
 
                 if (totEnergy > 0 && (ecalBarrelEnergy + ecalEndCapEnergy) / totEnergy > 0.95)
-                    fPFAE->Fill(pfoEnergy,1.);
+                    m_PFAE->Fill(pfoEnergy,1.);
 
                 if (totEnergy > 0 && hcalEnergy / totEnergy > 0.95)
-                    fPFAH->Fill(pfoEnergy,1.);
+                    m_PFAH->Fill(pfoEnergy,1.);
 
                 if (totEnergy > 0 && muonEnergy / totEnergy > 0.95)
-                    fPFAM->Fill(pfoEnergy,1.);
+                    m_PFAM->Fill(pfoEnergy,1.);
             }
 
-            fXvsY->Fill(_x, _y, 1.);
+            m_XvsY->Fill(m_x, m_y, 1.);
         }
     }
-    catch(DataNotAvailableException &e)
+    catch(DataNotAvailableException &)
     {
-        m_out(DEBUG) << "No Collection : " <<  _particleCollectionName << std::endl;
+        m_out(DEBUG) << "No Collection : " <<  m_particleCollectionName << std::endl;
     }
 
-    fCalEnergyVsCosThetaR->Fill(_cosThetaR, totEnergy,1.);
+    m_CalEnergyVsCosThetaR->Fill(m_cosThetaR, totEnergy,1.);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -716,53 +670,55 @@ void PandoraPFACalibrator::check(LCEvent *pLCEvent)
 
 void PandoraPFACalibrator::end()
 {
-    std::cout << "PandoraPFACalibrator::end()  " << name() << " processed " << _nEvt << " events in " << _nRun << " runs " << std::endl ;
+    std::cout << "PandoraPFACalibrator::end()  " << name() << " processed " << m_nEvt << " events in " << m_nRun << " runs " << std::endl;
 
-    TFile *hfile = new TFile(_rootFile.c_str(),"recreate");
-    fPFA->Write();
-    fPFAB->Write();
-    fPFAVsCosTheta->Write();
-    fPFAVsCosThetaR->Write();
-    fPFAVsZCoG->Write();
-    fPFAVsCosThetaX->Write();
+    TFile *hfile = new TFile(m_rootFile.c_str(),"recreate");
+    m_PFA->Write();
+    m_PFAB->Write();
+    m_PFAVsCosTheta->Write();
+    m_PFAVsCosThetaR->Write();
+    m_PFAVsZCoG->Write();
+    m_PFAVsCosThetaX->Write();
 
-    fPFAE->Write();
-    fPFAH->Write();
-    fPFAM->Write();
+    m_PFAE->Write();
+    m_PFAH->Write();
+    m_PFAM->Write();
 
-    fXvsY->Write();
+    m_XvsY->Write();
 
-    fEcalEnergy->Write();
-    fHcalEnergy->Write();
-    fMuonEnergy->Write();
-    fLcalEnergy->Write();
-    fCalEnergy->Write();
+    m_EcalEnergy->Write();
+    m_HcalEnergy->Write();
+    m_MuonEnergy->Write();
+    m_LcalEnergy->Write();
+    m_CalEnergy->Write();
 
-    fEcalBarrelHcalEnergy->Write();
-    fEcalEndCapHcalEnergy->Write();
+    m_EcalBarrelHcalEnergyEM->Write();
+    m_EcalEndCapHcalEnergyEM->Write();
+    m_EcalBarrelHcalEnergyHAD->Write();
+    m_EcalEndCapHcalEnergyHAD->Write();
 
-    fCalEnergyE->Write();
-    fCalEnergyH->Write();
-    fCalEnergyM->Write();
+    m_CalEnergyE->Write();
+    m_CalEnergyH->Write();
+    m_CalEnergyM->Write();
 
-    fCalEnergyVsCosTheta->Write();
-    fCalEnergyVsCosThetaR->Write();
+    m_CalEnergyVsCosTheta->Write();
+    m_CalEnergyVsCosThetaR->Write();
 
-    fEcalBarrelEnergyByLayer->Write();
-    fEcalEndCapEnergyByLayer->Write();
+    m_EcalBarrelEnergyByLayer->Write();
+    m_EcalEndCapEnergyByLayer->Write();
 
-    fEcalBarrelMIP->Write();
-    fEcalEndCapMIP->Write();
-    fHcalMIP->Write();
-    fMuonMIP->Write();
+    m_EcalBarrelMIP->Write();
+    m_EcalEndCapMIP->Write();
+    m_HcalMIP->Write();
+    m_MuonMIP->Write();
 
-    fEcalBarrelMIPcorr->Write();
-    fEcalEndCapMIPcorr->Write();
-    fHcalMIPcorr->Write();
-    fMuonMIPcorr->Write();
+    m_EcalBarrelMIPcorr->Write();
+    m_EcalEndCapMIPcorr->Write();
+    m_HcalMIPcorr->Write();
+    m_MuonMIPcorr->Write();
 
-    fCosT->Write();
-    fPhotonCosT->Write();
+    m_CosT->Write();
+    m_PhotonCosT->Write();
 
     hfile->Close();
     delete hfile;

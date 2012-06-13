@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     if ((nArgs < 1) || (nArgs > 2))
     {
         std::cout << std::endl
-                  << "Usage: ./analysePerformance inputFileName [outputFileName]" << std::endl << std::endl
+                  << "Usage: ./AnalysePerformanceFull inputFileName [outputFileName]" << std::endl << std::endl
                   << "  inputFileName  : file containing pandora pfo analysis tree" << std::endl
                   << "  outputFileName : optional output root file, for histogram output" << std::endl << std::endl;
         return 1;

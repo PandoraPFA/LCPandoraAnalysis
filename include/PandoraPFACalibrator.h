@@ -101,84 +101,89 @@ public:
     virtual void end() ;
 
 private:
-    std::vector<std::string> _inputMCParticleCollections;
-    std::vector<std::string> _ecalBarrelCollections;
-    std::vector<std::string> _ecalEndCapCollections;
-    std::vector<std::string> _hcalCollections;
-    std::vector<std::string> _muonCollections;
-    std::vector<std::string> _lcalCollections;
-    std::vector<std::string> _bcalCollections;
-    std::vector<std::string> _lhcalCollections;
-    std::string _particleCollectionName;
-    std::string _rootFile;
+    typedef std::vector<std::string> StringVector;                  ///< 
+    StringVector    m_inputMCParticleCollections;                   ///< 
+    StringVector    m_ecalBarrelCollections;                        ///< 
+    StringVector    m_ecalEndCapCollections;                        ///< 
+    StringVector    m_hcalCollections;                              ///< 
+    StringVector    m_muonCollections;                              ///< 
+    StringVector    m_lcalCollections;                              ///< 
+    StringVector    m_bcalCollections;                              ///< 
+    StringVector    m_lhcalCollections;                             ///< 
+    std::string     m_particleCollectionName;                       ///< 
+    std::string     m_rootFile;                                     ///< 
 
-    int _nRun ;
-    int _nEvt ;
-    int   _digitalHcal;
-    float _ecalToMIP;
-    float _hcalToMIP;
-    float _muonToMIP;
-    float _ecalMIPThreshold;
-    float _hcalMIPThreshold;
-    float _ecalEMMIPToGeV;
-    float _hcalEMMIPToGeV;
-    float _ecalBarrelHadMIPToGeV;
-    float _ecalEndCapHadMIPToGeV;
-    float _hcalHadMIPToGeV;
-    float _zOfEndCap;
-    float _cosTheta;
-    float _cosThetaR;
-    float _cosThetaX;
-    float _zCoG;
-    float _x;
-    float _y;
-    float _zmean;
-    std::string _detectorName;
+    int             m_nRun;                                         ///< 
+    int             m_nEvt;                                         ///< 
 
-    TH1F* fPFA;
-    TH1F* fPFAB;
-    TH2F* fPFAVsCosTheta;
-    TH2F* fPFAVsCosThetaR;
-    TH2F* fPFAVsZCoG;
-    TH2F* fPFAVsCosThetaX;
+    float           m_ecalToMIP;                                    ///< 
+    float           m_hcalToMIP;                                    ///< 
+    float           m_muonToMIP;                                    ///< 
 
-    TH1F* fPFAE;
-    TH1F* fPFAH;
-    TH1F* fPFAM;
+    float           m_ecalToEMGeVCalibration;                       ///< 
+    float           m_hcalToHadGeVCalibration;                      ///< 
 
-    TH2F* fXvsY;
+    float           m_ecalToHadGeVCalibrationBarrel;                ///< 
+    float           m_ecalToHadGeVCalibrationEndCap;                ///< 
+    float           m_hcalToEMGeVCalibration;                       ///< 
 
-    TH1F* fEcalEnergy;
-    TH1F* fHcalEnergy;
-    TH1F* fMuonEnergy;
-    TH1F* fLcalEnergy;
-    TH1F* fCalEnergy;
+    float           m_maxHCalHitHadronicEnergy;                     ///< 
 
-    TH2F* fEcalBarrelHcalEnergy;
-    TH2F* fEcalEndCapHcalEnergy;
+    float           m_zOfEndCap;                                    ///< 
+    float           m_cosTheta;                                     ///< 
+    float           m_cosThetaR;                                    ///< 
+    float           m_cosThetaX;                                    ///< 
+    float           m_zCoG;                                         ///< 
+    float           m_x;                                            ///< 
+    float           m_y;                                            ///< 
+    std::string     m_detectorName;                                 ///< 
 
-    TH1F* fCalEnergyE;
-    TH1F* fCalEnergyH;
-    TH1F* fCalEnergyM;
+    TH1F           *m_PFA;                                          ///< 
+    TH1F           *m_PFAB;                                         ///< 
+    TH2F           *m_PFAVsCosTheta;                                ///< 
+    TH2F           *m_PFAVsCosThetaR;                               ///< 
+    TH2F           *m_PFAVsZCoG;                                    ///< 
+    TH2F           *m_PFAVsCosThetaX;                               ///< 
 
-    TH2F* fCalEnergyVsCosTheta;
-    TH2F* fCalEnergyVsCosThetaR;
+    TH1F           *m_PFAE;                                         ///< 
+    TH1F           *m_PFAH;                                         ///< 
+    TH1F           *m_PFAM;                                         ///< 
 
-    TH1F* fEcalBarrelEnergyByLayer;
-    TH1F* fEcalEndCapEnergyByLayer;
+    TH2F           *m_XvsY;                                         ///< 
 
-    TH1F* fEcalBarrelMIP;
-    TH1F* fEcalEndCapMIP;
-    TH1F* fHcalMIP;
-    TH1F* fMuonMIP;
+    TH1F           *m_EcalEnergy;                                   ///< 
+    TH1F           *m_HcalEnergy;                                   ///< 
+    TH1F           *m_MuonEnergy;                                   ///< 
+    TH1F           *m_LcalEnergy;                                   ///< 
+    TH1F           *m_CalEnergy;                                    ///< 
 
-    TH1F* fEcalBarrelMIPcorr;
-    TH1F* fEcalEndCapMIPcorr;
-    TH1F* fHcalMIPcorr;
-    TH1F* fMuonMIPcorr;
+    TH2F           *m_EcalBarrelHcalEnergyEM;                       ///< 
+    TH2F           *m_EcalEndCapHcalEnergyEM;                       ///< 
+    TH2F           *m_EcalBarrelHcalEnergyHAD;                      ///< 
+    TH2F           *m_EcalEndCapHcalEnergyHAD;                      ///< 
 
-    TH1F* fCosT;
-    TH1F* fPhotonCosT;
+    TH1F           *m_CalEnergyE;                                   ///< 
+    TH1F           *m_CalEnergyH;                                   ///< 
+    TH1F           *m_CalEnergyM;                                   ///< 
+
+    TH2F           *m_CalEnergyVsCosTheta;                          ///< 
+    TH2F           *m_CalEnergyVsCosThetaR;                         ///< 
+
+    TH1F           *m_EcalBarrelEnergyByLayer;                      ///< 
+    TH1F           *m_EcalEndCapEnergyByLayer;                      ///< 
+
+    TH1F           *m_EcalBarrelMIP;                                ///< 
+    TH1F           *m_EcalEndCapMIP;                                ///< 
+    TH1F           *m_HcalMIP;                                      ///< 
+    TH1F           *m_MuonMIP;                                      ///< 
+
+    TH1F           *m_EcalBarrelMIPcorr;                            ///< 
+    TH1F           *m_EcalEndCapMIPcorr;                            ///< 
+    TH1F           *m_HcalMIPcorr;                                  ///< 
+    TH1F           *m_MuonMIPcorr;                                  ///< 
+
+    TH1F           *m_CosT;                                         ///< 
+    TH1F           *m_PhotonCosT;                                   ///< 
 };
 
 #endif
