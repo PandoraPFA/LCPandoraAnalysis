@@ -71,10 +71,11 @@ void PfoAnalysis::init()
 {
     m_nRun = 0;
     m_nEvt = 0;
-
     this->Clear();
 
     m_tree = new TTree("PfoAnalysisTree", "PfoAnalysisTree");
+    m_tree->Branch("run", &m_nRun, "m_nRun/I");
+    m_tree->Branch("event", &m_nEvt, "m_nEvt/I");
     m_tree->Branch("nPfosTotal", &m_nPfosTotal, "nPfosTotal/I");
     m_tree->Branch("nPfosNeutralHadrons", &m_nPfosNeutralHadrons, "nPfosNeutralHadrons/I");
     m_tree->Branch("nPfosPhotons", &m_nPfosPhotons, "nPfosPhotons/I");
@@ -114,14 +115,16 @@ void PfoAnalysis::init()
 
 void PfoAnalysis::processRunHeader(lcio::LCRunHeader */*pLCRunHeader*/)
 {
-    ++m_nRun;
+    m_nRun = 0;
+    m_nEvt = 0;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 void PfoAnalysis::processEvent(EVENT::LCEvent *pLCEvent)
 {
-    ++m_nEvt;
+    m_nRun = pLCEvent->getRunNumber();
+    m_nEvt = pLCEvent->getEventNumber();
     this->Clear();
     this->ExtractCollections(pLCEvent);
     this->MakeQuarkVariables();
