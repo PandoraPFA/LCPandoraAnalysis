@@ -203,6 +203,8 @@ void PandoraPFACalibrator::init()
     m_LcalEnergy = new TH1F("fLcalEnergy", "total lcal energy", 1000, 0., 250.);
     m_CalEnergy  = new TH1F("fCalEnergy", "total cal energy", 1000, 0., 250.);
 
+    m_EcalHcalEnergyEM = new TH2F("fEcalHcalEnergyEM", "ecal vs hcal energy EM", 1000, 0., 250., 1000, 0., 250.);
+    m_EcalHcalEnergyHAD = new TH2F("fEcalHcalEnergyHAD", "ecal vs hcal energy HAD", 1000, 0., 250., 1000, 0., 250.);
     m_EcalBarrelHcalEnergyEM = new TH2F("fEcalBarrelHcalEnergyEM", "ecal barrel vs hcal energy EM", 1000, 0., 250., 1000, 0., 250.);
     m_EcalEndCapHcalEnergyEM = new TH2F("fEcalEndCapHcalEnergyEM", "ecal endcap vs hcal energy EM", 1000, 0., 250., 1000, 0., 250.);
     m_EcalBarrelHcalEnergyHAD = new TH2F("fEcalBarrelHcalEnergyHAD", "ecal barrel vs hcal energy HAD", 1000, 0., 250., 1000, 0., 250.);
@@ -544,6 +546,9 @@ void PandoraPFACalibrator::processEvent(LCEvent *evt)
     {
         m_EcalEnergy->Fill(ecalBarrelEnergy + ecalEndCapEnergy,1.);
 
+        m_EcalHcalEnergyEM->Fill(ecalBarrelEnergy + ecalEndCapEnergy, hcalEnergy * m_hcalToEMGeVCalibration, 1.);
+        m_EcalHcalEnergyHAD->Fill(ecalBarrelEnergy * m_ecalToHadGeVCalibrationBarrel + ecalEndCapEnergy * m_ecalToHadGeVCalibrationEndCap, hcalEnergy, 1.);
+
         m_EcalBarrelHcalEnergyEM->Fill(ecalBarrelEnergy, hcalEnergy * m_hcalToEMGeVCalibration, 1.);
         m_EcalEndCapHcalEnergyEM->Fill(ecalEndCapEnergy, hcalEnergy * m_hcalToEMGeVCalibration, 1.);
 
@@ -692,6 +697,8 @@ void PandoraPFACalibrator::end()
     m_LcalEnergy->Write();
     m_CalEnergy->Write();
 
+    m_EcalHcalEnergyEM->Write();
+    m_EcalHcalEnergyHAD->Write();
     m_EcalBarrelHcalEnergyEM->Write();
     m_EcalEndCapHcalEnergyEM->Write();
     m_EcalBarrelHcalEnergyHAD->Write();

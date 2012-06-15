@@ -157,6 +157,8 @@ private:
     TH1F           *m_LcalEnergy;                                   ///< 
     TH1F           *m_CalEnergy;                                    ///< 
 
+    TH2F           *m_EcalHcalEnergyEM;                             ///< 
+    TH2F           *m_EcalHcalEnergyHAD;                            ///< 
     TH2F           *m_EcalBarrelHcalEnergyEM;                       ///< 
     TH2F           *m_EcalEndCapHcalEnergyEM;                       ///< 
     TH2F           *m_EcalBarrelHcalEnergyHAD;                      ///< 
