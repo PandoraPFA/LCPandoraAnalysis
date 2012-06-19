@@ -74,8 +74,8 @@ void PfoAnalysis::init()
     this->Clear();
 
     m_tree = new TTree("PfoAnalysisTree", "PfoAnalysisTree");
-    m_tree->Branch("run", &m_nRun, "m_nRun/I");
-    m_tree->Branch("event", &m_nEvt, "m_nEvt/I");
+    m_tree->Branch("run", &m_nRun, "run/I");
+    m_tree->Branch("event", &m_nEvt, "event/I");
     m_tree->Branch("nPfosTotal", &m_nPfosTotal, "nPfosTotal/I");
     m_tree->Branch("nPfosNeutralHadrons", &m_nPfosNeutralHadrons, "nPfosNeutralHadrons/I");
     m_tree->Branch("nPfosPhotons", &m_nPfosPhotons, "nPfosPhotons/I");
