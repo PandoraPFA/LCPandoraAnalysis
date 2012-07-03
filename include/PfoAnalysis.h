@@ -94,6 +94,9 @@ private:
     int                 m_nRun;                                 ///< 
     int                 m_nEvt;                                 ///< 
 
+    int                 m_nRunSum;                              ///< 
+    int                 m_nEvtSum;                              ///< 
+
     StringVector        m_inputQuarkParticleCollections;        ///< 
     StringVector        m_inputMCParticleCollections;           ///< 
     StringVector        m_inputParticleCollections;             ///< 
