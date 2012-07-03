@@ -71,6 +71,8 @@ void PfoAnalysis::init()
 {
     m_nRun = 0;
     m_nEvt = 0;
+    m_nRunSum = 0;
+    m_nEvtSum = 0;
     this->Clear();
 
     m_tree = new TTree("PfoAnalysisTree", "PfoAnalysisTree");
@@ -117,6 +119,7 @@ void PfoAnalysis::processRunHeader(lcio::LCRunHeader */*pLCRunHeader*/)
 {
     m_nRun = 0;
     m_nEvt = 0;
+    ++m_nRunSum;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -125,6 +128,7 @@ void PfoAnalysis::processEvent(EVENT::LCEvent *pLCEvent)
 {
     m_nRun = pLCEvent->getRunNumber();
     m_nEvt = pLCEvent->getEventNumber();
+    ++m_nEvtSum;
     this->Clear();
     this->ExtractCollections(pLCEvent);
     this->MakeQuarkVariables();
@@ -143,7 +147,7 @@ void PfoAnalysis::end()
 {
     if (m_printing > -1)
     {
-        std::cout << "PfoAnalysis::end() " << this->name() << " processed " << m_nEvt << " events in " << m_nRun << " runs " << std::endl
+        std::cout << "PfoAnalysis::end() " << this->name() << " processed " << m_nEvtSum << " events in " << m_nRunSum << " runs " << std::endl
                   << "Rootfile: " << m_rootFile.c_str() << std::endl;
     }
 
