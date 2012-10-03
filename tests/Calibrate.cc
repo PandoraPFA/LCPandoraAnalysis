@@ -10,17 +10,15 @@
 #include "TCanvas.h"
 #include "TFile.h"
 #include "TH1F.h"
-#include "TMinuit.h"
 #include "TSystem.h"
 #include "TTree.h"
 
 #include "AnalysisHelper.h"
 
 #include <cmath>
+#include <cstdlib>
 #include <fcntl.h>
 #include <iostream>
-#include <limits>
-#include <sstream>
 #include <string>
 
 using namespace pandora_analysis;
