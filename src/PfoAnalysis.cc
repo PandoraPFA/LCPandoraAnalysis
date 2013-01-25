@@ -152,6 +152,10 @@ void PfoAnalysis::end()
     }
 
     TFile *pTFile = new TFile(m_rootFile.c_str(), "recreate");
+    m_tree->SetDirectory(pTFile);
+    m_hPfoEnergySum->SetDirectory(pTFile);
+    m_hPfoEnergySumL7A->SetDirectory(pTFile);
+
     m_tree->Write();
     m_hPfoEnergySum->Write();
     m_hPfoEnergySumL7A->Write();
