@@ -272,25 +272,25 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
 
     // Examine histograms and investigate variation of resolution with cos(theta)
     float cosThetaBins[14] = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.925, 0.95, 0.975, 1.0};
-    TH1F *pEvsCHist = new TH1F("SigmaEvsCosTheta", "#sigma(E) vs cos(#theta)", 13, cosThetaBins);
-    pEvsCHist->SetYTitle("#sigma(E)");
-    pEvsCHist->SetXTitle("cos(#theta)");
+    TH1F *pResVsCosThetaHist = new TH1F("ResVsCosTheta", "RMS_{90}(E_{j}) / Mean_{90}(E_{j}) vs |cos(#theta)|", 13, cosThetaBins);
+    pResVsCosThetaHist->SetYTitle("RMS_{90}(E_{j}) / Mean_{90}(E_{j}) [%]");
+    pResVsCosThetaHist->SetXTitle("|cos(#theta)|");
 
-    float sigma(0.f), sigmasigma(0.f);
-    AnalysisHelper::CalculatePerformance(pPFA,  sigma, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA_1, sigma, sigmasigma);  pEvsCHist->SetBinContent( 1, sigma); pEvsCHist->SetBinError( 1, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA_2, sigma, sigmasigma);  pEvsCHist->SetBinContent( 2, sigma); pEvsCHist->SetBinError( 2, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA_3, sigma, sigmasigma);  pEvsCHist->SetBinContent( 3, sigma); pEvsCHist->SetBinError( 3, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA_4, sigma, sigmasigma);  pEvsCHist->SetBinContent( 4, sigma); pEvsCHist->SetBinError( 4, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA_5, sigma, sigmasigma);  pEvsCHist->SetBinContent( 5, sigma); pEvsCHist->SetBinError( 5, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA_6, sigma, sigmasigma);  pEvsCHist->SetBinContent( 6, sigma); pEvsCHist->SetBinError( 6, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA_7, sigma, sigmasigma);  pEvsCHist->SetBinContent( 7, sigma); pEvsCHist->SetBinError( 7, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA_8, sigma, sigmasigma);  pEvsCHist->SetBinContent( 8, sigma); pEvsCHist->SetBinError( 8, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA_9, sigma, sigmasigma);  pEvsCHist->SetBinContent( 9, sigma); pEvsCHist->SetBinError( 9, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA_11, sigma, sigmasigma); pEvsCHist->SetBinContent(10, sigma); pEvsCHist->SetBinError(10, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA_12, sigma, sigmasigma); pEvsCHist->SetBinContent(11, sigma); pEvsCHist->SetBinError(11, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA_13, sigma, sigmasigma); pEvsCHist->SetBinContent(12, sigma); pEvsCHist->SetBinError(12, sigmasigma);
-    AnalysisHelper::CalculatePerformance(pPFA_14, sigma, sigmasigma); pEvsCHist->SetBinContent(13, sigma); pEvsCHist->SetBinError(13, sigmasigma);
+    float resolution(0.f), resolutionError(0.f);
+    AnalysisHelper::CalculatePerformance(pPFA,    resolution, resolutionError);
+    AnalysisHelper::CalculatePerformance(pPFA_1,  resolution, resolutionError); pResVsCosThetaHist->SetBinContent( 1, resolution); pResVsCosThetaHist->SetBinError( 1, resolutionError);
+    AnalysisHelper::CalculatePerformance(pPFA_2,  resolution, resolutionError); pResVsCosThetaHist->SetBinContent( 2, resolution); pResVsCosThetaHist->SetBinError( 2, resolutionError);
+    AnalysisHelper::CalculatePerformance(pPFA_3,  resolution, resolutionError); pResVsCosThetaHist->SetBinContent( 3, resolution); pResVsCosThetaHist->SetBinError( 3, resolutionError);
+    AnalysisHelper::CalculatePerformance(pPFA_4,  resolution, resolutionError); pResVsCosThetaHist->SetBinContent( 4, resolution); pResVsCosThetaHist->SetBinError( 4, resolutionError);
+    AnalysisHelper::CalculatePerformance(pPFA_5,  resolution, resolutionError); pResVsCosThetaHist->SetBinContent( 5, resolution); pResVsCosThetaHist->SetBinError( 5, resolutionError);
+    AnalysisHelper::CalculatePerformance(pPFA_6,  resolution, resolutionError); pResVsCosThetaHist->SetBinContent( 6, resolution); pResVsCosThetaHist->SetBinError( 6, resolutionError);
+    AnalysisHelper::CalculatePerformance(pPFA_7,  resolution, resolutionError); pResVsCosThetaHist->SetBinContent( 7, resolution); pResVsCosThetaHist->SetBinError( 7, resolutionError);
+    AnalysisHelper::CalculatePerformance(pPFA_8,  resolution, resolutionError); pResVsCosThetaHist->SetBinContent( 8, resolution); pResVsCosThetaHist->SetBinError( 8, resolutionError);
+    AnalysisHelper::CalculatePerformance(pPFA_9,  resolution, resolutionError); pResVsCosThetaHist->SetBinContent( 9, resolution); pResVsCosThetaHist->SetBinError( 9, resolutionError);
+    AnalysisHelper::CalculatePerformance(pPFA_11, resolution, resolutionError); pResVsCosThetaHist->SetBinContent(10, resolution); pResVsCosThetaHist->SetBinError(10, resolutionError);
+    AnalysisHelper::CalculatePerformance(pPFA_12, resolution, resolutionError); pResVsCosThetaHist->SetBinContent(11, resolution); pResVsCosThetaHist->SetBinError(11, resolutionError);
+    AnalysisHelper::CalculatePerformance(pPFA_13, resolution, resolutionError); pResVsCosThetaHist->SetBinContent(12, resolution); pResVsCosThetaHist->SetBinError(12, resolutionError);
+    AnalysisHelper::CalculatePerformance(pPFA_14, resolution, resolutionError); pResVsCosThetaHist->SetBinContent(13, resolution); pResVsCosThetaHist->SetBinError(13, resolutionError);
 
     AnalysisHelper::CalculatePerformance(pPFA_udsHM20);
     AnalysisHelper::CalculatePerformance(pPFA_udsHM10);
@@ -343,7 +343,7 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
         std::cout << "Will write histograms to file : " << outputRootFileName << std::endl;
         TFile *pTOutputFile = new TFile(outputRootFileName.c_str(), "RECREATE");
         pTOutputFile->cd();
-        pEvsCHist->Write();
+        pResVsCosThetaHist->Write();
         pNPFO->Write();
         pPFA_MZ->Write();
         pPFA_MW->Write();
@@ -437,5 +437,5 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
     delete pPFA_DMZOMZQQ8;
     delete pPFA_1Clone;
     delete pPFA_9Clone;
-    delete pEvsCHist;
+    delete pResVsCosThetaHist;
 }

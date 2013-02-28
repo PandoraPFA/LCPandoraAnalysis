@@ -17,10 +17,9 @@
 namespace pandora_analysis
 {
 
-void AnalysisHelper::CalculatePerformance(const TH1F *const pTH1F, float &sigma, float &sigmasigma, bool fixDistributionCentre, bool print)
+void AnalysisHelper::CalculatePerformance(const TH1F *const pTH1F, float &resolution, float &resolutionError, bool fixDistributionCentre, bool print)
 {
     static const float FLOAT_MAX(std::numeric_limits<float>::max());
-    sigma = sigmasigma = FLOAT_MAX;
 
     if (NULL == pTH1F)
         return;
@@ -59,7 +58,7 @@ void AnalysisHelper::CalculatePerformance(const TH1F *const pTH1F, float &sigma,
     }
 
     // Calculate truncated properties
-    float rmsmin(FLOAT_MAX), frac(FLOAT_MAX), efrac(FLOAT_MAX), mean(FLOAT_MAX), low(FLOAT_MAX), rms(FLOAT_MAX);
+    float rmsmin(FLOAT_MAX), sigma(FLOAT_MAX), sigmasigma(FLOAT_MAX), frac(FLOAT_MAX), efrac(FLOAT_MAX), mean(FLOAT_MAX), low(FLOAT_MAX), rms(FLOAT_MAX);
     float high(0.f);
 
     for (unsigned int istart = 0; istart <= is0; ++istart)
@@ -146,7 +145,8 @@ void AnalysisHelper::CalculatePerformance(const TH1F *const pTH1F, float &sigma,
         (fixDistributionCentre) ? (std::cout << ", sE/E: " << frac << "+-" << efrac << std::endl) : (std::cout << std::endl);
     }
 
-    sigma = frac;
+    resolution = frac;
+    resolutionError = efrac;
 }
 
 } // namespace pandora_analysis

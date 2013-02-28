@@ -34,12 +34,12 @@ public:
      *  @brief  Calculate performance figures for an energy spectrum provided in form of a root th1f
      * 
      *  @param  pTH1F
-     *  @param  sigma
-     *  @param  sigmasigma
+     *  @param  resolution
+     *  @param  resolutionError
      *  @param  fixDistributionCentre
      *  @param  print
      */
-    static void CalculatePerformance(const TH1F *const pTH1F, float &sigma, float &sigmasigma, bool fixDistributionCentre = true, bool print = true);
+    static void CalculatePerformance(const TH1F *const pTH1F, float &resolution, float &resolutionError, bool fixDistributionCentre = true, bool print = true);
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

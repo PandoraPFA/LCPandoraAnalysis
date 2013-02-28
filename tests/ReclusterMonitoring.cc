@@ -74,9 +74,9 @@ void ReclusterMonitoring(TFile *pTFile, const unsigned int nRegionBins, const fl
     for (unsigned int i = 0; i <= nRegionBins; ++i)
         pRegionBinEdges[i] = static_cast<float>(i) * (maxValue / static_cast<float>(nRegionBins));
 
-    TH1F *pEvsRHist = new TH1F("SigmaEvsRes", "#sigma(E) vs resolution", nRegionBins, pRegionBinEdges);
-    pEvsRHist->SetYTitle("#sigma(E)");
-    pEvsRHist->SetXTitle("sqrt(SumSquaredEnergyChanges)");
+    TH1F *pResVsEnergyChangeHist = new TH1F("ResVsEnergyChange", "RMS_{90}(E_{j}) / Mean_{90}(E_{j}) vs sqrt(SumSquaredEnergyChanges)", nRegionBins, pRegionBinEdges);
+    pResVsEnergyChangeHist->SetYTitle("RMS_{90}(E_{j}) / Mean_{90}(E_{j}) [%]");
+    pResVsEnergyChangeHist->SetXTitle("sqrt(SumSquaredEnergyChanges)");
 
     // Book histograms
     TH1F **pRegionHistograms = new TH1F*[nRegionBins];
@@ -125,13 +125,13 @@ void ReclusterMonitoring(TFile *pTFile, const unsigned int nRegionBins, const fl
     }
 
     // Extract performance figures from energy spectra histograms
-    float sigma(0.f), sigmasigma(0.f);
+    float resolution(0.f), resolutionError(0.f);
 
     for (unsigned int i = 0; i < nRegionBins; ++i)
     {
-        sigma = 0.f; sigmasigma = 0.f;
-        AnalysisHelper::CalculatePerformance(pRegionHistograms[i], sigma, sigmasigma);
-        pEvsRHist->SetBinContent(i + 1, sigma); pEvsRHist->SetBinError(i + 1, sigmasigma);
+        resolution = 0.f; resolutionError = 0.f;
+        AnalysisHelper::CalculatePerformance(pRegionHistograms[i], resolution, resolutionError);
+        pResVsEnergyChangeHist->SetBinContent(i + 1, resolution); pResVsEnergyChangeHist->SetBinError(i + 1, resolutionError);
     }
 
     // Write histograms to output file, if specified
@@ -140,8 +140,8 @@ void ReclusterMonitoring(TFile *pTFile, const unsigned int nRegionBins, const fl
         std::cout << "Will write histograms to file : " << outputRootFileName << std::endl;
         TFile *pTOutputFile = new TFile(outputRootFileName.c_str(), "RECREATE");
         pTOutputFile->cd();
-        pEvsRHist->GetYaxis()->SetRangeUser(0.f, 1.f);
-        pEvsRHist->Write();
+        pResVsEnergyChangeHist->GetYaxis()->SetRangeUser(0.f, 10.f);
+        pResVsEnergyChangeHist->Write();
 
         for (unsigned int i = 0; i < nRegionBins; ++i)
             pRegionHistograms[i]->Write();
@@ -154,7 +154,7 @@ void ReclusterMonitoring(TFile *pTFile, const unsigned int nRegionBins, const fl
     for (unsigned int i = 0; i < nRegionBins; ++i)
         delete pRegionHistograms[i];
 
-    delete pEvsRHist;
+    delete pResVsEnergyChangeHist;
     delete [] pRegionBinEdges;
     delete [] pRegionHistograms;
 }
