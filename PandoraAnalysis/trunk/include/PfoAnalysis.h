@@ -13,6 +13,7 @@
 
 #include "marlin/Processor.h"
 
+class TFile;
 class TH1F;
 class TTree;
 
@@ -89,6 +90,7 @@ private:
     void PerformPfoAnalysis();
 
     typedef std::vector<ReconstructedParticle *> ParticleVector;
+    typedef std::vector<MCParticle*> MCParticleVector;
     typedef std::vector<std::string> StringVector;
 
     int                 m_nRun;                                 ///< 
@@ -101,13 +103,15 @@ private:
     StringVector        m_inputMCParticleCollections;           ///< 
     StringVector        m_inputParticleCollections;             ///< 
     StringVector        m_inputReclusterMonitoringCollections;  ///< 
+    StringVector        m_mcParticleCollections;                ///< 
 
     int                 m_printing;                             ///< 
     std::string         m_rootFile;                             ///< 
 
-    ParticleVector      m_pfovec;                               ///< 
-    ParticleVector      m_mcpfovec;                             ///< 
-    ParticleVector      m_quarkpfovec;                          ///< 
+    ParticleVector      m_pfoVector;                            ///< 
+    ParticleVector      m_mcPfoVector;                          ///< 
+    ParticleVector      m_quarkPfoVector;                       ///< 
+    MCParticleVector    m_pfoTargetVector;                      ///< 
 
     int                 m_nPfosTotal;                           ///< 
     int                 m_nPfosNeutralHadrons;                  ///< 
@@ -143,6 +147,34 @@ private:
     float               m_sumModulusEnergyChanges;              ///< 
     float               m_sumSquaredEnergyChanges;              ///< 
 
+    typedef std::vector<float> FloatVector;
+    FloatVector         m_pfoEnergies;                          ///< 
+    FloatVector         m_pfoPx;                                ///< 
+    FloatVector         m_pfoPy;                                ///< 
+    FloatVector         m_pfoPz;                                ///< 
+    FloatVector         m_pfoCosTheta;                          ///< 
+
+    FloatVector         m_pfoTargetEnergies;                    ///< 
+    FloatVector         m_pfoTargetPx;                          ///< 
+    FloatVector         m_pfoTargetPy;                          ///< 
+    FloatVector         m_pfoTargetPz;                          ///< 
+    FloatVector         m_pfoTargetCosTheta;                    ///< 
+
+    typedef std::vector<int> IntVector;
+    IntVector           m_pfoPdgCodes;                          ///< 
+    IntVector           m_pfoTargetPdgCodes;                    ///< 
+
+    int                 m_nPfoTargetsTotal;                     ///< 
+    int                 m_nPfoTargetsNeutralHadrons;            ///< 
+    int                 m_nPfoTargetsPhotons;                   ///< 
+    int                 m_nPfoTargetsTracks;                    ///< 
+
+    float               m_pfoTargetsEnergyTotal;                ////< 
+    float               m_pfoTargetsEnergyNeutralHadrons;       ////< 
+    float               m_pfoTargetsEnergyPhotons;              ////< 
+    float               m_pfoTargetsEnergyTracks;               ////< 
+
+    TFile              *m_pTFile;                               ///< 
     TTree              *m_tree;                                 ///< 
     TH1F               *m_hPfoEnergySum;                        ///< 
     TH1F               *m_hPfoEnergySumL7A;                     ///<

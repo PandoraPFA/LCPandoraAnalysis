@@ -63,9 +63,9 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
     const unsigned int nRegionBins(13);
     float pRegionBinEdges[nRegionBins + 1] = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.925, 0.95, 0.975, 1.0};
 
-    TH1F *pEvsRHist = new TH1F("SigmaEvsCosTheta", "RMS_{90}(E) / Mean_{90}(E) vs cos(#theta)", nRegionBins, pRegionBinEdges);
-    pEvsRHist->SetYTitle("RMS_{90}(E) / Mean_{90}(E) (%)");
-    pEvsRHist->SetXTitle("cos(#theta)");
+    TH1F *pResVsCosThetaHist = new TH1F("ResVsCosTheta", "RMS_{90}(E_{j}) / Mean_{90}(E_{j}) vs |cos(#theta)|", nRegionBins, pRegionBinEdges);
+    pResVsCosThetaHist->SetYTitle("RMS_{90}(E_{j}) / Mean_{90}(E_{j}) [%]");
+    pResVsCosThetaHist->SetXTitle("|cos(#theta)|");
 
     // Book histograms
     TH1F **pRegionHistograms = new TH1F*[nRegionBins];
@@ -116,14 +116,14 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
     }
 
     // Extract performance figures from energy spectra histograms
-    float sigma(0.f), sigmasigma(0.f);
-    AnalysisHelper::CalculatePerformance(pPFAL7A, sigma, sigmasigma);
+    float resolution(0.f), resolutionError(0.f);
+    AnalysisHelper::CalculatePerformance(pPFAL7A, resolution, resolutionError);
 
     for (unsigned int i = 0; i < nRegionBins; ++i)
     {
-        sigma = 0.f; sigmasigma = 0.f;
-        AnalysisHelper::CalculatePerformance(pRegionHistograms[i], sigma, sigmasigma);
-        pEvsRHist->SetBinContent(i + 1, sigma); pEvsRHist->SetBinError(i + 1, sigmasigma);
+        resolution = 0.f; resolutionError = 0.f;
+        AnalysisHelper::CalculatePerformance(pRegionHistograms[i], resolution, resolutionError);
+        pResVsCosThetaHist->SetBinContent(i + 1, resolution); pResVsCosThetaHist->SetBinError(i + 1, resolutionError);
     }
 
     // Write histograms to output file, if specified
@@ -132,8 +132,8 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
         std::cout << "Will write histograms to file : " << outputRootFileName << std::endl;
         TFile *pTOutputFile = new TFile(outputRootFileName.c_str(), "RECREATE");
         pTOutputFile->cd();
-        pEvsRHist->GetYaxis()->SetRangeUser(0.f, 1.f);
-        pEvsRHist->Write();
+        pResVsCosThetaHist->GetYaxis()->SetRangeUser(0.f, 10.f);
+        pResVsCosThetaHist->Write();
         pPFAL7A->Write();
 
         for (unsigned int i = 0; i < nRegionBins; ++i)
@@ -148,6 +148,6 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
         delete pRegionHistograms[i];
 
     delete pPFAL7A;
-    delete pEvsRHist;
+    delete pResVsCosThetaHist;
     delete [] pRegionHistograms;
 }
