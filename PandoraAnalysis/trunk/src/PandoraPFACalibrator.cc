@@ -182,6 +182,8 @@ void PandoraPFACalibrator::init()
     m_nRun = 0;
     m_nEvt = 0;
 
+    m_pTFile = new TFile(m_rootFile.c_str(), "recreate");
+
     // PFA total energy
     m_PFA = new TH1F("fPFAtot", "total energy", 1000, 0., 250.);
     m_PFAB = new TH1F("fPFAB", "total energy barrel", 1000, 0., 250.);
@@ -189,11 +191,9 @@ void PandoraPFACalibrator::init()
     m_PFAVsCosThetaR = new TH2F("fPFAVsCosThetaR", "total energy vs CosThetaReco", 500, 0., 1., 1000, 0., 250.);
     m_PFAVsZCoG = new TH2F("fPFAVsZCoG", "total energy vs zCog", 600, 0., 3000., 1000, 0., 200.);
     m_PFAVsCosThetaX = new TH2F("fPFAVsCosThetaX", "total energy vs CosTheta", 200, -1., 1., 1000, 0., 250.);
-
     m_PFAE = new TH1F("fPFAE", "total energy ECAL only events", 1000, 0., 250.);
     m_PFAH = new TH1F("fPFAH", "total energy HCAL only events", 1000, 0., 250.);
     m_PFAM = new TH1F("fPFAM", "total energy MUON only events", 1000, 0., 250.);
-
     m_XvsY = new TH2F("fXvsY", "x vs y", 1000, -2500., 2500., 1000, -2500., 2500.);
 
     // ECAL total energy
@@ -202,21 +202,17 @@ void PandoraPFACalibrator::init()
     m_MuonEnergy = new TH1F("fMuonEnergy", "total muon energy", 1000, 0., 250.);
     m_LcalEnergy = new TH1F("fLcalEnergy", "total lcal energy", 1000, 0., 250.);
     m_CalEnergy  = new TH1F("fCalEnergy", "total cal energy", 1000, 0., 250.);
-
     m_EcalHcalEnergyEM = new TH2F("fEcalHcalEnergyEM", "ecal vs hcal energy EM", 1000, 0., 250., 1000, 0., 250.);
     m_EcalHcalEnergyHAD = new TH2F("fEcalHcalEnergyHAD", "ecal vs hcal energy HAD", 1000, 0., 250., 1000, 0., 250.);
     m_EcalBarrelHcalEnergyEM = new TH2F("fEcalBarrelHcalEnergyEM", "ecal barrel vs hcal energy EM", 1000, 0., 250., 1000, 0., 250.);
     m_EcalEndCapHcalEnergyEM = new TH2F("fEcalEndCapHcalEnergyEM", "ecal endcap vs hcal energy EM", 1000, 0., 250., 1000, 0., 250.);
     m_EcalBarrelHcalEnergyHAD = new TH2F("fEcalBarrelHcalEnergyHAD", "ecal barrel vs hcal energy HAD", 1000, 0., 250., 1000, 0., 250.);
     m_EcalEndCapHcalEnergyHAD = new TH2F("fEcalEndCapHcalEnergyHAD", "ecal endcap vs hcal energy HAD", 1000, 0., 250., 1000, 0., 250.);
-
     m_CalEnergyE = new TH1F("fCalEnergyE", "total cal energy E", 1000, 0., 250.);
     m_CalEnergyH = new TH1F("fCalEnergyH", "total cal energy H", 1000, 0., 250.);
     m_CalEnergyM = new TH1F("fCalEnergyM", "total cal energy M", 1000, 0., 250.);
-
     m_CalEnergyVsCosTheta = new TH2F("fCalEnergyVsCosTheta", "total cal energy vs cos theta", 500, 0., 1., 1000, 0., 250.);
     m_CalEnergyVsCosThetaR = new TH2F("fCalEnergyVsCosThetaR", "total cal energy vs cos theta reco", 500, 0., 1.,1000, 0., 250.);
-
     m_EcalBarrelEnergyByLayer = new TH1F("fEcalBarrelEnergyByLayer", "ecal barrel energy profile", 100, 0., 100.);
     m_EcalEndCapEnergyByLayer = new TH1F("fEcalEndCapEnergyByLayer", "ecal endcap energy profile", 100, 0., 100.);
 
@@ -225,14 +221,51 @@ void PandoraPFACalibrator::init()
     m_EcalEndCapMIP = new TH1F("fEcalEndCapMIP", "ecal endcap MIP peak ", 100, 0., 5.);
     m_HcalMIP = new TH1F("fHcalMIP", "hcal MIP peak ", 100, 0., 5.);
     m_MuonMIP = new TH1F("fMuonMIP", "muon MIP peak ", 100, 0., 5.);
-
     m_EcalBarrelMIPcorr = new TH1F("fEcalBarrelMIPcorr", "ecal barrel MIP peak ", 100, 0., 5.);
     m_EcalEndCapMIPcorr = new TH1F("fEcalEndCapMIPcorr", "ecal endcap MIP peak ", 100, 0., 5.);
     m_HcalMIPcorr = new TH1F("fHcalMIPcorr", "hcal MIP peak ", 100, 0., 5.);
     m_MuonMIPcorr = new TH1F("fMuonMIPcorr", "muon MIP peak ", 100, 0., 5.);
-
     m_CosT = new TH1F("fCosT", "cosTheta ", 100, 0., 1.);
     m_PhotonCosT = new TH1F("fPhotonCosT", "cosTheta Photon", 100, 0., 1.0);
+
+    m_PFA->SetDirectory(m_pTFile);
+    m_PFAB->SetDirectory(m_pTFile);
+    m_PFAVsCosTheta->SetDirectory(m_pTFile);
+    m_PFAVsCosThetaR->SetDirectory(m_pTFile);
+    m_PFAVsZCoG->SetDirectory(m_pTFile);
+    m_PFAVsCosThetaX->SetDirectory(m_pTFile);
+    m_PFAE->SetDirectory(m_pTFile);
+    m_PFAH->SetDirectory(m_pTFile);
+    m_PFAM->SetDirectory(m_pTFile);
+    m_XvsY->SetDirectory(m_pTFile);
+    m_EcalEnergy->SetDirectory(m_pTFile);
+    m_HcalEnergy->SetDirectory(m_pTFile);
+    m_MuonEnergy->SetDirectory(m_pTFile);
+    m_LcalEnergy->SetDirectory(m_pTFile);
+    m_CalEnergy->SetDirectory(m_pTFile);
+    m_EcalHcalEnergyEM->SetDirectory(m_pTFile);
+    m_EcalHcalEnergyHAD->SetDirectory(m_pTFile);
+    m_EcalBarrelHcalEnergyEM->SetDirectory(m_pTFile);
+    m_EcalEndCapHcalEnergyEM->SetDirectory(m_pTFile);
+    m_EcalBarrelHcalEnergyHAD->SetDirectory(m_pTFile);
+    m_EcalEndCapHcalEnergyHAD->SetDirectory(m_pTFile);
+    m_CalEnergyE->SetDirectory(m_pTFile);
+    m_CalEnergyH->SetDirectory(m_pTFile);
+    m_CalEnergyM->SetDirectory(m_pTFile);
+    m_CalEnergyVsCosTheta->SetDirectory(m_pTFile);
+    m_CalEnergyVsCosThetaR->SetDirectory(m_pTFile);
+    m_EcalBarrelEnergyByLayer->SetDirectory(m_pTFile);
+    m_EcalEndCapEnergyByLayer->SetDirectory(m_pTFile);
+    m_EcalBarrelMIP->SetDirectory(m_pTFile);
+    m_EcalEndCapMIP->SetDirectory(m_pTFile);
+    m_HcalMIP->SetDirectory(m_pTFile);
+    m_MuonMIP->SetDirectory(m_pTFile);
+    m_EcalBarrelMIPcorr->SetDirectory(m_pTFile);
+    m_EcalEndCapMIPcorr->SetDirectory(m_pTFile);
+    m_HcalMIPcorr->SetDirectory(m_pTFile);
+    m_MuonMIPcorr->SetDirectory(m_pTFile);
+    m_CosT->SetDirectory(m_pTFile);
+    m_PhotonCosT->SetDirectory(m_pTFile);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -677,56 +710,46 @@ void PandoraPFACalibrator::end()
 {
     std::cout << "PandoraPFACalibrator::end()  " << name() << " processed " << m_nEvt << " events in " << m_nRun << " runs " << std::endl;
 
-    TFile *hfile = new TFile(m_rootFile.c_str(),"recreate");
     m_PFA->Write();
     m_PFAB->Write();
     m_PFAVsCosTheta->Write();
     m_PFAVsCosThetaR->Write();
     m_PFAVsZCoG->Write();
     m_PFAVsCosThetaX->Write();
-
     m_PFAE->Write();
     m_PFAH->Write();
     m_PFAM->Write();
-
     m_XvsY->Write();
-
     m_EcalEnergy->Write();
     m_HcalEnergy->Write();
     m_MuonEnergy->Write();
     m_LcalEnergy->Write();
     m_CalEnergy->Write();
-
     m_EcalHcalEnergyEM->Write();
     m_EcalHcalEnergyHAD->Write();
     m_EcalBarrelHcalEnergyEM->Write();
     m_EcalEndCapHcalEnergyEM->Write();
     m_EcalBarrelHcalEnergyHAD->Write();
     m_EcalEndCapHcalEnergyHAD->Write();
-
     m_CalEnergyE->Write();
     m_CalEnergyH->Write();
     m_CalEnergyM->Write();
-
     m_CalEnergyVsCosTheta->Write();
     m_CalEnergyVsCosThetaR->Write();
-
     m_EcalBarrelEnergyByLayer->Write();
     m_EcalEndCapEnergyByLayer->Write();
-
     m_EcalBarrelMIP->Write();
     m_EcalEndCapMIP->Write();
     m_HcalMIP->Write();
     m_MuonMIP->Write();
-
     m_EcalBarrelMIPcorr->Write();
     m_EcalEndCapMIPcorr->Write();
     m_HcalMIPcorr->Write();
     m_MuonMIPcorr->Write();
-
     m_CosT->Write();
     m_PhotonCosT->Write();
+    m_pTFile->Write();
+    m_pTFile->Close();
 
-    hfile->Close();
-    delete hfile;
+    delete m_pTFile;
 }

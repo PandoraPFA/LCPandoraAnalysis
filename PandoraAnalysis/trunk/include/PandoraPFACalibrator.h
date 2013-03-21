@@ -5,6 +5,7 @@
 
 #include <vector>
 
+class TFile;
 class TH1F;
 class TH2F;
 
@@ -137,6 +138,8 @@ private:
     float           m_x;                                            ///< 
     float           m_y;                                            ///< 
     std::string     m_detectorName;                                 ///< 
+
+    TFile          *m_pTFile;                                       ///< 
 
     TH1F           *m_PFA;                                          ///< 
     TH1F           *m_PFAB;                                         ///< 
