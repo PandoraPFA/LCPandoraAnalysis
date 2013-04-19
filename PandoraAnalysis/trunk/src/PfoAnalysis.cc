@@ -9,6 +9,7 @@
 #include "EVENT/LCCollection.h"
 #include "EVENT/LCGenericObject.h"
 #include "EVENT/MCParticle.h"
+#include "EVENT/SimTrackerHit.h"
 
 #include "CalorimeterHitType.h"
 
@@ -61,6 +62,12 @@ PfoAnalysis::PfoAnalysis() :
                              m_mcParticleCollections,
                              StringVector());
 
+    registerInputCollections(LCIO::SIMTRACKERHIT,
+                             "CoilCollections", 
+                             "Names of coil collections, used for leakage correction",
+                             m_coilCollections,
+                             StringVector());
+
     std::string rootFile("PFOAnalysis.root");
     registerProcessorParameter( "RootFile",
                                 "Name of the output root file",
@@ -106,6 +113,7 @@ void PfoAnalysis::init()
     m_tree->Branch("pfoMassTotal", &m_pfoMassTotal, "pfoMassTotal/F");
     m_tree->Branch("mcEnergyTotal", &m_mcEnergyTotal, "mcEnergyTotal/F");
     m_tree->Branch("mcEnergyENu", &m_mcEnergyENu, "mcEnergyENu/F");
+    m_tree->Branch("mcEnergyCoil", &m_mcEnergyCoil, "mcEnergyCoil/F");
     m_tree->Branch("mcEnergyFwd", &m_mcEnergyFwd, "mcEnergyFwd/F");
     m_tree->Branch("eQQ", &m_eQQ, "eQQ/F");
     m_tree->Branch("eQ1", &m_eQ1, "eQ1/F");
@@ -162,6 +170,10 @@ void PfoAnalysis::processEvent(EVENT::LCEvent *pLCEvent)
     m_nRun = pLCEvent->getRunNumber();
     m_nEvt = pLCEvent->getEventNumber();
     ++m_nEvtSum;
+
+    if ((m_nEvtSum % 100) == 0)
+        std::cout << " processed events: " << m_nEvtSum << std::endl;
+
     this->Clear();
     this->ExtractCollections(pLCEvent);
     this->MakeQuarkVariables();
@@ -221,6 +233,7 @@ void PfoAnalysis::Clear()
     m_pfoMassTotal = 0.f;
     m_mcEnergyTotal = 0.f;
     m_mcEnergyENu = 0.f;
+    m_mcEnergyCoil = 0.f;
     m_mcEnergyFwd = 0.f;
     m_eQQ = -99.f;
     m_eQ1 = -99.f;
@@ -395,6 +408,30 @@ void PfoAnalysis::ExtractCollections(EVENT::LCEvent *pLCEvent)
         catch (...)
         {
             streamlog_out(WARNING) << "Could not extract mc particle information" << std::endl;
+        }
+    }
+
+    // Extract coil collection
+    for (StringVector::const_iterator iter = m_coilCollections.begin(), iterEnd = m_coilCollections.end();
+        iter != iterEnd; ++iter)
+    {
+        try
+        {
+            const EVENT::LCCollection *pLCCollection = pLCEvent->getCollection(*iter);
+
+            for (unsigned int i = 0, nElements = pLCCollection->getNumberOfElements(); i < nElements; ++i)
+            {
+                SimTrackerHit *pSimTrackerHit = dynamic_cast<SimTrackerHit*>(pLCCollection->getElementAt(i));
+
+                if (NULL == pSimTrackerHit)
+                    throw EVENT::Exception("Collection type mismatch");
+
+                m_mcEnergyCoil += pSimTrackerHit->getEDep();
+            }
+        }
+        catch (...)
+        {
+            streamlog_out(MESSAGE) << "Could not extract coil collection" << std::endl;
         }
     }
 }

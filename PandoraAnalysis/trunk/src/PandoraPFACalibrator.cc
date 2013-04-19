@@ -185,48 +185,48 @@ void PandoraPFACalibrator::init()
     m_pTFile = new TFile(m_rootFile.c_str(), "recreate");
 
     // PFA total energy
-    m_PFA = new TH1F("fPFAtot", "total energy", 1000, 0., 250.);
-    m_PFAB = new TH1F("fPFAB", "total energy barrel", 1000, 0., 250.);
-    m_PFAVsCosTheta = new TH2F("fPFAVsCosTheta", "total energy vs CosTheta", 500, 0., 1., 1000, 0., 250.);
-    m_PFAVsCosThetaR = new TH2F("fPFAVsCosThetaR", "total energy vs CosThetaReco", 500, 0., 1., 1000, 0., 250.);
-    m_PFAVsZCoG = new TH2F("fPFAVsZCoG", "total energy vs zCog", 600, 0., 3000., 1000, 0., 200.);
-    m_PFAVsCosThetaX = new TH2F("fPFAVsCosThetaX", "total energy vs CosTheta", 200, -1., 1., 1000, 0., 250.);
-    m_PFAE = new TH1F("fPFAE", "total energy ECAL only events", 1000, 0., 250.);
-    m_PFAH = new TH1F("fPFAH", "total energy HCAL only events", 1000, 0., 250.);
-    m_PFAM = new TH1F("fPFAM", "total energy MUON only events", 1000, 0., 250.);
-    m_XvsY = new TH2F("fXvsY", "x vs y", 1000, -2500., 2500., 1000, -2500., 2500.);
+    m_PFA = new TH1F("fPFAtot", "total energy", 2000, 0., 250.);
+    m_PFAB = new TH1F("fPFAB", "total energy barrel", 2000, 0., 250.);
+    m_PFAVsCosTheta = new TH2F("fPFAVsCosTheta", "total energy vs CosTheta", 500, 0., 1., 2000, 0., 250.);
+    m_PFAVsCosThetaR = new TH2F("fPFAVsCosThetaR", "total energy vs CosThetaReco", 500, 0., 1., 2000, 0., 250.);
+    m_PFAVsZCoG = new TH2F("fPFAVsZCoG", "total energy vs zCog", 600, 0., 3000., 2000, 0., 200.);
+    m_PFAVsCosThetaX = new TH2F("fPFAVsCosThetaX", "total energy vs CosTheta", 200, -1., 1., 2000, 0., 250.);
+    m_PFAE = new TH1F("fPFAE", "total energy ECAL only events", 2000, 0., 250.);
+    m_PFAH = new TH1F("fPFAH", "total energy HCAL only events", 2000, 0., 250.);
+    m_PFAM = new TH1F("fPFAM", "total energy MUON only events", 2000, 0., 250.);
+    m_XvsY = new TH2F("fXvsY", "x vs y", 12000, -2500., 2500., 2000, -2500., 2500.);
 
     // ECAL total energy
-    m_EcalEnergy = new TH1F("fEcalEnergy", "total ecal energy", 1000, 0., 250.);
-    m_HcalEnergy = new TH1F("fHcalEnergy", "total hcal energy", 1000, 0., 250.);
-    m_MuonEnergy = new TH1F("fMuonEnergy", "total muon energy", 1000, 0., 250.);
-    m_LcalEnergy = new TH1F("fLcalEnergy", "total lcal energy", 1000, 0., 250.);
-    m_CalEnergy  = new TH1F("fCalEnergy", "total cal energy", 1000, 0., 250.);
-    m_EcalHcalEnergyEM = new TH2F("fEcalHcalEnergyEM", "ecal vs hcal energy EM", 1000, 0., 250., 1000, 0., 250.);
-    m_EcalHcalEnergyHAD = new TH2F("fEcalHcalEnergyHAD", "ecal vs hcal energy HAD", 1000, 0., 250., 1000, 0., 250.);
-    m_EcalBarrelHcalEnergyEM = new TH2F("fEcalBarrelHcalEnergyEM", "ecal barrel vs hcal energy EM", 1000, 0., 250., 1000, 0., 250.);
-    m_EcalEndCapHcalEnergyEM = new TH2F("fEcalEndCapHcalEnergyEM", "ecal endcap vs hcal energy EM", 1000, 0., 250., 1000, 0., 250.);
-    m_EcalBarrelHcalEnergyHAD = new TH2F("fEcalBarrelHcalEnergyHAD", "ecal barrel vs hcal energy HAD", 1000, 0., 250., 1000, 0., 250.);
-    m_EcalEndCapHcalEnergyHAD = new TH2F("fEcalEndCapHcalEnergyHAD", "ecal endcap vs hcal energy HAD", 1000, 0., 250., 1000, 0., 250.);
-    m_CalEnergyE = new TH1F("fCalEnergyE", "total cal energy E", 1000, 0., 250.);
-    m_CalEnergyH = new TH1F("fCalEnergyH", "total cal energy H", 1000, 0., 250.);
-    m_CalEnergyM = new TH1F("fCalEnergyM", "total cal energy M", 1000, 0., 250.);
-    m_CalEnergyVsCosTheta = new TH2F("fCalEnergyVsCosTheta", "total cal energy vs cos theta", 500, 0., 1., 1000, 0., 250.);
-    m_CalEnergyVsCosThetaR = new TH2F("fCalEnergyVsCosThetaR", "total cal energy vs cos theta reco", 500, 0., 1.,1000, 0., 250.);
+    m_EcalEnergy = new TH1F("fEcalEnergy", "total ecal energy", 2000, 0., 250.);
+    m_HcalEnergy = new TH1F("fHcalEnergy", "total hcal energy", 2000, 0., 250.);
+    m_MuonEnergy = new TH1F("fMuonEnergy", "total muon energy", 2000, 0., 250.);
+    m_LcalEnergy = new TH1F("fLcalEnergy", "total lcal energy", 2000, 0., 250.);
+    m_CalEnergy  = new TH1F("fCalEnergy", "total cal energy", 2000, 0., 250.);
+    m_EcalHcalEnergyEM = new TH2F("fEcalHcalEnergyEM", "ecal vs hcal energy EM", 2000, 0., 250., 2000, 0., 250.);
+    m_EcalHcalEnergyHAD = new TH2F("fEcalHcalEnergyHAD", "ecal vs hcal energy HAD", 2000, 0., 250., 2000, 0., 250.);
+    m_EcalBarrelHcalEnergyEM = new TH2F("fEcalBarrelHcalEnergyEM", "ecal barrel vs hcal energy EM", 2000, 0., 250., 2000, 0., 250.);
+    m_EcalEndCapHcalEnergyEM = new TH2F("fEcalEndCapHcalEnergyEM", "ecal endcap vs hcal energy EM", 2000, 0., 250., 2000, 0., 250.);
+    m_EcalBarrelHcalEnergyHAD = new TH2F("fEcalBarrelHcalEnergyHAD", "ecal barrel vs hcal energy HAD", 2000, 0., 250., 2000, 0., 250.);
+    m_EcalEndCapHcalEnergyHAD = new TH2F("fEcalEndCapHcalEnergyHAD", "ecal endcap vs hcal energy HAD", 2000, 0., 250., 2000, 0., 250.);
+    m_CalEnergyE = new TH1F("fCalEnergyE", "total cal energy E", 2000, 0., 250.);
+    m_CalEnergyH = new TH1F("fCalEnergyH", "total cal energy H", 2000, 0., 250.);
+    m_CalEnergyM = new TH1F("fCalEnergyM", "total cal energy M", 2000, 0., 250.);
+    m_CalEnergyVsCosTheta = new TH2F("fCalEnergyVsCosTheta", "total cal energy vs cos theta", 500, 0., 1., 2000, 0., 250.);
+    m_CalEnergyVsCosThetaR = new TH2F("fCalEnergyVsCosThetaR", "total cal energy vs cos theta reco", 500, 0., 1.,2000, 0., 250.);
     m_EcalBarrelEnergyByLayer = new TH1F("fEcalBarrelEnergyByLayer", "ecal barrel energy profile", 100, 0., 100.);
     m_EcalEndCapEnergyByLayer = new TH1F("fEcalEndCapEnergyByLayer", "ecal endcap energy profile", 100, 0., 100.);
 
     // MIP Calibration
-    m_EcalBarrelMIP = new TH1F("fEcalBarrelMIP", "ecal barrel MIP peak ", 100, 0., 5.);
-    m_EcalEndCapMIP = new TH1F("fEcalEndCapMIP", "ecal endcap MIP peak ", 100, 0., 5.);
-    m_HcalMIP = new TH1F("fHcalMIP", "hcal MIP peak ", 100, 0., 5.);
-    m_MuonMIP = new TH1F("fMuonMIP", "muon MIP peak ", 100, 0., 5.);
-    m_EcalBarrelMIPcorr = new TH1F("fEcalBarrelMIPcorr", "ecal barrel MIP peak ", 100, 0., 5.);
-    m_EcalEndCapMIPcorr = new TH1F("fEcalEndCapMIPcorr", "ecal endcap MIP peak ", 100, 0., 5.);
-    m_HcalMIPcorr = new TH1F("fHcalMIPcorr", "hcal MIP peak ", 100, 0., 5.);
-    m_MuonMIPcorr = new TH1F("fMuonMIPcorr", "muon MIP peak ", 100, 0., 5.);
-    m_CosT = new TH1F("fCosT", "cosTheta ", 100, 0., 1.);
-    m_PhotonCosT = new TH1F("fPhotonCosT", "cosTheta Photon", 100, 0., 1.0);
+    m_EcalBarrelMIP = new TH1F("fEcalBarrelMIP", "ecal barrel MIP peak ", 200, 0., 5.);
+    m_EcalEndCapMIP = new TH1F("fEcalEndCapMIP", "ecal endcap MIP peak ", 200, 0., 5.);
+    m_HcalMIP = new TH1F("fHcalMIP", "hcal MIP peak ", 200, 0., 5.);
+    m_MuonMIP = new TH1F("fMuonMIP", "muon MIP peak ", 200, 0., 5.);
+    m_EcalBarrelMIPcorr = new TH1F("fEcalBarrelMIPcorr", "ecal barrel MIP peak ", 200, 0., 5.);
+    m_EcalEndCapMIPcorr = new TH1F("fEcalEndCapMIPcorr", "ecal endcap MIP peak ", 200, 0., 5.);
+    m_HcalMIPcorr = new TH1F("fHcalMIPcorr", "hcal MIP peak ", 200, 0., 5.);
+    m_MuonMIPcorr = new TH1F("fMuonMIPcorr", "muon MIP peak ", 200, 0., 5.);
+    m_CosT = new TH1F("fCosT", "cosTheta ", 200, 0., 1.);
+    m_PhotonCosT = new TH1F("fPhotonCosT", "cosTheta Photon", 200, 0., 1.0);
 
     m_PFA->SetDirectory(m_pTFile);
     m_PFAB->SetDirectory(m_pTFile);
