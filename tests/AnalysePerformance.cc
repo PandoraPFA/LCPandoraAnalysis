@@ -8,7 +8,7 @@
 
 #include "TFile.h"
 #include "TH1F.h"
-#include "TTree.h"
+#include "TChain.h"
 
 #include "AnalysisHelper.h"
 
@@ -20,7 +20,7 @@
 
 using namespace pandora_analysis;
 
-void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName);
+void AnalysePerformance(TChain *pTChain, const std::string &outputRootFileName);
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -40,24 +40,24 @@ int main(int argc, char **argv)
     const std::string inputFileName(argv[1]);
     const std::string outputRootFileName((nArgs == 2) ? argv[2] : "");
 
-    TFile *pTFile = new TFile(inputFileName.c_str(), "READ");
+    TChain *pTChain = new TChain("PfoAnalysisTree");
+    pTChain->Add(inputFileName.c_str());
 
-    if (pTFile->IsZombie())
+    if (0 == pTChain->GetEntries())
     {
-        std::cout << "Error opening file " << inputFileName << std::endl;
-        delete pTFile;
+        std::cout << "Error opening PfoAnalysisTree " << std::endl;
         return 1;
     }
 
-    AnalysePerformance(pTFile, outputRootFileName);
-    pTFile->Close();
+    AnalysePerformance(pTChain, outputRootFileName);
+    delete pTChain;
 
     return 0;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
+void AnalysePerformance(TChain *pTChain, const std::string &outputRootFileName)
 {
     // Define regions for which to create and investigate pfo energy spectra
     const unsigned int nRegionBins(13);
@@ -80,27 +80,19 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
     }
 
     // Loop over entries in pfo analysis tree, creating energy spectra for specified regions
-    TTree *pTTree = NULL;
-    pTFile->GetObject("PfoAnalysisTree", pTTree);
-
-    if (!pTTree)
-    {
-        std::cout << "Error opening root tree: PfoAnalysisTree " << std::endl;
-        return;
-    }
-
-    const unsigned int nTreeEntries(pTTree->GetEntries());
+    const unsigned int nTreeEntries(pTChain->GetEntries());
 
     int qPdg(0);
-    float pfoEnergyTotal(0.f), mcEnergyENu(0.f), thrust(0.f);
-    pTTree->SetBranchAddress("pfoEnergyTotal", &pfoEnergyTotal);
-    pTTree->SetBranchAddress("mcEnergyENu", &mcEnergyENu);
-    pTTree->SetBranchAddress("qPdg", &qPdg);
-    pTTree->SetBranchAddress("thrust", &thrust);
+    float pfoEnergyTotal(0.f), mcEnergyENu(0.f), mcEnergyCoil(0.f), thrust(0.f);
+    pTChain->SetBranchAddress("pfoEnergyTotal", &pfoEnergyTotal);
+    pTChain->SetBranchAddress("mcEnergyENu", &mcEnergyENu);
+    pTChain->SetBranchAddress("mcEnergyCoil", &mcEnergyCoil);
+    pTChain->SetBranchAddress("qPdg", &qPdg);
+    pTChain->SetBranchAddress("thrust", &thrust);
 
     for (unsigned int iTree = 0; iTree < nTreeEntries; ++iTree)
     {
-        pTTree->GetEntry(iTree);
+        pTChain->GetEntry(iTree);
 
         if ((qPdg < 1) || (qPdg > 3))
             continue;

@@ -104,6 +104,7 @@ private:
     StringVector        m_inputParticleCollections;             ///< 
     StringVector        m_inputReclusterMonitoringCollections;  ///< 
     StringVector        m_mcParticleCollections;                ///< 
+    StringVector        m_coilCollections;                      ///< 
 
     int                 m_printing;                             ///< 
     std::string         m_rootFile;                             ///< 
@@ -133,6 +134,7 @@ private:
 
     float               m_mcEnergyTotal;                        ///< 
     float               m_mcEnergyENu;                          ///< 
+    float               m_mcEnergyCoil;                         ///< 
     float               m_mcEnergyFwd;                          ///< 
     float               m_eQQ;                                  ///< 
     float               m_eQ1;                                  ///< 
