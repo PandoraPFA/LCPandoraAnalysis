@@ -172,7 +172,6 @@ private:
     TH1F           *m_PFAB;                                         ///< 
     TH2F           *m_PFAVsCosTheta;                                ///< 
     TH2F           *m_PFAVsCosThetaR;                               ///< 
-    TH2F           *m_PFAVsCosThetaF;                               ///< 
     TH1F           *m_PFAE;                                         ///< 
     TH1F           *m_PFAH;                                         ///< 
     TH1F           *m_PFAM;                                         ///< 

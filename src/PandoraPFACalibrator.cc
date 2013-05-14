@@ -204,7 +204,6 @@ void PandoraPFACalibrator::init()
     m_PFAB = new TH1F("fPFABarrel", "pfo energy barrel", 2000, 0., 250.);
     m_PFAVsCosTheta = new TH2F("fPFAVsCosTheta", "pfo energy vs cosTheta", 500, 0., 1., 2000, 0., 250.);
     m_PFAVsCosThetaR = new TH2F("fPFAVsCosThetaR", "pfo energy vs cosThetaReco", 500, 0., 1., 2000, 0., 250.);
-    m_PFAVsCosThetaF = new TH2F("fPFAVsCosThetaFull", "pfo energy vs full cosTheta range", 200, -1., 1., 2000, 0., 250.);
     m_PFAE = new TH1F("fPFAECAL", "pfo energy ECAL only events", 2000, 0., 250.);
     m_PFAH = new TH1F("fPFAHCAL", "pfo energy HCAL only events", 2000, 0., 250.);
     m_PFAM = new TH1F("fPFAMUON", "pfo energy MUON only events", 2000, 0., 250.);
@@ -243,7 +242,6 @@ void PandoraPFACalibrator::init()
     m_PFAB->SetDirectory(m_pTFile);
     m_PFAVsCosTheta->SetDirectory(m_pTFile);
     m_PFAVsCosThetaR->SetDirectory(m_pTFile);
-    m_PFAVsCosThetaF->SetDirectory(m_pTFile);
     m_PFAE->SetDirectory(m_pTFile);
     m_PFAH->SetDirectory(m_pTFile);
     m_PFAM->SetDirectory(m_pTFile);
@@ -531,7 +529,6 @@ void PandoraPFACalibrator::end()
     m_PFAB->Write();
     m_PFAVsCosTheta->Write();
     m_PFAVsCosThetaR->Write();
-    m_PFAVsCosThetaF->Write();
     m_PFAE->Write();
     m_PFAH->Write();
     m_PFAM->Write();
