@@ -76,20 +76,6 @@ PandoraPFACalibrator::PandoraPFACalibrator() : Processor("PandoraPFACalibrator")
         m_particleCollectionName,
         std::string("PandoraPFANewPFOs"));
 
-    // Allow use of old and new config for input pfo lists
-    typedef std::set<std::string> StringSet;
-    StringSet uniqueMCPfoCollections;
-    uniqueMCPfoCollections.insert(m_mcPfoCollections.begin(), m_mcPfoCollections.end());
-    uniqueMCPfoCollections.insert(m_inputMCParticleCollections.begin(), m_inputMCParticleCollections.end());
-    m_mcPfoCollections.clear();
-    m_mcPfoCollections.insert(m_mcPfoCollections.begin(), uniqueMCPfoCollections.begin(), uniqueMCPfoCollections.end());
-
-    StringSet uniqueRecoPfoCollections;
-    uniqueRecoPfoCollections.insert(m_recoPfoCollections.begin(), m_recoPfoCollections.end());
-    uniqueRecoPfoCollections.insert(m_particleCollectionName);
-    m_recoPfoCollections.clear();
-    m_recoPfoCollections.insert(m_recoPfoCollections.begin(), uniqueRecoPfoCollections.begin(), uniqueRecoPfoCollections.end());
-
     LCStrVec ecalBarrelCollections;
     registerInputCollections(LCIO::CALORIMETERHIT,
         "ECALBarrelcollections", 
@@ -183,16 +169,31 @@ PandoraPFACalibrator::PandoraPFACalibrator() : Processor("PandoraPFACalibrator")
         "The maximum hadronic energy allowed for a single hcal hit",
         m_maxHCalHitHadronicEnergy,
         -1.f);
-
-    CellIDDecoder<CalorimeterHit>::setDefaultEncoding("M:3,S-1:3,I:9,J:9,K-1:6");
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 void PandoraPFACalibrator::init() 
 {
+    // Finalise steering - allow use of old and new config for input pfo lists
+    typedef std::set<std::string> StringSet;
+    StringSet uniqueMCPfoCollections;
+    uniqueMCPfoCollections.insert(m_mcPfoCollections.begin(), m_mcPfoCollections.end());
+    uniqueMCPfoCollections.insert(m_inputMCParticleCollections.begin(), m_inputMCParticleCollections.end());
+    m_mcPfoCollections.clear();
+    m_mcPfoCollections.insert(m_mcPfoCollections.begin(), uniqueMCPfoCollections.begin(), uniqueMCPfoCollections.end());
+
+    StringSet uniqueRecoPfoCollections;
+    uniqueRecoPfoCollections.insert(m_recoPfoCollections.begin(), m_recoPfoCollections.end());
+    uniqueRecoPfoCollections.insert(m_particleCollectionName);
+    m_recoPfoCollections.clear();
+    m_recoPfoCollections.insert(m_recoPfoCollections.begin(), uniqueRecoPfoCollections.begin(), uniqueRecoPfoCollections.end());
+
+    CellIDDecoder<CalorimeterHit>::setDefaultEncoding("M:3,S-1:3,I:9,J:9,K-1:6");
+
     this->printParameters();
 
+    // Member variable initialisation
     m_nRun = 0;
     m_nEvt = 0;
 
@@ -292,7 +293,7 @@ void PandoraPFACalibrator::processEvent(LCEvent *pLCEvent)
     ++m_nEvt;
 
     // Read mc pfo collection
-    float cosTheta(0.f);
+    float cosTheta(std::numeric_limits<float>::max());
     this->ReadMCParticles(pLCEvent, m_mcPfoCollections, cosTheta);
 
     // Read hit collections
