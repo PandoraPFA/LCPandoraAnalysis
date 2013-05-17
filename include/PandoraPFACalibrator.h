@@ -168,41 +168,40 @@ private:
     TFile          *m_pTFile;                                       ///< 
     std::string     m_rootFile;                                     ///< 
 
-    TH1F           *m_PFA;                                          ///< 
-    TH1F           *m_PFAB;                                         ///< 
-    TH2F           *m_PFAVsCosTheta;                                ///< 
-    TH2F           *m_PFAVsCosThetaR;                               ///< 
-    TH1F           *m_PFAE;                                         ///< 
-    TH1F           *m_PFAH;                                         ///< 
-    TH1F           *m_PFAM;                                         ///< 
+    TH1F           *m_hPfoEnergy;                                   ///< 
+    TH1F           *m_hPfoEnergyBarrel;                             ///< 
+    TH1F           *m_hPfoEnergy95ECal;                             ///< 
+    TH1F           *m_hPfoEnergy95HCal;                             ///< 
+    TH1F           *m_hPfoEnergy95Muon;                             ///< 
+    TH2F           *m_hPfoEnergyVsCosTheta;                         ///< 
+    TH2F           *m_hPfoEnergyVsCosThetaReco;                     ///< 
 
-    TH1F           *m_EcalEnergy;                                   ///< 
-    TH1F           *m_HcalEnergy;                                   ///< 
-    TH1F           *m_MuonEnergy;                                   ///< 
-    TH1F           *m_LcalEnergy;                                   ///< 
-    TH1F           *m_CalEnergy;                                    ///< 
-    TH2F           *m_EcalHcalEnergyEM;                             ///< 
-    TH2F           *m_EcalHcalEnergyHAD;                            ///< 
-    TH2F           *m_EcalBarrelHcalEnergyEM;                       ///< 
-    TH2F           *m_EcalEndCapHcalEnergyEM;                       ///< 
-    TH2F           *m_EcalBarrelHcalEnergyHAD;                      ///< 
-    TH2F           *m_EcalEndCapHcalEnergyHAD;                      ///< 
-    TH1F           *m_CalEnergyE;                                   ///< 
-    TH1F           *m_CalEnergyH;                                   ///< 
-    TH1F           *m_CalEnergyM;                                   ///< 
-    TH2F           *m_CalEnergyVsCosTheta;                          ///< 
-    TH2F           *m_CalEnergyVsCosThetaR;                         ///< 
-    TH1F           *m_EcalBarrelEnergyByLayer;                      ///< 
-    TH1F           *m_EcalEndCapEnergyByLayer;                      ///< 
+    TH1F           *m_hCaloEnergy;                                  ///< 
+    TH1F           *m_hCaloEnergyECal;                              ///< 
+    TH1F           *m_hCaloEnergyHCal;                              ///< 
+    TH1F           *m_hCaloEnergyMuon;                              ///< 
+    TH1F           *m_hCaloEnergy95ECal;                            ///< 
+    TH1F           *m_hCaloEnergy95HCal;                            ///< 
+    TH1F           *m_hCaloEnergy95Muon;                            ///< 
+    TH1F           *m_hEcalBarrelEnergyByLayer;                     ///< 
+    TH1F           *m_hEcalEndCapEnergyByLayer;                     ///< 
+    TH2F           *m_hECalHCalEnergyEM;                            ///< 
+    TH2F           *m_hECalHcalEnergyHAD;                           ///< 
+    TH2F           *m_hECalBarrelHCalEnergyEM;                      ///< 
+    TH2F           *m_hECalEndCapHCalEnergyEM;                      ///< 
+    TH2F           *m_hECalBarrelHCalEnergyHAD;                     ///< 
+    TH2F           *m_hECalEndCapHCalEnergyHAD;                     ///< 
+    TH2F           *m_hCaloEnergyVsCosTheta;                        ///< 
+    TH2F           *m_hCaloEnergyVsCosThetaReco;                    ///< 
 
-    TH1F           *m_EcalBarrelMIP;                                ///< 
-    TH1F           *m_EcalEndCapMIP;                                ///< 
-    TH1F           *m_HcalMIP;                                      ///< 
-    TH1F           *m_MuonMIP;                                      ///< 
-    TH1F           *m_EcalBarrelMIPcorr;                            ///< 
-    TH1F           *m_EcalEndCapMIPcorr;                            ///< 
-    TH1F           *m_HcalMIPcorr;                                  ///< 
-    TH1F           *m_MuonMIPcorr;                                  ///< 
+    TH1F           *m_hECalBarrelMIP;                               ///< 
+    TH1F           *m_hECalEndCapMIP;                               ///< 
+    TH1F           *m_hHCalMIP;                                     ///< 
+    TH1F           *m_hMuonMIP;                                     ///< 
+    TH1F           *m_hECalBarrelMIPCorr;                           ///< 
+    TH1F           *m_hECalEndCapMIPCorr;                           ///< 
+    TH1F           *m_hHCalMIPCorr;                                 ///< 
+    TH1F           *m_hMuonMIPCorr;                                 ///< 
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
