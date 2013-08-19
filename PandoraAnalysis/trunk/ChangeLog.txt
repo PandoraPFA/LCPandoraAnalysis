@@ -1,4 +1,32 @@
 ************************************************************************
+TAG V00-05 FOR ILCSOFT USAGE
+************************************************************************
+AnalysePerformance binary now reads TChains, rather than a single TTree.
+Included new PfoTarget information in PfoAnalysis tree.
+PfoAnalysis now attempts to store an estimate of energy deposited in coil.
+Explicitly set ROOT directory for output tree and histograms.
+Finalise steering parameters in init method, rather than in constructor.
+Added Calibrate test binary.
+Added run and event counters for display of number of runs and events processed.
+Altered PandoraPFACalibrator histogram binning and names.
+Removed unused histograms.
+Cosmetic changes.
+Makefile update, including basic dependency tracking. 
+
+************************************************************************
+TAG V00-04 FOR ILCSOFT USAGE
+************************************************************************
+Added new total ECAL energy vs total HCAL energy histograms.
+Write absolute run and event number information to analysis tree.
+Added new pfa analysis variables to output tree.
+Updated default PandoraPFACalibrator parameter values for consistency.
+Removed unused test binary.
+Cosmetic changes.
+Added example steering file for PandoraPFACalibrator.
+Updated PandoraAnalysis example steering file.
+Prevents copying of header files.
+
+************************************************************************
 TAG V00-03 FOR ILCSOFT USAGE
 ************************************************************************
 Added new PandoraPFACalibrator processor, courtesy of A. Lucaci-Timoce.
