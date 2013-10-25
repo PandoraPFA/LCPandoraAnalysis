@@ -8,6 +8,7 @@
 
 #include "TApplication.h"
 #include "TCanvas.h"
+#include "TChain.h"
 #include "TFile.h"
 #include "TH1F.h"
 #include "TSystem.h"
@@ -35,13 +36,13 @@ public:
     Parameters();
 
     bool            m_shouldPlotResults;            ///< Whether to plot resulting energy distribution
-    std::string     m_inputFileName;                ///< The name of the file containing the Pandora analysis tree
+    std::string     m_inputFileNames;               ///< The name of the file(s) containing the Pandora analysis tree(s)
     double          m_eCalToEm;                     ///< ECalToEm calibration factor
     double          m_hCalToEm;                     ///< HCalToEm calibration factor
     double          m_eCalToHad;                    ///< ECalToHad calibration factor
     double          m_hCalToHad;                    ///< HCalToHad calibration factor
     double          m_muon;                         ///< Muon calibration factor
-    TTree          *m_pTTree;                       ///< To hold the address of the Pandora analysis tree
+    TChain         *m_pTChain;                      ///< The chain of Pandora analysis trees
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -86,30 +87,19 @@ int main(int argc, char **argv)
     pApplication->SetReturnFromRun(kTRUE);
 
     // Extract pfo analysis tree
-    TFile *pTFile = new TFile(parameters.m_inputFileName.c_str(), "READ");
+    parameters.m_pTChain->Add(parameters.m_inputFileNames.c_str());
 
-    if (pTFile->IsZombie())
+    if (0 == parameters.m_pTChain->GetEntries())
     {
-        std::cout << "Error opening file " << parameters.m_inputFileName << std::endl;
-        delete pTFile;
-        return 1;
-    }
-
-    pTFile->GetObject("PfoAnalysisTree", parameters.m_pTTree);
-
-    if (!parameters.m_pTTree)
-    {
-        std::cout << "Error opening root tree: PfoAnalysisTree " << std::endl;
+        std::cout << "Error opening PfoAnalysisTree " << std::endl;
         return 1;
     }
 
     // Obtain results
     GetSigma(parameters);
 
-    delete parameters.m_pTTree;
-    parameters.m_pTTree = NULL;
-
-    pTFile->Close();
+    delete parameters.m_pTChain;
+    parameters.m_pTChain = NULL;
     delete pApplication;
 
     return 0;
@@ -119,28 +109,28 @@ int main(int argc, char **argv)
 
 void GetSigma(const Parameters &parameters)
 {
-    const unsigned int nTreeEntries(parameters.m_pTTree->GetEntries());
+    const unsigned int nEntries(parameters.m_pTChain->GetEntries());
 
     int qPdg(0);
     float pfoEnergyTracks(0.f), pfoECalToEmEnergy(0.f), pfoHCalToEmEnergy(0.f), pfoECalToHadEnergy(0.f), pfoHCalToHadEnergy(0.f),
         pfoOtherEnergy(0.f), pfoMuonToEnergy(0.f), mcEnergyENu(0.f), thrust(0.f);
 
-    parameters.m_pTTree->SetBranchAddress("pfoEnergyTracks", &pfoEnergyTracks);
-    parameters.m_pTTree->SetBranchAddress("pfoECalToEmEnergy", &pfoECalToEmEnergy);
-    parameters.m_pTTree->SetBranchAddress("pfoHCalToEmEnergy", &pfoHCalToEmEnergy);
-    parameters.m_pTTree->SetBranchAddress("pfoECalToHadEnergy", &pfoECalToHadEnergy);
-    parameters.m_pTTree->SetBranchAddress("pfoHCalToHadEnergy", &pfoHCalToHadEnergy);
-    parameters.m_pTTree->SetBranchAddress("pfoOtherEnergy", &pfoOtherEnergy);
-    parameters.m_pTTree->SetBranchAddress("pfoMuonToEnergy", &pfoMuonToEnergy);
-    parameters.m_pTTree->SetBranchAddress("mcEnergyENu", &mcEnergyENu);
-    parameters.m_pTTree->SetBranchAddress("qPdg", &qPdg);
-    parameters.m_pTTree->SetBranchAddress("thrust", &thrust);
+    parameters.m_pTChain->SetBranchAddress("pfoEnergyTracks", &pfoEnergyTracks);
+    parameters.m_pTChain->SetBranchAddress("pfoECalToEmEnergy", &pfoECalToEmEnergy);
+    parameters.m_pTChain->SetBranchAddress("pfoHCalToEmEnergy", &pfoHCalToEmEnergy);
+    parameters.m_pTChain->SetBranchAddress("pfoECalToHadEnergy", &pfoECalToHadEnergy);
+    parameters.m_pTChain->SetBranchAddress("pfoHCalToHadEnergy", &pfoHCalToHadEnergy);
+    parameters.m_pTChain->SetBranchAddress("pfoOtherEnergy", &pfoOtherEnergy);
+    parameters.m_pTChain->SetBranchAddress("pfoMuonToEnergy", &pfoMuonToEnergy);
+    parameters.m_pTChain->SetBranchAddress("mcEnergyENu", &mcEnergyENu);
+    parameters.m_pTChain->SetBranchAddress("qPdg", &qPdg);
+    parameters.m_pTChain->SetBranchAddress("thrust", &thrust);
 
     TH1F *pPFAL7A = new TH1F("fPFA_L7A", "TotalEnergy<0.7A", 10000, 0., 5000.);
 
-    for (unsigned int iTree = 0; iTree < nTreeEntries; ++iTree)
+    for (unsigned int iTree = 0; iTree < nEntries; ++iTree)
     {
-        parameters.m_pTTree->GetEntry(iTree);
+        parameters.m_pTChain->GetEntry(iTree);
 
         //if ((qPdg < 1) || (qPdg > 3))
         //    continue;
@@ -219,7 +209,7 @@ bool ParseCommandLine(int argc, char *argv[], Parameters &parameters)
         switch (c)
         {
         case 'i':
-            parameters.m_inputFileName = optarg;
+            parameters.m_inputFileNames = optarg;
             break;
         case 'p':
             parameters.m_shouldPlotResults = true;
@@ -242,7 +232,7 @@ bool ParseCommandLine(int argc, char *argv[], Parameters &parameters)
         case 'h':
         default:
             std::cout << std::endl << "Calibrate " << std::endl
-                      << "    -i name   (mandatory, input file name)" << std::endl
+                      << "    -i name   (mandatory, input file name(s), can include wildcards if string is in quotes)" << std::endl
                       << "    -p        (optional, whether to plot results,      default 0)" << std::endl
                       << "    -a value  (optional, ECalToEM calibration factor,  default 1)" << std::endl
                       << "    -b value  (optional, HCalToEM calibration factor,  default 1)" << std::endl
@@ -262,11 +252,12 @@ bool ParseCommandLine(int argc, char *argv[], Parameters &parameters)
 
 Parameters::Parameters() :
     m_shouldPlotResults(false),
-    m_inputFileName(""),
+    m_inputFileNames(""),
     m_eCalToEm(1.),
     m_hCalToEm(1.),
     m_eCalToHad(1.),
     m_hCalToHad(1.),
-    m_muon(1.)
+    m_muon(1.),
+    m_pTChain(new TChain("PfoAnalysisTree"))
 {
 }
