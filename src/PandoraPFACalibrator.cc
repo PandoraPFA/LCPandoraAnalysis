@@ -439,7 +439,7 @@ void PandoraPFACalibrator::ReadHitEnergies(LCEvent *pLCEvent, const LCStrVec &co
                     const float y(pCalorimeterHit->getPosition()[1]);
                     const float z(pCalorimeterHit->getPosition()[2]);
                     const float r(std::sqrt(x * x + y * y + z * z));
-                    const float correction((std::fabs(z) < m_zOfEndCap) ? r / std::sqrt(x * x + y * y) : r / z);
+                    const float correction((std::fabs(z) < m_zOfEndCap) ? r / std::sqrt(x * x + y * y) : r / std::fabs(z));
 
                     const float energyInMips(pCalorimeterHit->getEnergy() * mipConstant);
 
