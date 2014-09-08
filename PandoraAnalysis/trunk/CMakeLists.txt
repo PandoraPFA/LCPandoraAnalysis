@@ -11,7 +11,7 @@ PROJECT( PandoraAnalysis )
 
 # project version
 SET( ${PROJECT_NAME}_VERSION_MAJOR 0 )
-SET( ${PROJECT_NAME}_VERSION_MINOR 6 )
+SET( ${PROJECT_NAME}_VERSION_MINOR 7 )
 SET( ${PROJECT_NAME}_VERSION_PATCH 0 )
 
 
@@ -64,7 +64,7 @@ INSTALL_SHARED_LIBRARY( ${PROJECT_NAME} DESTINATION lib )
 
 
 # make standalone analysis executables
-SET( PROGRAMS AnalysePerformance AnalysePerformanceFull Calibrate ReclusterMonitoring )
+SET( PROGRAMS AnalysePerformance AnalysePerformanceFull Calibrate )
 
 FOREACH( program ${PROGRAMS} )
     ADD_EXECUTABLE( ${program} ${PROJECT_SOURCE_DIR}/tests/${program}.cc )
