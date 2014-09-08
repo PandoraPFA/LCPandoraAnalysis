@@ -102,7 +102,6 @@ private:
     StringVector        m_inputQuarkParticleCollections;        ///< 
     StringVector        m_inputMCParticleCollections;           ///< 
     StringVector        m_inputParticleCollections;             ///< 
-    StringVector        m_inputReclusterMonitoringCollections;  ///< 
     StringVector        m_mcParticleCollections;                ///< 
     StringVector        m_coilCollections;                      ///< 
 
@@ -145,9 +144,6 @@ private:
     float               m_mQQ;                                  ///< 
     float               m_thrust;                               ///< 
     int                 m_qPdg;                                 ///< 
-    float               m_netEnergyChange;                      ///< 
-    float               m_sumModulusEnergyChanges;              ///< 
-    float               m_sumSquaredEnergyChanges;              ///< 
 
     typedef std::vector<float> FloatVector;
     FloatVector         m_pfoEnergies;                          ///< 

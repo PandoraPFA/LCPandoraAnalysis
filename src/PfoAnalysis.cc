@@ -50,12 +50,6 @@ PfoAnalysis::PfoAnalysis() :
                              m_inputParticleCollections,
                              StringVector());
 
-    registerInputCollections(LCIO::LCGENERICOBJECT,
-                             "InputReclusterMonitoringCollections",
-                             "Names of input recluster monitoring collections",
-                             m_inputReclusterMonitoringCollections,
-                             StringVector());
-
     registerInputCollections(LCIO::MCPARTICLE,
                              "MCParticleCollections", 
                              "Names of mc particle collections",
@@ -124,9 +118,6 @@ void PfoAnalysis::init()
     m_tree->Branch("mQQ", &m_mQQ, "mQQ/F");
     m_tree->Branch("thrust", &m_thrust, "thrust/F");
     m_tree->Branch("qPdg", &m_qPdg, "qPdg/I");
-    m_tree->Branch("netEnergyChange", &m_netEnergyChange, "netEnergyChange/F");
-    m_tree->Branch("sumModulusEnergyChanges", &m_sumModulusEnergyChanges, "sumModulusEnergyChanges/F");
-    m_tree->Branch("sumSquaredEnergyChanges", &m_sumSquaredEnergyChanges, "sumSquaredEnergyChanges/F");
     m_tree->Branch("pfoEnergies", &m_pfoEnergies);
     m_tree->Branch("pfoPx", &m_pfoPx);
     m_tree->Branch("pfoPy", &m_pfoPy);
@@ -244,9 +235,6 @@ void PfoAnalysis::Clear()
     m_mQQ = -99.f;
     m_thrust = -99.f;
     m_qPdg = -99;
-    m_netEnergyChange = 0.f;
-    m_sumModulusEnergyChanges = 0.f;
-    m_sumSquaredEnergyChanges = 0.f;
 
     m_pfoEnergies.clear();
     m_pfoPx.clear();
@@ -347,32 +335,6 @@ void PfoAnalysis::ExtractCollections(EVENT::LCEvent *pLCEvent)
         catch (...)
         {
             streamlog_out(ERROR) << "Could not extract input particle collection: " << *iter << std::endl;
-        }
-    }
-
-    // Extract recluster monitoring information, if present
-    for (StringVector::const_iterator iter = m_inputReclusterMonitoringCollections.begin(), iterEnd = m_inputReclusterMonitoringCollections.end();
-        iter != iterEnd; ++iter)
-    {
-        try
-        {
-            const EVENT::LCCollection *pLCCollection = pLCEvent->getCollection(*iter);
-
-            for (unsigned int i = 0, nElements = pLCCollection->getNumberOfElements(); i < nElements; ++i)
-            {
-                EVENT::LCGenericObject *pLCGenericObject = dynamic_cast<EVENT::LCGenericObject*>(pLCCollection->getElementAt(i));
-
-                if (NULL == pLCGenericObject)
-                    throw EVENT::Exception("Collection type mismatch");
-
-                m_netEnergyChange += pLCGenericObject->getFloatVal(0);
-                m_sumModulusEnergyChanges += pLCGenericObject->getFloatVal(1);
-                m_sumSquaredEnergyChanges += pLCGenericObject->getFloatVal(2);
-            }
-        }
-        catch (...)
-        {
-            streamlog_out(WARNING) << "Could not extract ReclusterMonitoring information" << std::endl;
         }
     }
 
