@@ -81,8 +81,10 @@ private:
 
     /**
      *  @brief  Make quark variables
+     * 
+     *  @param  pLCEvent the lc event
      */
-    void MakeQuarkVariables();
+    void MakeQuarkVariables(EVENT::LCEvent *pLCEvent);
 
     /**
      *  @brief  Perform pfo analysis
@@ -99,18 +101,20 @@ private:
     int                 m_nRunSum;                              ///< 
     int                 m_nEvtSum;                              ///< 
 
-    StringVector        m_inputQuarkParticleCollections;        ///< 
-    StringVector        m_inputMCParticleCollections;           ///< 
-    StringVector        m_inputParticleCollections;             ///< 
-    StringVector        m_mcParticleCollections;                ///< 
-    StringVector        m_coilCollections;                      ///< 
+    std::string         m_inputPfoCollection;                   ///< 
+    std::string         m_mcParticleCollection;                 ///< 
+    std::string         m_coilCollection;                       ///< 
 
     int                 m_printing;                             ///< 
     std::string         m_rootFile;                             ///< 
 
+    int                 m_lookForQuarksWithMotherZ;             ///< 
+
+    float               m_mcPfoSelectionRadius;                 ///< 
+    float               m_mcPfoSelectionMomentum;               ///< 
+    float               m_mcPfoSelectionLowEnergyNPCutOff;      ///< 
+
     ParticleVector      m_pfoVector;                            ///< 
-    ParticleVector      m_mcPfoVector;                          ///< 
-    ParticleVector      m_quarkPfoVector;                       ///< 
     MCParticleVector    m_pfoTargetVector;                      ///< 
 
     int                 m_nPfosTotal;                           ///< 
@@ -130,20 +134,6 @@ private:
     float               m_pfoOtherEnergy;                       ///< 
 
     float               m_pfoMassTotal;                         ///< 
-
-    float               m_mcEnergyTotal;                        ///< 
-    float               m_mcEnergyENu;                          ///< 
-    float               m_mcEnergyCoil;                         ///< 
-    float               m_mcEnergyFwd;                          ///< 
-    float               m_eQQ;                                  ///< 
-    float               m_eQ1;                                  ///< 
-    float               m_eQ2;                                  ///< 
-    float               m_costQQ;                               ///< 
-    float               m_costQ1;                               ///< 
-    float               m_costQ2;                               ///< 
-    float               m_mQQ;                                  ///< 
-    float               m_thrust;                               ///< 
-    int                 m_qPdg;                                 ///< 
 
     typedef std::vector<float> FloatVector;
     FloatVector         m_pfoEnergies;                          ///< 
@@ -167,15 +157,28 @@ private:
     int                 m_nPfoTargetsPhotons;                   ///< 
     int                 m_nPfoTargetsTracks;                    ///< 
 
-    float               m_pfoTargetsEnergyTotal;                ////< 
-    float               m_pfoTargetsEnergyNeutralHadrons;       ////< 
-    float               m_pfoTargetsEnergyPhotons;              ////< 
-    float               m_pfoTargetsEnergyTracks;               ////< 
+    float               m_pfoTargetsEnergyTotal;                ///< 
+    float               m_pfoTargetsEnergyNeutralHadrons;       ///< 
+    float               m_pfoTargetsEnergyPhotons;              ///< 
+    float               m_pfoTargetsEnergyTracks;               ///< 
+
+    float               m_mcEnergyENu;                          ///< 
+    float               m_mcEnergyCoil;                         ///< 
+    float               m_mcEnergyFwd;                          ///< 
+    float               m_eQQ;                                  ///< 
+    float               m_eQ1;                                  ///< 
+    float               m_eQ2;                                  ///< 
+    float               m_costQQ;                               ///< 
+    float               m_costQ1;                               ///< 
+    float               m_costQ2;                               ///< 
+    float               m_mQQ;                                  ///< 
+    float               m_thrust;                               ///< 
+    int                 m_qPdg;                                 ///< 
 
     TFile              *m_pTFile;                               ///< 
     TTree              *m_tree;                                 ///< 
     TH1F               *m_hPfoEnergySum;                        ///< 
-    TH1F               *m_hPfoEnergySumL7A;                     ///<
+    TH1F               *m_hPfoEnergySumL7A;                     ///< 
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

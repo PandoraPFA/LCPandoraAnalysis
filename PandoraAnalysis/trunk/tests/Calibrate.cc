@@ -183,7 +183,7 @@ void Pause()
     while(true)
     {
         gSystem->ProcessEvents();
-        fcntl(1, F_SETFL, flag | O_NONBLOCK);
+        (void) fcntl(1, F_SETFL, flag | O_NONBLOCK);
         key = getchar();
 
         if((key == '\n') || (key == '\r'))
@@ -192,7 +192,7 @@ void Pause()
         usleep(1000);
     }
 
-    fcntl(1, F_SETFL, flag);
+    (void) fcntl(1, F_SETFL, flag);
 #else
     std::cout << "Pause() is only implemented for unix operating systems." << std::endl;
 #endif
