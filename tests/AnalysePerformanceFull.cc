@@ -73,8 +73,7 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
 
     int nPfosTotal(0), nPfosNeutralHadrons(0), nPfosPhotons(0), nPfosTracks(0), qPdg(0);
     float pfoEnergyTotal(0.f), pfoEnergyNeutralHadrons(0.f), pfoEnergyPhotons(0.f), pfoEnergyTracks(0.f), pfoMassTotal(0.f),
-        mcEnergyTotal(0.f), mcEnergyENu(0.f), mcEnergyFwd(0.f), eQQ(0.f), eQ1(0.f), eQ2(0.f), costQQ(0.f), costQ1(0.f), costQ2(0.f),
-        mQQ(0.f), thrust(0.f), netEnergyChange(0.f), sumModulusEnergyChanges(0.f), sumSquaredEnergyChanges(0.f);
+        mcEnergyENu(0.f), mcEnergyFwd(0.f), eQQ(0.f), eQ1(0.f), eQ2(0.f), costQQ(0.f), costQ1(0.f), costQ2(0.f), mQQ(0.f), thrust(0.f);
 
     pTTree->SetBranchAddress("nPfosTotal", &nPfosTotal);
     pTTree->SetBranchAddress("nPfosNeutralHadrons", &nPfosNeutralHadrons);
@@ -85,7 +84,6 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
     pTTree->SetBranchAddress("pfoEnergyPhotons", &pfoEnergyPhotons);
     pTTree->SetBranchAddress("pfoEnergyTracks", &pfoEnergyTracks);
     pTTree->SetBranchAddress("pfoMassTotal", &pfoMassTotal);
-    pTTree->SetBranchAddress("mcEnergyTotal", &mcEnergyTotal);
     pTTree->SetBranchAddress("mcEnergyENu", &mcEnergyENu);
     pTTree->SetBranchAddress("mcEnergyFwd", &mcEnergyFwd);
     pTTree->SetBranchAddress("eQQ", &eQQ);
@@ -97,9 +95,6 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
     pTTree->SetBranchAddress("mQQ", &mQQ);
     pTTree->SetBranchAddress("thrust", &thrust);
     pTTree->SetBranchAddress("qPdg", &qPdg);
-    pTTree->SetBranchAddress("netEnergyChange", &netEnergyChange);
-    pTTree->SetBranchAddress("sumModulusEnergyChanges", &sumModulusEnergyChanges);
-    pTTree->SetBranchAddress("sumSquaredEnergyChanges", &sumSquaredEnergyChanges);
 
     // Book histograms
     TH1F *pNPFO = new TH1F("fNPFO", "number of pfos ", 200, 0., 200.);

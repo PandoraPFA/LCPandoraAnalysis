@@ -7,16 +7,10 @@
  */
 
 #include "EVENT/LCCollection.h"
-#include "EVENT/LCRelation.h"
 #include "EVENT/MCParticle.h"
-#include "EVENT/Track.h"
-#include "EVENT/SimCalorimeterHit.h"
 #include "EVENT/CalorimeterHit.h"
 #include "EVENT/LCStrVec.h"
 #include "EVENT/ReconstructedParticle.h"
-#include "IMPL/ReconstructedParticleImpl.h"
-#include "IMPL/LCFlagImpl.h"
-#include "IMPL/ClusterImpl.h"
 #include "UTIL/CellIDDecoder.h"
 
 #include "gear/GEAR.h"
@@ -29,7 +23,6 @@
 #include "TFile.h"
 
 #include "PandoraPFACalibrator.h"
-#include "MCPfoMaker.h"
 
 #include <cmath>
 #include <iostream>
