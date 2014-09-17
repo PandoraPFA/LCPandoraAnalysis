@@ -9,7 +9,6 @@
 #include "EVENT/LCCollection.h"
 #include "EVENT/MCParticle.h"
 #include "EVENT/ReconstructedParticle.h"
-#include "EVENT/SimTrackerHit.h"
 
 #include "CalorimeterHitType.h"
 
@@ -21,7 +20,7 @@
 #include "PfoAnalysis.h"
 
 #include <cmath>
-#include <set>
+#include <cstdlib>
 
 PfoAnalysis pfoAnalysis;
 
@@ -42,12 +41,6 @@ PfoAnalysis::PfoAnalysis() :
                             "MCParticleCollection",
                             "Name of mc particle collections",
                             m_mcParticleCollection,
-                            std::string());
-
-    registerInputCollection(LCIO::SIMTRACKERHIT,
-                            "CoilCollection",
-                            "Name of coil collections, used for leakage correction",
-                            m_coilCollection,
                             std::string());
 
     registerProcessorParameter("LookForQuarksWithMotherZ",
@@ -133,7 +126,6 @@ void PfoAnalysis::init()
     m_tree->Branch("pfoTargetsEnergyPhotons", &m_pfoTargetsEnergyPhotons, "pfoTargetsEnergyPhotons/F");
     m_tree->Branch("pfoTargetsEnergyTracks", &m_pfoTargetsEnergyTracks, "pfoTargetsEnergyTracks/F");
     m_tree->Branch("mcEnergyENu", &m_mcEnergyENu, "mcEnergyENu/F");
-    m_tree->Branch("mcEnergyCoil", &m_mcEnergyCoil, "mcEnergyCoil/F");
     m_tree->Branch("mcEnergyFwd", &m_mcEnergyFwd, "mcEnergyFwd/F");
     m_tree->Branch("eQQ", &m_eQQ, "eQQ/F");
     m_tree->Branch("eQ1", &m_eQ1, "eQ1/F");
@@ -252,7 +244,6 @@ void PfoAnalysis::Clear()
     m_pfoTargetsEnergyTracks = 0.f;
 
     m_mcEnergyENu = 0.f;
-    m_mcEnergyCoil = 0.f;
     m_mcEnergyFwd = 0.f;
     m_eQQ = -99.f;
     m_eQ1 = -99.f;
@@ -269,14 +260,14 @@ void PfoAnalysis::Clear()
 
 void PfoAnalysis::ExtractCollections(EVENT::LCEvent *pLCEvent)
 {
-    // Extract reconstructed particle collection
+    // Extract reconstructed pfo collection
     try
     {
-        LCCollection *pLCCollection = pLCEvent->getCollection(m_inputPfoCollection);
+        const EVENT::LCCollection *pLCCollection = pLCEvent->getCollection(m_inputPfoCollection);
 
         for (unsigned int i = 0, nElements = pLCCollection->getNumberOfElements(); i < nElements; ++i)
         {
-            ReconstructedParticle *pReconstructedParticle = dynamic_cast<ReconstructedParticle*>(pLCCollection->getElementAt(i));
+            const EVENT::ReconstructedParticle *pReconstructedParticle = dynamic_cast<EVENT::ReconstructedParticle*>(pLCCollection->getElementAt(i));
 
             if (NULL == pReconstructedParticle)
                 throw EVENT::Exception("Collection type mismatch");
@@ -289,56 +280,54 @@ void PfoAnalysis::ExtractCollections(EVENT::LCEvent *pLCEvent)
         streamlog_out(ERROR) << "Could not extract input particle collection: " << m_inputPfoCollection << std::endl;
     }
 
-    // Extract mc particle collection
-    std::set<MCParticle*> pfoTargetList;
-
+    // Extract mc pfo collection
     try
     {
         const EVENT::LCCollection *pLCCollection = pLCEvent->getCollection(m_mcParticleCollection);
 
         for (unsigned int i = 0, nElements = pLCCollection->getNumberOfElements(); i < nElements; ++i)
         {
-            MCParticle *pMCParticle = dynamic_cast<MCParticle*>(pLCCollection->getElementAt(i));
+            const EVENT::MCParticle *pMCParticle = dynamic_cast<EVENT::MCParticle*>(pLCCollection->getElementAt(i));
 
             if (NULL == pMCParticle)
                 throw EVENT::Exception("Collection type mismatch");
 
-            const float innerRadius(std::sqrt(pMCParticle->getVertex()[0] * pMCParticle->getVertex()[0] + pMCParticle->getVertex()[1] * pMCParticle->getVertex()[1] + pMCParticle->getVertex()[2] * pMCParticle->getVertex()[2]));
-            const float outerRadius(std::sqrt(pMCParticle->getEndpoint()[0] * pMCParticle->getEndpoint()[0] + pMCParticle->getEndpoint()[1] * pMCParticle->getEndpoint()[1] + pMCParticle->getEndpoint()[2] * pMCParticle->getEndpoint()[2]));
-            const float momentum(std::sqrt(pMCParticle->getMomentum()[0] * pMCParticle->getMomentum()[0] + pMCParticle->getMomentum()[1] * pMCParticle->getMomentum()[1] + pMCParticle->getMomentum()[2] * pMCParticle->getMomentum()[2]));
+            if (!pMCParticle->getParents().empty())
+                continue;
 
-            if ((pfoTargetList.find(pMCParticle) == pfoTargetList.end()) &&
-                (outerRadius > m_mcPfoSelectionRadius) && (innerRadius <= m_mcPfoSelectionRadius) && (momentum > m_mcPfoSelectionMomentum) &&
-                !((pMCParticle->getPDG() == 2212 || pMCParticle->getPDG() == 2112) && (pMCParticle->getEnergy() < m_mcPfoSelectionLowEnergyNPCutOff)) )
-            {
-                pfoTargetList.insert(pMCParticle);
-                m_pfoTargetVector.push_back(pMCParticle);
-            }
+            MCParticleList mcPfoCandidates;
+            this->ApplyPfoSelectionRules(pMCParticle, mcPfoCandidates);
         }
     }
     catch (...)
     {
         streamlog_out(WARNING) << "Could not extract mc particle collection " << m_mcParticleCollection << std::endl;
     }
+}
 
-    // Extract coil collection
-    try
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void PfoAnalysis::ApplyPfoSelectionRules(const EVENT::MCParticle *pMCParticle, MCParticleList &mcPfoCandidates)
+{
+    const float innerRadius(std::sqrt(pMCParticle->getVertex()[0] * pMCParticle->getVertex()[0] + pMCParticle->getVertex()[1] * pMCParticle->getVertex()[1] + pMCParticle->getVertex()[2] * pMCParticle->getVertex()[2]));
+    const float outerRadius(std::sqrt(pMCParticle->getEndpoint()[0] * pMCParticle->getEndpoint()[0] + pMCParticle->getEndpoint()[1] * pMCParticle->getEndpoint()[1] + pMCParticle->getEndpoint()[2] * pMCParticle->getEndpoint()[2]));
+    const float momentum(std::sqrt(pMCParticle->getMomentum()[0] * pMCParticle->getMomentum()[0] + pMCParticle->getMomentum()[1] * pMCParticle->getMomentum()[1] + pMCParticle->getMomentum()[2] * pMCParticle->getMomentum()[2]));
+
+    if ((mcPfoCandidates.find(pMCParticle) == mcPfoCandidates.end()) &&
+        (outerRadius > m_mcPfoSelectionRadius) && (innerRadius <= m_mcPfoSelectionRadius) && (momentum > m_mcPfoSelectionMomentum) &&
+        !((pMCParticle->getPDG() == 2212 || pMCParticle->getPDG() == 2112) && (pMCParticle->getEnergy() < m_mcPfoSelectionLowEnergyNPCutOff)))
     {
-        const EVENT::LCCollection *pLCCollection = pLCEvent->getCollection(m_coilCollection);
-
-        for (unsigned int i = 0, nElements = pLCCollection->getNumberOfElements(); i < nElements; ++i)
-        {
-            SimTrackerHit *pSimTrackerHit = dynamic_cast<SimTrackerHit*>(pLCCollection->getElementAt(i));
-
-            if (NULL == pSimTrackerHit)
-                throw EVENT::Exception("Collection type mismatch");
-
-            m_mcEnergyCoil += pSimTrackerHit->getEDep();
-        }
+        m_pfoTargetVector.push_back(pMCParticle);
+        mcPfoCandidates.insert(pMCParticle);
     }
-    catch (...)
+    else
     {
-        streamlog_out(MESSAGE) << "Could not extract coil collection " << m_coilCollection << std::endl;
+        const EVENT::MCParticleVec &daughterVector(pMCParticle->getDaughters());
+
+        for (EVENT::MCParticleVec::const_iterator iter = daughterVector.begin(), iterEnd = daughterVector.end(); iter != iterEnd; ++iter)
+        {
+            this->ApplyPfoSelectionRules(*iter, mcPfoCandidates);
+        }
     }
 }
 
@@ -354,7 +343,7 @@ void PfoAnalysis::MakeQuarkVariables(EVENT::LCEvent *pLCEvent)
 
         for (unsigned int i = 0, nElements = pLCCollection->getNumberOfElements(); i < nElements; ++i)
         {
-            MCParticle *pMCParticle = dynamic_cast<MCParticle*>(pLCCollection->getElementAt(i));
+            const EVENT::MCParticle *pMCParticle = dynamic_cast<EVENT::MCParticle*>(pLCCollection->getElementAt(i));
 
             if (NULL == pMCParticle)
                 throw EVENT::Exception("Collection type mismatch");
@@ -410,9 +399,9 @@ void PfoAnalysis::MakeQuarkVariables(EVENT::LCEvent *pLCEvent)
         const float pQ2[3] = {mcQuarkVector[1]->getMomentum()[0], mcQuarkVector[1]->getMomentum()[1], mcQuarkVector[1]->getMomentum()[2]};
         const float pQQ[3] = {pQ1[0] + pQ2[0], pQ1[1] + pQ2[1], pQ1[2] + pQ2[2]};
 
-        TLorentzVector q1(pQ1[0], pQ1[1], pQ1[2], mcQuarkVector[0]->getEnergy());
-        TLorentzVector q2(pQ2[0], pQ2[1], pQ2[2], mcQuarkVector[1]->getEnergy());
-        TLorentzVector qq = q1 + q2;
+        const TLorentzVector q1(pQ1[0], pQ1[1], pQ1[2], mcQuarkVector[0]->getEnergy());
+        const TLorentzVector q2(pQ2[0], pQ2[1], pQ2[2], mcQuarkVector[1]->getEnergy());
+        const TLorentzVector qq = q1 + q2;
 
         m_mQQ = qq.M();
         m_eQQ = mcQuarkVector[0]->getEnergy() + mcQuarkVector[1]->getEnergy();
@@ -421,13 +410,13 @@ void PfoAnalysis::MakeQuarkVariables(EVENT::LCEvent *pLCEvent)
         const float pQ2Tot(std::sqrt(pQ2[0] * pQ2[0] + pQ2[1] * pQ2[1] + pQ2[2] * pQ2[2]));
         const float pQQTot(std::sqrt(pQQ[0] * pQQ[0] + pQQ[1] * pQQ[1] + pQQ[2] * pQQ[2]));
 
-        if (0.f != pQQTot)
+        if (std::fabs(pQQTot) > std::numeric_limits<float>::epsilon())
             m_costQQ = pQQ[2] / pQQTot;
 
-        if (0.f != pQ1Tot)
+        if (std::fabs(pQ1Tot) > std::numeric_limits<float>::epsilon())
             m_costQ1 = pQ1[2] / pQ1Tot;
 
-        if (0.f != pQ2Tot)
+        if (std::fabs(pQ2Tot) > std::numeric_limits<float>::epsilon())
             m_costQ2 = pQ2[2] / pQ2Tot;
 
         m_eQ1 = pQ1Tot;
@@ -457,7 +446,7 @@ void PfoAnalysis::PerformPfoAnalysis()
     // Extract quantities relating to reconstructed pfos
     for (ParticleVector::const_iterator iter = m_pfoVector.begin(), iterEnd = m_pfoVector.end(); iter != iterEnd; ++iter)
     {
-        ReconstructedParticle *pPfo = *iter;
+        const EVENT::ReconstructedParticle *pPfo = *iter;
 
         ++m_nPfosTotal;
         m_pfoEnergyTotal += pPfo->getEnergy();
@@ -482,15 +471,15 @@ void PfoAnalysis::PerformPfoAnalysis()
         {
             // Neutral pfos
             float cellEnergySum(0.f);
-            const ClusterVec &clusterVec = pPfo->getClusters();
+            const EVENT::ClusterVec &clusterVec(pPfo->getClusters());
 
-            for (ClusterVec::const_iterator iter = clusterVec.begin(), iterEnd = clusterVec.end(); iter != iterEnd; ++iter)
+            for (EVENT::ClusterVec::const_iterator iter = clusterVec.begin(), iterEnd = clusterVec.end(); iter != iterEnd; ++iter)
             {
-                const CalorimeterHitVec &calorimeterHitVec = (*iter)->getCalorimeterHits();
+                const EVENT::CalorimeterHitVec &calorimeterHitVec((*iter)->getCalorimeterHits());
 
-                for (CalorimeterHitVec::const_iterator hitIter = calorimeterHitVec.begin(), hitIterEnd = calorimeterHitVec.end(); hitIter != hitIterEnd; ++hitIter)
+                for (EVENT::CalorimeterHitVec::const_iterator hitIter = calorimeterHitVec.begin(), hitIterEnd = calorimeterHitVec.end(); hitIter != hitIterEnd; ++hitIter)
                 {
-                    EVENT::CalorimeterHit *pCalorimeterHit = *hitIter;
+                    const EVENT::CalorimeterHit *pCalorimeterHit = *hitIter;
                     cellEnergySum += pCalorimeterHit->getEnergy();
                 }
             }
@@ -503,16 +492,16 @@ void PfoAnalysis::PerformPfoAnalysis()
                 ++m_nPfosPhotons;
                 m_pfoEnergyPhotons += pPfo->getEnergy();
 
-                for (ClusterVec::const_iterator iter = clusterVec.begin(), iterEnd = clusterVec.end(); iter != iterEnd; ++iter)
+                for (EVENT::ClusterVec::const_iterator iter = clusterVec.begin(), iterEnd = clusterVec.end(); iter != iterEnd; ++iter)
                 {
-                    const CalorimeterHitVec &calorimeterHitVec = (*iter)->getCalorimeterHits();
+                    const EVENT::CalorimeterHitVec &calorimeterHitVec((*iter)->getCalorimeterHits());
 
-                    for (CalorimeterHitVec::const_iterator hitIter = calorimeterHitVec.begin(), hitIterEnd = calorimeterHitVec.end(); hitIter != hitIterEnd; ++hitIter)
+                    for (EVENT::CalorimeterHitVec::const_iterator hitIter = calorimeterHitVec.begin(), hitIterEnd = calorimeterHitVec.end(); hitIter != hitIterEnd; ++hitIter)
                     {
-                        EVENT::CalorimeterHit *pCalorimeterHit = *hitIter;
+                        const EVENT::CalorimeterHit *pCalorimeterHit = *hitIter;
 
                         const float hitEnergy(correctionFactor * pCalorimeterHit->getEnergy());
-                        CHT cht(pCalorimeterHit->getType());
+                        const CHT cht(pCalorimeterHit->getType());
 
                         if (cht.is(CHT::ecal))
                         {
@@ -539,16 +528,16 @@ void PfoAnalysis::PerformPfoAnalysis()
                 ++m_nPfosNeutralHadrons;
                 m_pfoEnergyNeutralHadrons += pPfo->getEnergy();
 
-                for (ClusterVec::const_iterator iter = clusterVec.begin(), iterEnd = clusterVec.end(); iter != iterEnd; ++iter)
+                for (EVENT::ClusterVec::const_iterator iter = clusterVec.begin(), iterEnd = clusterVec.end(); iter != iterEnd; ++iter)
                 {
-                    const CalorimeterHitVec &calorimeterHitVec = (*iter)->getCalorimeterHits();
+                    const EVENT::CalorimeterHitVec &calorimeterHitVec((*iter)->getCalorimeterHits());
 
-                    for (CalorimeterHitVec::const_iterator hitIter = calorimeterHitVec.begin(), hitIterEnd = calorimeterHitVec.end(); hitIter != hitIterEnd; ++hitIter)
+                    for (EVENT::CalorimeterHitVec::const_iterator hitIter = calorimeterHitVec.begin(), hitIterEnd = calorimeterHitVec.end(); hitIter != hitIterEnd; ++hitIter)
                     {
-                        EVENT::CalorimeterHit *pCalorimeterHit = *hitIter;
+                        const EVENT::CalorimeterHit *pCalorimeterHit = *hitIter;
 
                         const float hitEnergy(correctionFactor * pCalorimeterHit->getEnergy());
-                        CHT cht(pCalorimeterHit->getType());
+                        const CHT cht(pCalorimeterHit->getType());
 
                         if (cht.is(CHT::ecal))
                         {
@@ -587,7 +576,7 @@ void PfoAnalysis::PerformPfoAnalysis()
     // Extract quantities relating to pfo targets
     for (MCParticleVector::const_iterator iter = m_pfoTargetVector.begin(), iterEnd = m_pfoTargetVector.end(); iter != iterEnd; ++iter)
     {
-        MCParticle *pMCParticle = *iter;
+        const EVENT::MCParticle *pMCParticle = *iter;
 
         ++m_nPfoTargetsTotal;
         m_pfoTargetsEnergyTotal += pMCParticle->getEnergy();
