@@ -9,9 +9,10 @@
 #ifndef PFO_ANALYSIS_H
 #define PFO_ANALYSIS_H 1
 
-#include "EVENT/ReconstructedParticle.h"
-
 #include "marlin/Processor.h"
+
+#include <set>
+#include <vector>
 
 class TFile;
 class TH1F;
@@ -67,6 +68,11 @@ public:
     virtual void end();
 
 private:
+    typedef std::vector<const EVENT::ReconstructedParticle *> ParticleVector;
+    typedef std::vector<const EVENT::MCParticle*> MCParticleVector;
+    typedef std::set<const EVENT::MCParticle*> MCParticleList;
+    typedef std::vector<std::string> StringVector;
+
     /**
      *  @brief  Clear current event details
      */
@@ -80,6 +86,14 @@ private:
     void ExtractCollections(EVENT::LCEvent *pLCEvent);
 
     /**
+     *  @brief  Apply pfo selection rules, starting with root particles
+     * 
+     *  @param  pMCParticle the address of a mc particle (initially call this recursive function with a top-level, root particle)
+     *  @param  mcPfoCandidates to collect the list of mc pfo candidates
+     */
+    void ApplyPfoSelectionRules(const EVENT::MCParticle *pMCParticle, MCParticleList &mcPfoCandidates);
+
+    /**
      *  @brief  Make quark variables
      * 
      *  @param  pLCEvent the lc event
@@ -91,10 +105,6 @@ private:
      */
     void PerformPfoAnalysis();
 
-    typedef std::vector<ReconstructedParticle *> ParticleVector;
-    typedef std::vector<MCParticle*> MCParticleVector;
-    typedef std::vector<std::string> StringVector;
-
     int                 m_nRun;                                 ///< 
     int                 m_nEvt;                                 ///< 
 
@@ -103,7 +113,6 @@ private:
 
     std::string         m_inputPfoCollection;                   ///< 
     std::string         m_mcParticleCollection;                 ///< 
-    std::string         m_coilCollection;                       ///< 
 
     int                 m_printing;                             ///< 
     std::string         m_rootFile;                             ///< 
@@ -163,7 +172,6 @@ private:
     float               m_pfoTargetsEnergyTracks;               ///< 
 
     float               m_mcEnergyENu;                          ///< 
-    float               m_mcEnergyCoil;                         ///< 
     float               m_mcEnergyFwd;                          ///< 
     float               m_eQQ;                                  ///< 
     float               m_eQ1;                                  ///< 
