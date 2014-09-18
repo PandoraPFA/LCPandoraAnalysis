@@ -83,10 +83,9 @@ void AnalysePerformance(TChain *pTChain, const std::string &outputRootFileName)
     const unsigned int nTreeEntries(pTChain->GetEntries());
 
     int qPdg(0);
-    float pfoEnergyTotal(0.f), mcEnergyENu(0.f), mcEnergyCoil(0.f), thrust(0.f);
+    float pfoEnergyTotal(0.f), mcEnergyENu(0.f), thrust(0.f);
     pTChain->SetBranchAddress("pfoEnergyTotal", &pfoEnergyTotal);
     pTChain->SetBranchAddress("mcEnergyENu", &mcEnergyENu);
-    pTChain->SetBranchAddress("mcEnergyCoil", &mcEnergyCoil);
     pTChain->SetBranchAddress("qPdg", &qPdg);
     pTChain->SetBranchAddress("thrust", &thrust);
 
