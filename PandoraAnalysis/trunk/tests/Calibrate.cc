@@ -75,32 +75,37 @@ bool ParseCommandLine(int argc, char *argv[], Parameters &parameters);
 
 int main(int argc, char **argv)
 {
-    // Parse command line parameters
-    Parameters parameters;
-
-    if (!ParseCommandLine(argc, argv, parameters))
-        return 1;
-
-    int myargc = 0;
-    char* myargv = (char *)"";
-    TApplication *pApplication = new TApplication("PandoraMonitoring", &myargc, &myargv);
-    pApplication->SetReturnFromRun(kTRUE);
-
-    // Extract pfo analysis tree
-    parameters.m_pTChain->Add(parameters.m_inputFileNames.c_str());
-
-    if (0 == parameters.m_pTChain->GetEntries())
+    try
     {
-        std::cout << "Error opening PfoAnalysisTree " << std::endl;
+        Parameters parameters;
+
+        if (!ParseCommandLine(argc, argv, parameters))
+            return 1;
+
+        int myargc = 0;
+        char* myargv = (char *)"";
+        TApplication *pApplication = new TApplication("PandoraMonitoring", &myargc, &myargv);
+        pApplication->SetReturnFromRun(kTRUE);
+
+        parameters.m_pTChain->Add(parameters.m_inputFileNames.c_str());
+
+        if (0 == parameters.m_pTChain->GetEntries())
+        {
+            std::cout << "Error opening PfoAnalysisTree " << std::endl;
+            return 1;
+        }
+
+        GetSigma(parameters);
+
+        delete parameters.m_pTChain;
+        parameters.m_pTChain = NULL;
+        delete pApplication;
+    }
+    catch (std::exception &exception)
+    {
+        std::cout << "Exception caught " << exception.what() << std::endl;
         return 1;
     }
-
-    // Obtain results
-    GetSigma(parameters);
-
-    delete parameters.m_pTChain;
-    parameters.m_pTChain = NULL;
-    delete pApplication;
 
     return 0;
 }

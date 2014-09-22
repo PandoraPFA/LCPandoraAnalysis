@@ -17,6 +17,17 @@
 namespace pandora_analysis
 {
 
+/**
+ *  @brief  InvalidEnergyException class
+ */
+class InvalidEnergyException : public std::exception
+{
+public:
+    const char *what() const throw();
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 void AnalysisHelper::CalculatePerformance(const TH1F *const pTH1F, float &resolution, float &resolutionError, bool fixDistributionCentre, bool print)
 {
     static const float FLOAT_MAX(std::numeric_limits<float>::max());
@@ -102,8 +113,7 @@ void AnalysisHelper::CalculatePerformance(const TH1F *const pTH1F, float &resolu
 
                 if (mean > 3500.)
                 {
-                    std::cout << "AnalysisHelper::CalcRms - Can only fix distribution centre for small range of specific energies. " << std::endl;
-                    throw std::exception();
+                    throw InvalidEnergyException();
                 }
 
                 if ((mean > 2500.) && (mean < 3500.))
@@ -147,6 +157,13 @@ void AnalysisHelper::CalculatePerformance(const TH1F *const pTH1F, float &resolu
 
     resolution = frac;
     resolutionError = efrac;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const char *InvalidEnergyException::what() const throw()
+{
+    return "AnalysisHelper::CalcRms - Can only fix distribution centre for small range of specific energies. ";
 }
 
 } // namespace pandora_analysis

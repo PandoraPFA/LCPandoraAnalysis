@@ -26,31 +26,39 @@ void AnalysePerformance(TChain *pTChain, const std::string &outputRootFileName);
 
 int main(int argc, char **argv)
 {
-    const int nArgs(argc - 1);
-
-    if ((nArgs < 1) || (nArgs > 2))
+    try
     {
-        std::cout << std::endl
-                  << "Usage: ./AnalysePerformance inputFileName [outputFileName]" << std::endl << std::endl
-                  << "  inputFileName  : file containing pandora pfo analysis tree" << std::endl
-                  << "  outputFileName : optional output root file, for histogram output" << std::endl << std::endl;
+        const int nArgs(argc - 1);
+
+        if ((nArgs < 1) || (nArgs > 2))
+        {
+            std::cout << std::endl
+                      << "Usage: ./AnalysePerformance inputFileName [outputFileName]" << std::endl << std::endl
+                      << "  inputFileName  : file containing pandora pfo analysis tree" << std::endl
+                      << "  outputFileName : optional output root file, for histogram output" << std::endl << std::endl;
+            return 1;
+        }
+
+        const std::string inputFileName(argv[1]);
+        const std::string outputRootFileName((nArgs == 2) ? argv[2] : "");
+
+        TChain *pTChain = new TChain("PfoAnalysisTree");
+        pTChain->Add(inputFileName.c_str());
+
+        if (0 == pTChain->GetEntries())
+        {
+            std::cout << "Error opening PfoAnalysisTree " << std::endl;
+            return 1;
+        }
+
+        AnalysePerformance(pTChain, outputRootFileName);
+        delete pTChain;
+    }
+    catch (std::exception &exception)
+    {
+        std::cout << "Exception caught " << exception.what() << std::endl;
         return 1;
     }
-
-    const std::string inputFileName(argv[1]);
-    const std::string outputRootFileName((nArgs == 2) ? argv[2] : "");
-
-    TChain *pTChain = new TChain("PfoAnalysisTree");
-    pTChain->Add(inputFileName.c_str());
-
-    if (0 == pTChain->GetEntries())
-    {
-        std::cout << "Error opening PfoAnalysisTree " << std::endl;
-        return 1;
-    }
-
-    AnalysePerformance(pTChain, outputRootFileName);
-    delete pTChain;
 
     return 0;
 }
