@@ -35,7 +35,52 @@ PandoraPFACalibrator aPandoraPFACalibrator;
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 PandoraPFACalibrator::PandoraPFACalibrator() :
-    Processor("PandoraPFACalibrator") 
+    Processor("PandoraPFACalibrator"),
+    m_nRun(0),
+    m_nEvt(0),
+    m_ecalToMIP(1.f),
+    m_hcalToMIP(1.f),
+    m_muonToMIP(1.f),
+    m_ecalToEMGeVCalibration(1.f),
+    m_hcalToHadGeVCalibration(1.f),
+    m_ecalToHadGeVCalibrationBarrel(1.f),
+    m_ecalToHadGeVCalibrationEndCap(1.f),
+    m_hcalToEMGeVCalibration(1.f),
+    m_maxHCalHitHadronicEnergy(10000),
+    m_zOfEndCap(std::numeric_limits<float>::max()),
+    m_pTFile(NULL),
+    m_hPfoEnergy(NULL),
+    m_hPfoEnergyBarrel(NULL),
+    m_hPfoEnergy95ECal(NULL),
+    m_hPfoEnergy95HCal(NULL),
+    m_hPfoEnergy95Muon(NULL),
+    m_hPfoEnergyVsCosTheta(NULL),
+    m_hPfoEnergyVsCosThetaReco(NULL),
+    m_hCaloEnergy(NULL),
+    m_hCaloEnergyECal(NULL),
+    m_hCaloEnergyHCal(NULL),
+    m_hCaloEnergyMuon(NULL),
+    m_hCaloEnergy95ECal(NULL),
+    m_hCaloEnergy95HCal(NULL),
+    m_hCaloEnergy95Muon(NULL),
+    m_hEcalBarrelEnergyByLayer(NULL),
+    m_hEcalEndCapEnergyByLayer(NULL),
+    m_hECalHCalEnergyEM(NULL),
+    m_hECalHcalEnergyHAD(NULL),
+    m_hECalBarrelHCalEnergyEM(NULL),
+    m_hECalEndCapHCalEnergyEM(NULL),
+    m_hECalBarrelHCalEnergyHAD(NULL),
+    m_hECalEndCapHCalEnergyHAD(NULL),
+    m_hCaloEnergyVsCosTheta(NULL),
+    m_hCaloEnergyVsCosThetaReco(NULL),
+    m_hECalBarrelMIP(NULL),
+    m_hECalEndCapMIP(NULL),
+    m_hHCalMIP(NULL),
+    m_hMuonMIP(NULL),
+    m_hECalBarrelMIPCorr(NULL),
+    m_hECalEndCapMIPCorr(NULL),
+    m_hHCalMIPCorr(NULL),
+    m_hMuonMIPCorr(NULL)
 {
     _description = "PandoraPFACalibrator for calibration of PandoraPFA";
 
@@ -122,47 +167,47 @@ PandoraPFACalibrator::PandoraPFACalibrator() :
     registerProcessorParameter("ECalToMipCalibration",
         "Calibration from deposited ECAL energy to MIP",
         m_ecalToMIP,
-        -1.f);
+        1.f);
 
     registerProcessorParameter("HCalToMipCalibration",
         "Calibration from deposited HCAL energy to MIP",
         m_hcalToMIP,
-        -1.f);
+        1.f);
 
     registerProcessorParameter("MuonToMipCalibration",
         "Calibration from deposited MUON energy to MIP",
         m_muonToMIP,
-        -1.f);
+        1.f);
 
     registerProcessorParameter("ECalToEMGeVCalibration",
         "Calibration from deposited ECAL to EM energy",
         m_ecalToEMGeVCalibration,
-        -1.f);
+        1.f);
 
     registerProcessorParameter("HCalToHadGeVCalibration",
         "Calibration from deposited HCAL to Hadronic energy",
         m_hcalToHadGeVCalibration,
-        -1.f);
+        1.f);
 
     registerProcessorParameter("ECalToHadGeVCalibrationBarrel",
         "Calibration from deposited ECAL barrel to Hadronic energy",
         m_ecalToHadGeVCalibrationBarrel,
-        -1.f);
+        1.f);
 
     registerProcessorParameter("ECalToHadGeVCalibrationEndCap",
         "Calibration from deposited ECAL endcap to Hadronic energy",
         m_ecalToHadGeVCalibrationEndCap,
-        -1.f);
+        1.f);
 
     registerProcessorParameter("HCalToEMGeVCalibration",
         "Calibration from deposited HCAL to EM energy",
         m_hcalToEMGeVCalibration,
-        -1.f);
+        1.f);
 
     registerProcessorParameter("MaxHCalHitHadronicEnergy",
         "The maximum hadronic energy allowed for a single hcal hit",
         m_maxHCalHitHadronicEnergy,
-        -1.f);
+        10000.f);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
