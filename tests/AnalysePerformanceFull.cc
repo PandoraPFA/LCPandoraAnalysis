@@ -26,31 +26,39 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName);
 
 int main(int argc, char **argv)
 {
-    const int nArgs(argc - 1);
-
-    if ((nArgs < 1) || (nArgs > 2))
+    try
     {
-        std::cout << std::endl
-                  << "Usage: ./AnalysePerformanceFull inputFileName [outputFileName]" << std::endl << std::endl
-                  << "  inputFileName  : file containing pandora pfo analysis tree" << std::endl
-                  << "  outputFileName : optional output root file, for histogram output" << std::endl << std::endl;
+        const int nArgs(argc - 1);
+
+        if ((nArgs < 1) || (nArgs > 2))
+        {
+            std::cout << std::endl
+                      << "Usage: ./AnalysePerformanceFull inputFileName [outputFileName]" << std::endl << std::endl
+                      << "  inputFileName  : file containing pandora pfo analysis tree" << std::endl
+                      << "  outputFileName : optional output root file, for histogram output" << std::endl << std::endl;
+            return 1;
+        }
+
+        const std::string inputFileName(argv[1]);
+        const std::string outputRootFileName((nArgs == 2) ? argv[2] : "");
+
+        TFile *pTFile = new TFile(inputFileName.c_str(), "READ");
+
+        if (pTFile->IsZombie())
+        {
+            std::cout << "Error opening file " << inputFileName << std::endl;
+            delete pTFile;
+            return 1;
+        }
+
+        AnalysePerformance(pTFile, outputRootFileName);
+        pTFile->Close();
+    }
+    catch (std::exception &exception)
+    {
+        std::cout << "Exception caught " << exception.what() << std::endl;
         return 1;
     }
-
-    const std::string inputFileName(argv[1]);
-    const std::string outputRootFileName((nArgs == 2) ? argv[2] : "");
-
-    TFile *pTFile = new TFile(inputFileName.c_str(), "READ");
-
-    if (pTFile->IsZombie())
-    {
-        std::cout << "Error opening file " << inputFileName << std::endl;
-        delete pTFile;
-        return 1;
-    }
-
-    AnalysePerformance(pTFile, outputRootFileName);
-    pTFile->Close();
 
     return 0;
 }
@@ -194,6 +202,21 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
         if (qPdg >= 1 && qPdg <= 5)
             pPFA_udscb->Fill(pfoEnergyTotal);
 
+        if (thrust <= 0.7f)
+        {
+            if (qPdg <= 2)
+                pPFA_L7Aud->Fill(pfoEnergyTotal + mcEnergyENu);
+
+            if (qPdg == 3)
+                pPFA_L7As->Fill(pfoEnergyTotal + mcEnergyENu);
+
+            if (qPdg == 4)
+                pPFA_L7Ac->Fill(pfoEnergyTotal + mcEnergyENu);
+
+            if (qPdg == 5)
+                pPFA_L7Ab->Fill(pfoEnergyTotal + mcEnergyENu);
+        }
+
         if (qPdg >= 1 && qPdg <= 3)
         {
             if (thrust <= 0.1f)
@@ -220,18 +243,6 @@ void AnalysePerformance(TFile *pTFile, const std::string &outputRootFileName)
 
                 if (mcEnergyFwd / pfoEnergyTotal < 0.01f)
                     pPFA_L7ANoFwd->Fill(pfoEnergyTotal + mcEnergyENu);
-
-                if (qPdg <= 2)
-                    pPFA_L7Aud->Fill(pfoEnergyTotal + mcEnergyENu);
-
-                if (qPdg == 3)
-                    pPFA_L7As->Fill(pfoEnergyTotal + mcEnergyENu);
-
-                if (qPdg == 4)
-                    pPFA_L7Ac->Fill(pfoEnergyTotal + mcEnergyENu);
-
-                if (qPdg == 5)
-                    pPFA_L7Ab->Fill(pfoEnergyTotal + mcEnergyENu);
 
                 pPFA_udsHM20->Fill(pfoEnergyTotal + mcEnergyENu - pfoEnergyNeutralHadrons * 0.1f);
                 pPFA_udsHM10->Fill(pfoEnergyTotal + mcEnergyENu - pfoEnergyNeutralHadrons * 0.05f);

@@ -34,7 +34,8 @@ PandoraPFACalibrator aPandoraPFACalibrator;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-PandoraPFACalibrator::PandoraPFACalibrator() : Processor("PandoraPFACalibrator") 
+PandoraPFACalibrator::PandoraPFACalibrator() :
+    Processor("PandoraPFACalibrator") 
 {
     _description = "PandoraPFACalibrator for calibration of PandoraPFA";
 
