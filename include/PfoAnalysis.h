@@ -184,7 +184,7 @@ private:
     int                 m_qPdg;                                 ///< 
 
     TFile              *m_pTFile;                               ///< 
-    TTree              *m_tree;                                 ///< 
+    TTree              *m_pTTree;                               ///< 
     TH1F               *m_hPfoEnergySum;                        ///< 
     TH1F               *m_hPfoEnergySumL7A;                     ///< 
 };
