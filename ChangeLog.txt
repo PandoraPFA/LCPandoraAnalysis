@@ -1,11 +1,20 @@
-************************************************************************
-TAG V00-06 FOR ILCSOFT USAGE
-************************************************************************
+--------------------------------------------------------------------------------------------------------------------------------------------
+TAG v00-07
+--------------------------------------------------------------------------------------------------------------------------------------------
+Unify MC Pfo selection with approach used within Pandora.
+Simplify use of MC particles in pfo analysis, removing need for separate input MCPfo and QuarkPfo collections.
+Address issues highlighted by Coverity.
+Remove some unused functionality.
+Fix for MIP direction-correction.
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+TAG v00-06
+--------------------------------------------------------------------------------------------------------------------------------------------
 Calibrate binary now reads TChains, rather than a single TTree.
 
-************************************************************************
-TAG V00-05 FOR ILCSOFT USAGE
-************************************************************************
+--------------------------------------------------------------------------------------------------------------------------------------------
+TAG v00-05
+--------------------------------------------------------------------------------------------------------------------------------------------
 AnalysePerformance binary now reads TChains, rather than a single TTree.
 Included new PfoTarget information in PfoAnalysis tree.
 PfoAnalysis now attempts to store an estimate of energy deposited in coil.
@@ -18,9 +27,9 @@ Removed unused histograms.
 Cosmetic changes.
 Makefile update, including basic dependency tracking. 
 
-************************************************************************
-TAG V00-04 FOR ILCSOFT USAGE
-************************************************************************
+--------------------------------------------------------------------------------------------------------------------------------------------
+TAG v00-04
+--------------------------------------------------------------------------------------------------------------------------------------------
 Added new total ECAL energy vs total HCAL energy histograms.
 Write absolute run and event number information to analysis tree.
 Added new pfa analysis variables to output tree.
@@ -31,9 +40,9 @@ Added example steering file for PandoraPFACalibrator.
 Updated PandoraAnalysis example steering file.
 Prevents copying of header files.
 
-************************************************************************
-TAG V00-03 FOR ILCSOFT USAGE
-************************************************************************
+--------------------------------------------------------------------------------------------------------------------------------------------
+TAG v00-03
+--------------------------------------------------------------------------------------------------------------------------------------------
 Added new PandoraPFACalibrator processor, courtesy of A. Lucaci-Timoce.
 Added example steering file for PandoraPFACalibrator.
 Updated PandoraAnalysis example steering file.
@@ -41,9 +50,9 @@ Updated to deal with missing trees more gracefully.
 Updated to deal with zombie root files more gracefully.
 Included <cstdlib> header to allow use of atoi and atof functions under gcc4.3 onwards.
 
-************************************************************************
-TAG V00-02 FOR ILCSOFT USAGE
-************************************************************************
+--------------------------------------------------------------------------------------------------------------------------------------------
+TAG v00-02
+--------------------------------------------------------------------------------------------------------------------------------------------
 Divided pfos into those containing tracks, those identified as photons and those remaining as neutral hadrons.
 Modified PfoAnalysis processor to writes just a root TTree containing quantities from which all analysis histograms can be recreated.
 Moved source for binaries to separate tests directory.
@@ -56,15 +65,11 @@ Removed some unnecessary histograms from AnalysePerformanceFull, renamed others.
 Altered use of mc neutrino energy so only included in selected histograms; marked with 'nu' or 'A' or used to assess neutral hadron calibration.
 Updated standalone Makefile: changed default compiler to g++ and added -O2 optimization flag.
 
-************************************************************************
-TAG V00-01 FOR ILCSOFT USAGE
-************************************************************************
+--------------------------------------------------------------------------------------------------------------------------------------------
+TAG v00-01
+--------------------------------------------------------------------------------------------------------------------------------------------
 Updated CMake files to use new ILCUTIL package.
 Addressed CppCheck (static analysis package) warnings.
-
-************************************************************************
-CREATE CLIC_CDR BRANCH
-************************************************************************
 Added flag to look for quarks with mother. By default, primary quarks are those with no parents (this is not the case for files generated in SLIC environment).
 Corrected histogram name, title and axis labels.
 Set BUILD_32BIT_COMPATIBLE to OFF by default.
@@ -73,9 +78,7 @@ Removed streamlog dependency specified for apple plaforms.
 Addressed gcc pedantic and extra warning messages. 
 Provided a gnu makefile.
 
-************************************************************************
-LCD_WG2_VALIDATION_3 TAG
-************************************************************************
-Improved error checking.
-Added missing header file includes, required for gcc 4.4 compilation.
+--------------------------------------------------------------------------------------------------------------------------------------------
+TAG LCD_WG2_VALIDATION_3
+--------------------------------------------------------------------------------------------------------------------------------------------
 Created pandora analysis package, which brings together a number of marlin processors and simple binaries to analyse particle flow performance.
