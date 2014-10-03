@@ -9,7 +9,11 @@
 #ifndef PFO_ANALYSIS_H
 #define PFO_ANALYSIS_H 1
 
+#include "EVENT/LCStrVec.h"
+
 #include "marlin/Processor.h"
+
+#include "CalibrationHelper.h"
 
 #include <set>
 #include <vector>
@@ -187,6 +191,10 @@ private:
     TTree              *m_pTTree;                               ///< 
     TH1F               *m_hPfoEnergySum;                        ///< 
     TH1F               *m_hPfoEnergySumL7A;                     ///< 
+
+    int                                             m_collectCalibrationDetails;        ///< Whether to collect calibration details
+    pandora_analysis::CalibrationHelper            *m_pCalibrationHelper;               ///< The address of the calibration helper
+    pandora_analysis::CalibrationHelper::Settings   m_calibrationHelperSettings;        ///< The calibration helper settings
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

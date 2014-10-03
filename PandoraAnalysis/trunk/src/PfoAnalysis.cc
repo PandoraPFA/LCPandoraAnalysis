@@ -74,7 +74,10 @@ PfoAnalysis::PfoAnalysis() :
     m_pTFile(NULL),
     m_pTTree(NULL),
     m_hPfoEnergySum(NULL),
-    m_hPfoEnergySumL7A(NULL)
+    m_hPfoEnergySumL7A(NULL),
+    m_collectCalibrationDetails(0),
+    m_pCalibrationHelper(NULL),
+    m_calibrationHelperSettings()
 {
     _description = "PfoAnalysis analyses output of PandoraPFANew";
 
@@ -91,34 +94,109 @@ PfoAnalysis::PfoAnalysis() :
                             std::string());
 
     registerProcessorParameter("LookForQuarksWithMotherZ",
-                               "Flag to look for quarks with mother Z",
-                               m_lookForQuarksWithMotherZ,
-                               int(0));
+                            "Flag to look for quarks with mother Z",
+                            m_lookForQuarksWithMotherZ,
+                            int(0));
 
     registerProcessorParameter("MCPfoSelectionRadius",
-                               "MC pfo selection radius",
-                               m_mcPfoSelectionRadius,
-                               float(500.f));
+                            "MC pfo selection radius",
+                            m_mcPfoSelectionRadius,
+                            float(500.f));
 
     registerProcessorParameter("MCPfoSelectionMomentum",
-                               "MC pfo selection momentum",
-                               m_mcPfoSelectionMomentum,
-                               float(0.01f));
+                            "MC pfo selection momentum",
+                            m_mcPfoSelectionMomentum,
+                            float(0.01f));
 
     registerProcessorParameter("MCPfoSelectionLowEnergyNPCutOff",
-                               "MC pfo selection neutron and proton low energy cut-off",
-                               m_mcPfoSelectionLowEnergyNPCutOff,
-                               float(1.2f));
+                            "MC pfo selection neutron and proton low energy cut-off",
+                            m_mcPfoSelectionLowEnergyNPCutOff,
+                            float(1.2f));
 
     registerProcessorParameter("RootFile",
-                               "Name of the output root file",
-                               m_rootFile,
-                               std::string("PFOAnalysis.root"));
+                            "Name of the output root file",
+                            m_rootFile,
+                            std::string("PFOAnalysis.root"));
 
     registerProcessorParameter("Printing",
-                               "Set the debug print level",
-                               m_printing,
-                               int(0));
+                           "Set the debug print level",
+                           m_printing,
+                           int(0));
+
+    registerProcessorParameter("CollectCalibrationDetails",
+                           "Whether to collect calibration details",
+                           m_collectCalibrationDetails,
+                           int(0));
+
+    registerProcessorParameter("HCalRingOuterSymmetryOrder",
+                           "Set the HCalRingOuterSymmetryOrder",
+                           m_calibrationHelperSettings.m_hCalRingOuterSymmetryOrder,
+                           int(8));
+
+    registerProcessorParameter("HCalRingOuterPhi0",
+                           "Set the HCalRingOuterPhi0",
+                           m_calibrationHelperSettings.m_hCalRingOuterPhi0,
+                           float(0));
+
+    registerInputCollections(LCIO::CALORIMETERHIT,
+                           "ECalCollections", 
+                           "Name of the ECal collection of calo hits used to form clusters",
+                           m_calibrationHelperSettings.m_eCalCollections,
+                           LCStrVec());
+
+    registerInputCollections(LCIO::CALORIMETERHIT,
+                           "HCalCollections", 
+                           "Name of the HCal collection of calo hits used to form clusters",
+                           m_calibrationHelperSettings.m_hCalCollections,
+                           LCStrVec());
+
+    registerInputCollections(LCIO::CALORIMETERHIT,
+                           "MuonCollections", 
+                           "Name of the Muon collection of calo hits used to form clusters",
+                           m_calibrationHelperSettings.m_muonCollections,
+                           LCStrVec());
+
+    registerInputCollections(LCIO::CALORIMETERHIT,
+                           "BCalCollections", 
+                           "Name of the BCal collection of calo hits used to form clusters",
+                           m_calibrationHelperSettings.m_bCalCollections,
+                           LCStrVec());
+
+    registerInputCollections(LCIO::CALORIMETERHIT,
+                           "LHCalCollections", 
+                           "Name of the LHCal collection of calo hits used to form clusters",
+                           m_calibrationHelperSettings.m_lHCalCollections,
+                           LCStrVec());
+
+    registerInputCollections(LCIO::CALORIMETERHIT,
+                           "LCalCollections", 
+                           "Name of the LCal collection of calo hits used to form clusters",
+                           m_calibrationHelperSettings.m_lCalCollections,
+                           LCStrVec());
+
+    registerInputCollections(LCIO::SIMCALORIMETERHIT, 
+                           "ECalCollectionsADC" , 
+                           "Name of the ECal collection post Mokka, pre digitisation" , 
+                           m_calibrationHelperSettings.m_eCalCollectionsADC , 
+                           LCStrVec());
+
+    registerInputCollections(LCIO::SIMCALORIMETERHIT, 
+                           "HCalBarrelCollectionsADC" , 
+                           "Name of the HCal Barrel collection post Mokka, pre digitisation" , 
+                           m_calibrationHelperSettings.m_hCalBarrelCollectionsADC , 
+                           LCStrVec());
+
+    registerInputCollections(LCIO::SIMCALORIMETERHIT, 
+                           "HCalEndCapCollectionsADC" , 
+                           "Name of the HCal EndCap collection post Mokka, pre digitisation" , 
+                           m_calibrationHelperSettings.m_hCalEndCapCollectionsADC , 
+                           LCStrVec());
+
+    registerInputCollections(LCIO::SIMCALORIMETERHIT, 
+                           "HCalOtherCollectionsADC" , 
+                           "Name of the HCal Other collection post Mokka, pre digitisation" , 
+                           m_calibrationHelperSettings.m_hCalOtherCollectionsADC , 
+                           LCStrVec());
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -184,9 +262,19 @@ void PfoAnalysis::init()
     m_pTTree->Branch("thrust", &m_thrust, "thrust/F");
     m_pTTree->Branch("qPdg", &m_qPdg, "qPdg/I");
 
+    if (m_collectCalibrationDetails)
+        m_pCalibrationHelper = new pandora_analysis::CalibrationHelper(m_calibrationHelperSettings);
+
+    if (m_pCalibrationHelper)
+    {
+        m_pCalibrationHelper->SetBranchAddresses(m_pTTree);
+        m_pCalibrationHelper->CreateHistograms();
+        m_pCalibrationHelper->SetHistogramDirectories(m_pTFile);
+    }
+
     m_hPfoEnergySum = new TH1F("fPFA", "total pfo energy", 10000, 0., 5000.);
-    m_hPfoEnergySum->SetDirectory(m_pTFile);
     m_hPfoEnergySumL7A = new TH1F("fPFA_L7A", "total pfo energy < 0.7 A", 10000, 0., 5000.);
+    m_hPfoEnergySum->SetDirectory(m_pTFile);
     m_hPfoEnergySumL7A->SetDirectory(m_pTFile);
 }
 
@@ -214,6 +302,11 @@ void PfoAnalysis::processEvent(EVENT::LCEvent *pLCEvent)
     this->ExtractCollections(pLCEvent);
     this->MakeQuarkVariables(pLCEvent);
     this->PerformPfoAnalysis();
+
+    if (m_pCalibrationHelper)
+        m_pCalibrationHelper->Calibrate(pLCEvent, m_pfoVector, m_nPfoTargetsTotal, m_nPfoTargetsTracks, m_nPfoTargetsNeutralHadrons, m_pfoTargetsEnergyTotal);
+
+    m_pTTree->Fill();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -236,9 +329,15 @@ void PfoAnalysis::end()
     m_hPfoEnergySum->Write();
     m_hPfoEnergySumL7A->Write();
 
+    if (m_pCalibrationHelper)
+        m_pCalibrationHelper->WriteHistograms();
+
     m_pTFile->Write();
     m_pTFile->Close();
     delete m_pTFile;
+
+    if (m_pCalibrationHelper)
+        delete m_pCalibrationHelper;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -301,6 +400,9 @@ void PfoAnalysis::Clear()
     m_mQQ = -99.f;
     m_thrust = -99.f;
     m_qPdg = -99;
+
+    if (m_pCalibrationHelper)
+        m_pCalibrationHelper->Clear();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -674,6 +776,4 @@ void PfoAnalysis::PerformPfoAnalysis()
 
     if ((m_qPdg >= 1) && (m_qPdg <= 3) && (m_thrust <= 0.7f))
         m_hPfoEnergySumL7A->Fill(m_pfoEnergyTotal + m_mcEnergyENu, 1.);
-
-    m_pTTree->Fill();
 }
