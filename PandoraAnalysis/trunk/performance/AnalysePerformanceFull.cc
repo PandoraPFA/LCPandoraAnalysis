@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraAnalysis/tests/AnalysePerformanceFull.cc
+ *  @file   PandoraAnalysis/performance/AnalysePerformanceFull.cc
  * 
  *  @brief  Implementation of pandora analyse performance full binary.
  * 
