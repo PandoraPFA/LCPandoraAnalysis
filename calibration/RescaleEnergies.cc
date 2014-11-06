@@ -1,7 +1,7 @@
 /**
- *  @file   PandoraAnalysis/tests/Calibrate.cc
+ *  @file   PandoraAnalysis/calibration/RescaleEnergies.cc
  * 
- *  @brief  Implementation of pandora analyse performance binary.
+ *  @brief  Implementation of rescale energies binary.
  * 
  *  $Log: $
  */
