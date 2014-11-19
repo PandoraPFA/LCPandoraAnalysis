@@ -1,40 +1,30 @@
 /**
  *  @file   PandoraAnalysis/calibration/PandoraPFACalibrate_HadronicScale_TotalEnergyMethod.cc
  * 
- *  @brief  Calculate E/HCalToHadGeVCalibration using the total energy method on KaonL events
+ *  @brief  Calculate E/HCalToHadGeVCalibration using the total energy method on kaonL events
  * 
  *  $Log: $
  */
+
 #include "TApplication.h"
-#include "TBranch.h"
 #include "TCanvas.h"
 #include "TChain.h"
 #include "TF1.h"
 #include "TFile.h"
 #include "TFitResult.h"
-#include "TFitResultPtr.h"
 #include "TH1F.h"
-#include "TLegend.h"
-#include "TMath.h"
-#include "TPad.h"
-#include "TPaveText.h"
 #include "TROOT.h"
-#include "TString.h"
-#include "TSystem.h"
 #include "TTree.h"
 
 #include <iostream>
-#include <cmath>
+#include <cstdlib>
 #include <fstream>
-#include <fcntl.h>
-#include <float.h>
-#include <limits.h>
+#include <limits>
 #include <stdexcept>
-#include <string>
-#include <sstream>
 
-using namespace std;
-
+/**
+ *  @brief  TotalEnergyMethod class
+ */
 class TotalEnergyMethod
 {
 public:
