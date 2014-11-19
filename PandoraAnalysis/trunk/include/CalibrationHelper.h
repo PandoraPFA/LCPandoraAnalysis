@@ -35,6 +35,11 @@ public:
     class Settings
     {
     public:
+        /**
+         *  @brief  Default constructor
+         */
+        Settings();
+
         LCStrVec    m_eCalCollections;                      ///< Input calorimeter hit collection names
         LCStrVec    m_hCalCollections;                      ///< Input calorimeter hit collection names
         LCStrVec    m_muonCollections;                      ///< Input calorimeter hit collection names

@@ -6,38 +6,24 @@
  * 
  *  $Log: $
  */
+
 #include "TApplication.h"
-#include "TBranch.h"
 #include "TCanvas.h"
 #include "TChain.h"
-#include "TF1.h"
 #include "TFile.h"
-#include "TFileCollection.h"
 #include "TFitResult.h"
-#include "TFitResultPtr.h"
 #include "TH1F.h"
-#include "TMath.h"
 #include "TROOT.h"
-#include "TString.h"
 #include "TSystemDirectory.h"
-#include "TTree.h"
 
 #include <iostream>
-#include <cmath>
 #include <cstdlib>
-#include <fcntl.h>
 #include <fstream>
 #include <limits>
-#include <sstream>
-#include <stdio.h>
 #include <stdexcept>
-#include <string>
-#include <vector>
-
-using namespace std;
 
 /**
- *  @brief  Parameters class
+ *  @brief  GeVToMIP class
  */
 class GeVToMIP 
 {

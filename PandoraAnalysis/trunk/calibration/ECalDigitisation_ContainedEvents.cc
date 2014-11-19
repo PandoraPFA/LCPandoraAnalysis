@@ -5,42 +5,24 @@
  * 
  *  $Log: $
  */
+
 #include "TApplication.h"
-#include "TBranch.h"
 #include "TCanvas.h"
 #include "TChain.h"
 #include "TF1.h"
-#include "TFile.h"
 #include "TFitResult.h"
-#include "TFitResultPtr.h"
 #include "TH1F.h"
-#include "THStack.h"
-#include "TLegend.h"
-#include "TMath.h"
-#include "TPad.h"
-#include "TPaveText.h"
 #include "TROOT.h"
-#include "TString.h"
-#include "TSystem.h"
-#include "TTree.h"
-
-// pandora_analysis namespace picked up here.
-#include "AnalysisHelper.h"
 
 #include <iostream>
-#include <cmath>
 #include <cstdlib>
-#include <fcntl.h>
 #include <fstream>
-#include <limits.h>
-#include <sstream>
-#include <stdio.h>
+#include <limits>
 #include <stdexcept>
-#include <string>
-#include <vector>
 
-using namespace pandora_analysis;
-
+/**
+ *  @brief  ECalDigitisation class
+ */
 class ECalDigitisation 
 {
 public:

@@ -66,6 +66,15 @@ public:
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+CalibrationHelper::Settings::Settings() :
+    m_hCalRingOuterSymmetryOrder(8),
+    m_hCalRingOuterPhi0(0.f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 CalibrationHelper::CalibrationHelper(const Settings &settings) :
     m_settings(settings),
     m_pfoMinHCalLayerToEdge(0),
@@ -443,6 +452,12 @@ void CalibrationHelper::AddADCEntries(const EVENT::LCEvent *pLCEvent, const EVEN
                 for (int iHit = 0; iHit < nElements; ++iHit)
                 {
                     const SimCalorimeterHit *pSimCalorimeterHit = dynamic_cast<const SimCalorimeterHit*>( pLCCollection->getElementAt(iHit));
+
+                    if (NULL == pSimCalorimeterHit)
+                    {
+                        m_out(ERROR) << "Collection type mismatch " << (*iter) << " expected to contain objects of type SimCalorimeterHit " << std::endl;
+                        throw;
+                    }
 
                     const float SimCaloHitEnergy = pSimCalorimeterHit->getEnergy();
                     const float x(pSimCalorimeterHit->getPosition()[0]);

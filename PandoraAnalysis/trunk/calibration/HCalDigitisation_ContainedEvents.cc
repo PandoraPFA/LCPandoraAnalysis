@@ -1,41 +1,28 @@
 /**
  *  @file   PandoraAnalysis/calibration/HCalDigitisation_ContainedEvents.cc
  * 
- *  @brief  Mean calo hit energy for KaonL events contained in HCal
+ *  @brief  Mean calo hit energy for kaonL events contained in HCal
  * 
  *  $Log: $
  */
+
 #include "TApplication.h"
-#include "TBranch.h"
 #include "TCanvas.h"
 #include "TChain.h"
 #include "TF1.h"
-#include "TFile.h"
 #include "TFitResult.h"
-#include "TFitResultPtr.h"
 #include "TH1F.h"
-#include "TMath.h"
 #include "TROOT.h"
-#include "TString.h"
-#include "TTree.h"
-
-// pandora_analysis namespace picked up here.
-#include "AnalysisHelper.h"
 
 #include <iostream>
-#include <cmath>
 #include <cstdlib>
-#include <fcntl.h>
 #include <fstream>
 #include <limits>
-#include <sstream>
-#include <stdio.h>
 #include <stdexcept>
-#include <string>
-#include <vector>
 
-using namespace pandora_analysis;
-
+/**
+ *  @brief  HCalDigitisation class
+ */
 class HCalDigitisation 
 {
 public:
@@ -196,6 +183,7 @@ HCalDigitisation::HCalDigitisation() :
     m_upperCosTheraCut(1.f),
     m_fitPercentage(90.f),
     m_numberHCalLayers(48),
+    m_pTChain(NULL),
     m_histogram(NULL),
     m_fitRangeLow(std::numeric_limits<float>::max()),
     m_fitRangeHigh(std::numeric_limits<float>::max()),
