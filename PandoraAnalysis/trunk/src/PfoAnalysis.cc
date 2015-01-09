@@ -430,6 +430,8 @@ void PfoAnalysis::ExtractCollections(EVENT::LCEvent *pLCEvent)
     }
 
     // Extract mc pfo collection
+    MCParticleList mcPfoCandidates;
+
     try
     {
         const EVENT::LCCollection *pLCCollection = pLCEvent->getCollection(m_mcParticleCollection);
@@ -444,7 +446,6 @@ void PfoAnalysis::ExtractCollections(EVENT::LCEvent *pLCEvent)
             if (!pMCParticle->getParents().empty())
                 continue;
 
-            MCParticleList mcPfoCandidates;
             this->ApplyPfoSelectionRules(pMCParticle, mcPfoCandidates);
         }
     }
@@ -452,11 +453,14 @@ void PfoAnalysis::ExtractCollections(EVENT::LCEvent *pLCEvent)
     {
         streamlog_out(WARNING) << "Could not extract mc particle collection " << m_mcParticleCollection << std::endl;
     }
+
+    m_pfoTargetVector.insert(m_pfoTargetVector.begin(), mcPfoCandidates.begin(), mcPfoCandidates.end());
+    std::sort(m_pfoTargetVector.begin(), m_pfoTargetVector.end(), PfoAnalysis::SortPfoTargetsByEnergy);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void PfoAnalysis::ApplyPfoSelectionRules(const EVENT::MCParticle *pMCParticle, MCParticleList &mcPfoCandidates)
+void PfoAnalysis::ApplyPfoSelectionRules(const EVENT::MCParticle *pMCParticle, MCParticleList &mcPfoCandidates) const
 {
     const float innerRadius(std::sqrt(pMCParticle->getVertex()[0] * pMCParticle->getVertex()[0] + pMCParticle->getVertex()[1] * pMCParticle->getVertex()[1] + pMCParticle->getVertex()[2] * pMCParticle->getVertex()[2]));
     const float outerRadius(std::sqrt(pMCParticle->getEndpoint()[0] * pMCParticle->getEndpoint()[0] + pMCParticle->getEndpoint()[1] * pMCParticle->getEndpoint()[1] + pMCParticle->getEndpoint()[2] * pMCParticle->getEndpoint()[2]));
@@ -466,7 +470,6 @@ void PfoAnalysis::ApplyPfoSelectionRules(const EVENT::MCParticle *pMCParticle, M
         (outerRadius > m_mcPfoSelectionRadius) && (innerRadius <= m_mcPfoSelectionRadius) && (momentum > m_mcPfoSelectionMomentum) &&
         !((pMCParticle->getPDG() == 2212 || pMCParticle->getPDG() == 2112) && (pMCParticle->getEnergy() < m_mcPfoSelectionLowEnergyNPCutOff)))
     {
-        m_pfoTargetVector.push_back(pMCParticle);
         mcPfoCandidates.insert(pMCParticle);
     }
     else
@@ -776,4 +779,11 @@ void PfoAnalysis::PerformPfoAnalysis()
 
     if ((m_qPdg >= 1) && (m_qPdg <= 3) && (m_thrust <= 0.7f))
         m_hPfoEnergySumL7A->Fill(m_pfoEnergyTotal + m_mcEnergyENu, 1.);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PfoAnalysis::SortPfoTargetsByEnergy(const EVENT::MCParticle *const pLhs, const EVENT::MCParticle *const pRhs)
+{
+    return (pLhs->getEnergy() > pRhs->getEnergy());
 }

@@ -95,7 +95,7 @@ private:
      *  @param  pMCParticle the address of a mc particle (initially call this recursive function with a top-level, root particle)
      *  @param  mcPfoCandidates to collect the list of mc pfo candidates
      */
-    void ApplyPfoSelectionRules(const EVENT::MCParticle *pMCParticle, MCParticleList &mcPfoCandidates);
+    void ApplyPfoSelectionRules(const EVENT::MCParticle *pMCParticle, MCParticleList &mcPfoCandidates) const;
 
     /**
      *  @brief  Make quark variables
@@ -108,6 +108,14 @@ private:
      *  @brief  Perform pfo analysis
      */
     void PerformPfoAnalysis();
+
+    /**
+     *  @brief  Sort mc pfo targets by decreasing energy
+     * 
+     *  @param  pLhs the address of the first mc pfo target
+     *  @param  pRhs the address of the second mc pfo target
+     */
+    static bool SortPfoTargetsByEnergy(const EVENT::MCParticle *const pLhs, const EVENT::MCParticle *const pRhs);
 
     int                 m_nRun;                                 ///< 
     int                 m_nEvt;                                 ///< 
