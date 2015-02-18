@@ -1,7 +1,7 @@
 /**
  *  @file   PandoraAnalysis/calibration/ECalDigitisation_ContainedEvents.cc
  * 
- *  @brief  Mean calo hit energy for photon events contained in ECal
+ *  @brief  Mean calo hit energy for photon events contained in ECal.  Used for setting digitisation constant in ECal (CalibrECAL).
  * 
  *  $Log: $
  */
@@ -38,37 +38,35 @@ public:
 
     /**
      *  @brief  Create histogram, find the limits for the percentage fit and perform Gaussian fit over this range
-     *  
-     *  @param  pChain data for calibration
     */
     void Process();
+
+// Inputs Set By Parsing Command Line
+    std::string     m_inputPhotonRootFiles; ///< Input root files - Photons
+    float           m_trueEnergy;           ///< True energy of photons being simulated
+    float           m_calibrationAccuracy;  ///< Fractional accuracy target for reconstructed energy
+    std::string     m_outputPath;           ///< Output path to send results
+    float           m_fitPercentage;        ///< Percentage of continuous data with narrowest range for Gaussian fit
 
 // Outputs
     float           m_amplitude;            ///< Amplitude of Gaussian fit
     float           m_mean;                 ///< Mean of Gaussian fit
     float           m_stdDev;               ///< Standard deviation of Gaussian fit
-    float           m_chi2;                 ///< Chi squared of Gaussian fit
     int             m_nEventsECalHist;      ///< Number of events in m_histogram
-
-// Non trivial setting on initialisation
-    float           m_trueEnergy;           ///< True energy of photons being simulated
-    std::string     m_inputPhotonRootFiles; ///< Input root files for
-    std::string     m_outputPath;           ///< Output path to send results
-    float           m_fitPercentage;        ///< Percentage of continuous data with narrowest range for Gaussian fit
 
 private:
     /**
-     *  @brief  Set m_binNumber and m_maxHistogramEnergy
+     *  @brief  Set m_maxHistogramEnergy
     */
     void PrepareHistogram();
 
     /**
-     *  @brief  Create ECal calo hit energy histrogram (m_histogram)
+     *  @brief  Create ECal calo hit energy histogram (m_histogram)
     */
     void CreateHistogram();
 
     /**
-     *  @brief  Fill ECal calo hit energy histrogram 
+     *  @brief  Fill ECal calo hit energy histogram 
     */
     void FillHistogram();
 
@@ -82,13 +80,14 @@ private:
     */
     void Fit();
 
+typedef std::vector<float> FloatVector;
+
 // Trivial setting on initialisation
     TChain         *m_pTChain;              ///< Chain of root files
     TH1F           *m_histogram;            ///< Histogram
     float           m_fitRangeLow;          ///< Low fit edge
     float           m_fitRangeHigh;         ///< High fit edge
     float           m_rMSFitRange;          ///< RMS of the fitRange data
-    int             m_binNumber;            ///< Number of bins on m_histogram
     float           m_maxHistogramEnergy;   ///< Max energy on m_histogram
 };
 
@@ -168,21 +167,20 @@ int main(int argc, char **argv)
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 ECalDigitisation::ECalDigitisation() :
+    m_inputPhotonRootFiles(""),
+    m_trueEnergy(std::numeric_limits<float>::max()),
+    m_calibrationAccuracy(0.02),
+    m_outputPath(""),
+    m_fitPercentage(90.f),
     m_amplitude(std::numeric_limits<float>::max()),
     m_mean(std::numeric_limits<float>::max()),
     m_stdDev(std::numeric_limits<float>::max()),
-    m_chi2(std::numeric_limits<float>::max()),
     m_nEventsECalHist(0),
-    m_trueEnergy(std::numeric_limits<float>::max()),
-    m_inputPhotonRootFiles(""),
-    m_outputPath(""),
-    m_fitPercentage(90.f),
     m_pTChain(NULL),
     m_histogram(NULL),
     m_fitRangeLow(std::numeric_limits<float>::max()),
     m_fitRangeHigh(std::numeric_limits<float>::max()),
     m_rMSFitRange(std::numeric_limits<float>::max()),
-    m_binNumber(std::numeric_limits<int>::max()),
     m_maxHistogramEnergy(0.f)
 {
 }
@@ -210,13 +208,9 @@ void ECalDigitisation::Process()
 
 void ECalDigitisation::PrepareHistogram()
 {
-typedef std::vector<float> FloatVector;
-    float           totalCaloHitEnergy;
-    float           eCalTotalCaloHitEnergy;
-    int             nPfoTargetsTotal;
-    int             nPfoTargetsPhotons;
-    FloatVector    *pfoTargetCosTheta(NULL);
-    float           binWidth = m_trueEnergy / 100.0;
+    float totalCaloHitEnergy, eCalTotalCaloHitEnergy;
+    int nPfoTargetsTotal, nPfoTargetsPhotons;
+    FloatVector *pfoTargetCosTheta(NULL);
 
     m_pTChain->SetBranchAddress("TotalCaloHitEnergy",&totalCaloHitEnergy);
     m_pTChain->SetBranchAddress("ECalTotalCaloHitEnergy",&eCalTotalCaloHitEnergy);
@@ -237,7 +231,6 @@ typedef std::vector<float> FloatVector;
                 m_maxHistogramEnergy = eCalTotalCaloHitEnergy;
         }
     }
-    m_binNumber = static_cast<int>( (m_maxHistogramEnergy + 0.5) / binWidth );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -246,7 +239,8 @@ void ECalDigitisation::CreateHistogram()
 {
     std::string Name = "CaloHitEnergyECal";
     std::string Title = "Calorimeter Hit Energy ECal (1==nPfoTargetsTotal && 1==nPfoTargetsPhotons && Contained in ECal)";
-    m_histogram = new TH1F(Name.c_str(), Title.c_str(), m_binNumber, 0., m_maxHistogramEnergy);
+    int binNumber = static_cast<int>( m_maxHistogramEnergy / ( m_calibrationAccuracy * m_trueEnergy ) );
+    m_histogram = new TH1F(Name.c_str(), Title.c_str(), binNumber, 0., m_maxHistogramEnergy);
     m_histogram->GetXaxis()->SetTitle("Calorimeter Hit Energy / GeV");
     m_histogram->GetYaxis()->SetTitle("Entries");
 }
@@ -255,12 +249,9 @@ void ECalDigitisation::CreateHistogram()
 
 void ECalDigitisation::FillHistogram()
 {
-typedef std::vector<float> FloatVector;
-    float           totalCaloHitEnergy;
-    float           eCalTotalCaloHitEnergy;
-    int             nPfoTargetsTotal;
-    int             nPfoTargetsPhotons;
-    FloatVector    *pfoTargetCosTheta(NULL);
+    float totalCaloHitEnergy, eCalTotalCaloHitEnergy;
+    int nPfoTargetsTotal, nPfoTargetsPhotons;
+    FloatVector *pfoTargetCosTheta(NULL);
 
     m_pTChain->SetBranchAddress("TotalCaloHitEnergy",&totalCaloHitEnergy);
     m_pTChain->SetBranchAddress("ECalTotalCaloHitEnergy",&eCalTotalCaloHitEnergy);
@@ -470,7 +461,6 @@ void ECalDigitisation::Fit()
             m_amplitude = Gaussian_Fit_Func->GetParameter(0);
             m_mean = Gaussian_Fit_Func->GetParameter(1);
             m_stdDev = std::pow(Gaussian_Fit_Func->GetParameter(2),-0.5);
-            m_chi2 = Gaussian_Fit_Func->GetChisquare();
 
             std::string canvasName = "ECalDigitisation";
             std::string canvasTitle = "ECal Digitisation";
@@ -509,29 +499,33 @@ bool ParseCommandLine(int argc, char *argv[], ECalDigitisation &eCalDigitisation
 {
     int c(0);
 
-    while (((c = getopt(argc, argv, "e:i:o:f:h")) != -1) || (argc == 1))
+    while (((c = getopt(argc, argv, "a:b:c:d:e:f")) != -1) || (argc == 1))
     {
         switch (c)
         {
-        case 'e':
-            eCalDigitisation.m_trueEnergy = atof(optarg);
-            break;
-        case 'i':
+        case 'a':
             eCalDigitisation.m_inputPhotonRootFiles = optarg;
             break;
-        case 'o':
+        case 'b':
+            eCalDigitisation.m_trueEnergy = atof(optarg);
+            break;
+        case 'c':
+            eCalDigitisation.m_calibrationAccuracy = atof(optarg);
+            break;
+        case 'd':
             eCalDigitisation.m_outputPath = optarg;
             break;
-        case 'f':
+        case 'e':
             eCalDigitisation.m_fitPercentage = atof(optarg);
             break;
-        case 'h':
+        case 'f':
         default:
             std::cout << std::endl << "Calibrate " << std::endl
-                      << "    -e value  (mandatory, true energy of photons being used for calibration)" << std::endl
-                      << "    -i        (mandatory, input file name(s), can include wildcards if string is in quotes)" << std::endl
-                      << "    -o value  (mandatory, output path to send results to)" << std::endl
-                      << "    -f value  (optional, fit percentage used for calibration, default 90% of data with narrowest rms)" << std::endl
+                      << "    -a        (mandatory, input file name(s), can include wildcards if string is in quotes)           " << std::endl
+                      << "    -b value  (mandatory, true energy of photons being used for calibration)                          " << std::endl
+                      << "    -c value  (optional, fractional accuracy to calibrate CalibrECAL to, default 0.02)                " << std::endl
+                      << "    -d        (mandatory, output path to send results to)                                             " << std::endl
+                      << "    -e value  (optional, fit percentage used for calibration, default 90% of data with narrowest rms) " << std::endl
                       << std::endl;
             return false;
         }

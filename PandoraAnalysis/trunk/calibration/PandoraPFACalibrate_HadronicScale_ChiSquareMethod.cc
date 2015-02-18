@@ -1,7 +1,7 @@
 /**
  *  @file   PandoraAnalysis/calibration/PandoraPFACalibrate_HadronicScale_ChiSquareMethod.cc
  * 
- *  @brief  Calculate E/HCalToHadGeVCalibration using the chi squared method on kaonL events
+ *  @brief  Chi square method.  Used for setting hadronic scale in PandoraPFA (ECalToHadGeVCalibration/HCalToHadGeVCalibration).
  * 
  *  $Log: $
  */
@@ -13,6 +13,7 @@
 #include "TFitResult.h"
 #include "TH2F.h"
 #include "TROOT.h"
+#include "TStyle.h"
 #include "TTree.h"
 
 #include <iostream>
@@ -42,17 +43,18 @@ public:
     */
     void Process();
 
+// Inputs Set By Parsing Command Line
+    std::string         m_inputKaonLRootFiles;          ///< Input root files - KaonL
+    float               m_trueEnergy;                   ///< Total energy of calibration particle
+    float               m_calibrationAccuracy;          ///< Fractional accuracy to calibrate H/ECalToHad to
+    std::string         m_outputPath;                   ///< Output path to send plots to
+    int                 m_numberHCalLayers;             ///< Number of layers in the HCal
+
 // Outputs
     float               m_eCalToHadInterceptMinChi2;    ///< Best fit ECalToHad intercept
     float               m_hCalToHadInterceptMinChi2;    ///< Best fit HCalToHad intercept
     float               m_minChi2;                      ///< Best fit measure, chi squared of fit
     int                 m_nEntriesHist;                 ///< Number of entries in histogram
-
-// Non trivial setting on initialisation
-    float               m_trueEnergy;                   ///< Total energy of calibration particle
-    std::string         m_inputKaonLRootFiles;          ///< Input root files for E/HCalToHad Calibration
-    std::string         m_outputPath;                   ///< Output path to send plots to
-    int                 m_numberHCalLayers;             ///< Number of layers in the HCal
 
 private:
     /**
@@ -71,9 +73,12 @@ private:
     void CSM();
 
     /**
-     *  @brief  Does the point defined by m_pfoHCalToHadEnergy and m_pfoECalToHadEnergy fall within 3 sigme of the ideal distribution
+     *  @brief  Does the point defined by pfoHCalToHadEnergy and pfoECalToHadEnergy fall within 3 sigma of the ideal distribution
+     * 
+     *  @param pfoECalToHadEnergy  : Hadronic energy in ECal
+     *  @param pfoHCalToHadEnergy  : Hadronic energy in HCal
     */
-    bool ThreeSigmaCut();
+    bool ThreeSigmaCut(float pfoECalToHadEnergy, float pfoHCalToHadEnergy);
 
     /**
      *  @brief  Plot m_histogram.
@@ -81,17 +86,11 @@ private:
     void Plot();
 
 // Non trivial setting on initialisation
-    float               m_kineticEnergy;                ///< Kinetic energy of calibration particle, from m_trueEnergy
-    int                 m_binNumber;                    ///< Number of bins (x/y symmetric), taken as 150
-    float               m_maxHistogramEnergy;           ///< Max energy on histogram (x/y symmetric), taken as 1.5 * m_trueEnergy
     float               m_hCalToHadResolutionConstant;  ///< HCal coefficient for stoichastic (sigma_E/E ~ coefficeint /sqrt(E)) process default 0.55
     float               m_eCalToHadResolutionConstant;  ///< ECal coefficient for stoichastic (sigma_E/E ~ coefficeint /sqrt(E)) process default 0.55
 
 // Trivial setting on initialisation
-    TChain             *m_pTChain;                      ///< Chain of root files
     TH2F               *m_histogram;                    ///< 2D histogram of ECalToHad vs HCalToHad energy
-    float               m_pfoHCalToHadEnergy;           ///< Error from stoichastic term from single particle resolution : sigmaE/E ~ ResConstant / sqrt(E)
-    float               m_pfoECalToHadEnergy;           ///< Error from stoichastic term from single particle resolution : sigmaE/E ~ ResConstant / sqrt(E)
 
 typedef std::vector<float> FloatVector;
     FloatVector         m_eCalEnergyAccepted;           ///< Vector of ECalToHad energies passing three sigma cuts
@@ -119,6 +118,9 @@ int main(int argc, char **argv)
     TApplication *pTApplication = NULL;
 
     gROOT->SetBatch();
+    gROOT->SetStyle("Plain");
+    gStyle->SetOptTitle(0);
+    gStyle->SetOptStat(0);
 
     try
     {
@@ -165,23 +167,18 @@ int main(int argc, char **argv)
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 ChiSquaredMethod::ChiSquaredMethod() :
+    m_inputKaonLRootFiles(""),
+    m_trueEnergy(std::numeric_limits<float>::max()),
+    m_calibrationAccuracy(0.005),
+    m_outputPath(""),
+    m_numberHCalLayers(48),
     m_eCalToHadInterceptMinChi2(std::numeric_limits<float>::max()),
     m_hCalToHadInterceptMinChi2(std::numeric_limits<float>::max()),
     m_minChi2(std::numeric_limits<float>::max()),
     m_nEntriesHist(0),
-    m_trueEnergy(std::numeric_limits<float>::max()),
-    m_inputKaonLRootFiles(""),
-    m_outputPath(""),
-    m_numberHCalLayers(48),
-    m_kineticEnergy(std::numeric_limits<float>::max()),
-    m_binNumber(150),
-    m_maxHistogramEnergy(std::numeric_limits<float>::max()),
     m_hCalToHadResolutionConstant(0.55), // Resolution constants from single particle calibration
     m_eCalToHadResolutionConstant(0.55), // Resolution constants from single particle calibration
-    m_pTChain(NULL),
     m_histogram(NULL),
-    m_pfoHCalToHadEnergy(std::numeric_limits<float>::max()),
-    m_pfoECalToHadEnergy(std::numeric_limits<float>::max()),
     m_eCalEnergyAccepted(NULL),
     m_hCalEnergyAccepted(NULL)
 {
@@ -197,8 +194,6 @@ ChiSquaredMethod::~ChiSquaredMethod()
 
 void ChiSquaredMethod::Process()
 {
-    m_maxHistogramEnergy = 1.5 * m_trueEnergy;
-    m_kineticEnergy = m_trueEnergy - 0.497672;
     this->CreateHistogram();
     this->FillHistogram();
     this->CSM();
@@ -210,7 +205,9 @@ void ChiSquaredMethod::CreateHistogram()
 {
     std::string Name = "histCSM";
     std::string Title = "Hadronic Energy Scale PandoraPFA Calibration, Chi Squared Method";
-    m_histogram = new TH2F(Name.c_str(),Title.c_str(),m_binNumber,0,m_maxHistogramEnergy,m_binNumber,0,m_maxHistogramEnergy);
+    int binNumber = static_cast<int>( 1.5 / m_calibrationAccuracy );
+    float maxHistogramEnergy = 1.5 * m_trueEnergy;
+    m_histogram = new TH2F(Name.c_str(),Title.c_str(),binNumber,0,maxHistogramEnergy,binNumber,0,maxHistogramEnergy);
     m_histogram->GetYaxis()->SetTitle("Hadronic Energy Measured in the ECal / GeV");
     m_histogram->GetXaxis()->SetTitle("Hadronic Energy Measured in the HCal / GeV");
 }
@@ -219,38 +216,35 @@ void ChiSquaredMethod::CreateHistogram()
 
 void ChiSquaredMethod::FillHistogram()
 {
-    int nPfoTargetsTotal;
-    int nPfoTargetsNeutralHadrons;
-    int nPfosTotal;
-    int nPfosNeutralHadrons;
-    int pfoMinHCalLayerToEdge;
+    int nPfoTargetsTotal, nPfoTargetsNeutralHadrons, nPfosTotal, nPfosNeutralHadrons, pfoMinHCalLayerToEdge;
+    float pfoECalToHadEnergy, pfoHCalToHadEnergy;
 
-    m_pTChain = new TChain("PfoAnalysisTree");
-    m_pTChain->Add(m_inputKaonLRootFiles.c_str());
+    TChain *pTChain = new TChain("PfoAnalysisTree");
+    pTChain->Add(m_inputKaonLRootFiles.c_str());
 
-    unsigned int nEntriesHistogram(m_pTChain->GetEntries());
+    unsigned int nEntriesHistogram(pTChain->GetEntries());
 
-    m_pTChain->SetBranchAddress("pfoECalToHadEnergy",&m_pfoECalToHadEnergy);
-    m_pTChain->SetBranchAddress("pfoHCalToHadEnergy",&m_pfoHCalToHadEnergy);
-    m_pTChain->SetBranchAddress("nPfoTargetsTotal",&nPfoTargetsTotal);
-    m_pTChain->SetBranchAddress("nPfoTargetsNeutralHadrons",&nPfoTargetsNeutralHadrons);
-    m_pTChain->SetBranchAddress("nPfosTotal",&nPfosTotal);
-    m_pTChain->SetBranchAddress("nPfosNeutralHadrons",&nPfosNeutralHadrons);
-    m_pTChain->SetBranchAddress("pfoMinHCalLayerToEdge",&pfoMinHCalLayerToEdge);
+    pTChain->SetBranchAddress("pfoECalToHadEnergy",&pfoECalToHadEnergy);
+    pTChain->SetBranchAddress("pfoHCalToHadEnergy",&pfoHCalToHadEnergy);
+    pTChain->SetBranchAddress("nPfoTargetsTotal",&nPfoTargetsTotal);
+    pTChain->SetBranchAddress("nPfoTargetsNeutralHadrons",&nPfoTargetsNeutralHadrons);
+    pTChain->SetBranchAddress("nPfosTotal",&nPfosTotal);
+    pTChain->SetBranchAddress("nPfosNeutralHadrons",&nPfosNeutralHadrons);
+    pTChain->SetBranchAddress("pfoMinHCalLayerToEdge",&pfoMinHCalLayerToEdge);
 
     int containedLayerExclusion = ceil(m_numberHCalLayers * 0.1);
 
     for (unsigned int i = 0; i < nEntriesHistogram ; i++) 
     {
-        m_pTChain->GetEntry(i);
+        pTChain->GetEntry(i);
 
-        if (ThreeSigmaCut() && nPfoTargetsTotal == 1 && nPfoTargetsNeutralHadrons == 1 && nPfosTotal == 1 && nPfosNeutralHadrons == 1 && 
+        if (ThreeSigmaCut(pfoECalToHadEnergy,pfoHCalToHadEnergy) && nPfoTargetsTotal == 1 && nPfoTargetsNeutralHadrons == 1 && nPfosTotal == 1 && nPfosNeutralHadrons == 1 && 
             pfoMinHCalLayerToEdge > containedLayerExclusion)
         {
-            m_eCalEnergyAccepted.push_back(m_pfoECalToHadEnergy);
-            m_hCalEnergyAccepted.push_back(m_pfoHCalToHadEnergy);
+            m_eCalEnergyAccepted.push_back(pfoECalToHadEnergy);
+            m_hCalEnergyAccepted.push_back(pfoHCalToHadEnergy);
             m_nEntriesHist++;
-            m_histogram->Fill(m_pfoHCalToHadEnergy,m_pfoECalToHadEnergy);
+            m_histogram->Fill(pfoHCalToHadEnergy,pfoECalToHadEnergy);
         }
     }
 }
@@ -265,15 +259,19 @@ void ChiSquaredMethod::CSM()
     float hCalToHadIntercept = std::numeric_limits<float>::max();
     float Chi2 = std::numeric_limits<float>::max();
 
-    for (unsigned int p = 0; p < 100; p++)
-    {
-        eCalToHadIntercept = (m_kineticEnergy * 0.75) + (m_kineticEnergy * 0.01 * p * 0.5);
+    unsigned int steps = static_cast<int>( 1.f / m_calibrationAccuracy );
+    float stepSize = m_trueEnergy * m_calibrationAccuracy;
+    float kineticEnergy = m_trueEnergy - 0.497672;
 
-        for (unsigned int q = 0; q < 100 ; q++)
+    for (unsigned int p = 0; p < steps; p++)
+    {
+        eCalToHadIntercept = (kineticEnergy * 0.5) + (stepSize * p );
+
+        for (unsigned int q = 0; q < steps ; q++)
         {
             Chi2 = 0;
 
-            hCalToHadIntercept = (m_kineticEnergy * 0.75) + (m_kineticEnergy * 0.01 * q * 0.5);
+            hCalToHadIntercept = (kineticEnergy * 0.5) + (stepSize * q );
 
             for (unsigned int j = 0; j < m_eCalEnergyAccepted.size() ; j++)
             {
@@ -298,16 +296,16 @@ void ChiSquaredMethod::CSM()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool ChiSquaredMethod::ThreeSigmaCut()
+bool ChiSquaredMethod::ThreeSigmaCut(float pfoECalToHadEnergy, float pfoHCalToHadEnergy)
 {
-    float idealHCalToHadIntercept = m_kineticEnergy;
-    float idealECalToHadIntercept = m_kineticEnergy;
+    float idealHCalToHadIntercept = m_trueEnergy - 0.497672; // Want to reconstruct kinetic energy
+    float idealECalToHadIntercept = m_trueEnergy - 0.497672; // Want to reconstruct kinetic energy
 
-    float pfoECalToHadEnergySigma = m_eCalToHadResolutionConstant * sqrt(m_pfoECalToHadEnergy);
-    float pfoHCalToHadEnergySigma = m_hCalToHadResolutionConstant * sqrt(m_pfoHCalToHadEnergy);
+    float pfoECalToHadEnergySigma = m_eCalToHadResolutionConstant * sqrt(pfoECalToHadEnergy);
+    float pfoHCalToHadEnergySigma = m_hCalToHadResolutionConstant * sqrt(pfoHCalToHadEnergy);
 
     // Formula for perpendicular distance of point m_pfoE/HCalToHad to ideal distribution
-    float perpDist = abs( ( (m_pfoHCalToHadEnergy * idealECalToHadIntercept) + (m_pfoECalToHadEnergy * idealHCalToHadIntercept) - (idealHCalToHadIntercept * idealECalToHadIntercept) ) / sqrt( (idealHCalToHadIntercept * idealHCalToHadIntercept) + (idealECalToHadIntercept * idealECalToHadIntercept) ) );
+    float perpDist = abs( ( (pfoHCalToHadEnergy * idealECalToHadIntercept) + (pfoECalToHadEnergy * idealHCalToHadIntercept) - (idealHCalToHadIntercept * idealECalToHadIntercept) ) / sqrt( (idealHCalToHadIntercept * idealHCalToHadIntercept) + (idealECalToHadIntercept * idealECalToHadIntercept) ) );
     float perpDistSigma = sqrt( ( pow (pfoHCalToHadEnergySigma * idealECalToHadIntercept, 2) + pow(pfoECalToHadEnergySigma * idealHCalToHadIntercept, 2) ) / ( pow(idealHCalToHadIntercept,2) + pow(idealECalToHadIntercept,2) ) );
 
     if ( perpDist <= 3 * perpDistSigma)
@@ -336,29 +334,33 @@ bool ParseCommandLine(int argc, char *argv[], ChiSquaredMethod &chiSquaredMethod
 {
     int c(0);
 
-    while (((c = getopt(argc, argv, "e:i:g:o:f")) != -1) || (argc == 1))
+    while (((c = getopt(argc, argv, "a:b:c:d:e:f")) != -1) || (argc == 1))
     {
         switch (c)
         {
-        case 'e':
-            chiSquaredMethod.m_trueEnergy = atof(optarg);
-            break;
-        case 'i':
+        case 'a':
             chiSquaredMethod.m_inputKaonLRootFiles = optarg;
             break;
-        case 'g':
-            chiSquaredMethod.m_numberHCalLayers = atoi(optarg);
+        case 'b':
+            chiSquaredMethod.m_trueEnergy = atof(optarg);
             break;
-        case 'o':
+        case 'c':
+            chiSquaredMethod.m_calibrationAccuracy = atof(optarg);
+            break;
+        case 'd':
             chiSquaredMethod.m_outputPath = optarg;
+            break;
+        case 'e':
+            chiSquaredMethod.m_numberHCalLayers = atoi(optarg);
             break;
         case 'f':
         default:
             std::cout << std::endl << "Calibrate " << std::endl
-                      << "    -e value  (mandatory, true energy of KaonL being used for calibration)" << std::endl
-                      << "    -i        (mandatory, input file name(s), can include wildcards if string is in quotes)" << std::endl
-                      << "    -g value  (mandatory, number of HCal layers in simulation, default 48)" << std::endl
-                      << "    -o value  (mandatory, output path to send results to)" << std::endl
+                      << "    -a        (mandatory, input file name(s), can include wildcards if string is in quotes)   " << std::endl
+                      << "    -b value  (mandatory, true energy of KaonL being used for calibration)                    " << std::endl
+                      << "    -c value  (optional, fractional accuracy to calibrate H/ECalToHad to, default 0.005)      " << std::endl
+                      << "    -d        (mandatory, output path to send results to)                                     " << std::endl
+                      << "    -e value  (mandatory, number of HCal layers in simulation, default 48)                    " << std::endl
                       << std::endl;
             return false;
         }

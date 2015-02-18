@@ -1,7 +1,7 @@
 /**
  *  @file   PandoraAnalysis/calibration/PandoraPFACalibrate_HadronicScale_TotalEnergyMethod.cc
  * 
- *  @brief  Calculate E/HCalToHadGeVCalibration using the total energy method on kaonL events
+ *  @brief  Total energy method.  Used for setting hadronic scale in PandoraPFA (ECalToHadGeVCalibration/HCalToHadGeVCalibration).
  * 
  *  $Log: $
  */
@@ -14,6 +14,7 @@
 #include "TFitResult.h"
 #include "TH1F.h"
 #include "TROOT.h"
+#include "TStyle.h"
 #include "TTree.h"
 
 #include <iostream>
@@ -43,82 +44,68 @@ public:
     */
     void Process();
 
-// Outputs
-    float               m_minRMS;                               ///< Narrowest standard deviation found by rescaling E/HCalToHad independantly
-    float               m_minRMSECalMultiplier;                 ///< Factor by which ECalToHad energy needs to be scaled by to produce narrowest standard deviation results
-    float               m_minRMSHCalMultiplier;                 ///< Factor by which HCalToHad energy needs to be scaled by to produce narrowest standard deviation results
-    int                 m_minRMSEvents;                         ///< Number of events in histogram with minimum RMS (different numbers pass 3sigma cut, so not constant)
+// Inputs Set By Parsing Command Line
+    float               m_trueEnergy;           ///< Total energy of calibration particle
+    std::string         m_inputKaonLRootFiles;  ///< Input root files - KaonL
+    int                 m_numberHCalLayers;     ///< Number of layers in the HCal
+    float               m_calibrationAccuracy;  ///< Fractional accuracy to calibrate H/ECalToHad to
+    std::string         m_outputPath;           ///< Output path to send plots to
+    float               m_fitPercentage;        ///< Percentage of data to fit Gaussian to. Percentage with narrowest range fitted
 
-// Non trivial setting on initialisation
-    float               m_trueEnergy;                           ///< Total energy of calibration particle
-    std::string         m_inputKaonLRootFiles;                  ///< Input root files for E/HCalToHad Calibration
-    std::string         m_outputPath;                           ///< Output path to send plots to
-    int                 m_numberHCalLayers;                     ///< Number of layers in the HCal
+// Outputs
+    float               m_minRMS;               ///< Narrowest standard deviation found by rescaling E/HCalToHad independantly
+    float               m_minRMSECalMultiplier; ///< Factor by which ECalToHad energy needs to be scaled by to produce narrowest standard deviation results
+    float               m_minRMSHCalMultiplier; ///< Factor by which HCalToHad energy needs to be scaled by to produce narrowest standard deviation results
+    int                 m_minRMSEvents;         ///< Number of events in histogram with minimum RMS (different numbers pass 3sigma cut, so not constant)
 
 private:
 
     /**
-     *  @brief  Initial coarse search for min RMS E/HCal multipliers to find min RMS (itter = 0.025)
+     *  @brief  Search for min RMS E/HCal multipliers to find min RMS
+     * 
+     *  @param eCalMultiplierGuess  : initial guess for the ECaltoHad energy rescale factor 
+     *  @param hCalMultiplierGuess  : initial guess for the HCaltoHad energy rescale factor 
     */
-    void CoarseSearch();
+    void Search(float eCalMultiplierGuess, float hCalMultiplierGuess);
 
     /**
-     *  @brief  Final fine search for min RMS E/HCal multipliers to find min RMS (itter = 0.01)
-    */
-    void FineSearch();
-
-    /**
-     *  @brief  Scan E/HCal multipliers in search of minimum RMS (2D cross param scan, 5 points cross chape step size m_itter)
+     *  @brief  Scan E/HCal multipliers in search of minimum RMS (2D cross param scan, 5 points cross shape step size m_iter)
     */
     void Itterator();
 
     /**
-     *  @brief  Does the point defined by m_pfoHCalToHadEnergy and m_pfoECalToHadEnergy fall within 3 sigme of the ideal distribution
+     *  @brief  Does the point defined by pfoHCalToHadEnergy and pfoECalToHadEnergy fall within 3 sigma of the ideal distribution
+     * 
+     *  @param pfoECalToHadEnergy  : Hadronic energy in ECal
+     *  @param pfoHCalToHadEnergy  : Hadronic energy in HCal
     */
-    bool ThreeSigmaCut();
+    bool ThreeSigmaCut(float pfoECalToHadEnergy, float pfoHCalToHadEnergy);
 
     /**
-     *  @brief  Sets m_fitRangeLow, m_fitRangeHigh and m_rMSFitRange based on m_fitPercentage using m_histogram
+     *  @brief  Sets m_fitRangeLow and m_fitRangeHigh based on m_fitPercentage using m_histogram
     */
     void RMSFitPercentageRange();
 
     /**
-     *  @brief  Performs a Gaussian fit to m_histogram and sets m_amplitude, m_mean, m_stdDev and m_chi2.  If m_plot on also plots data.
+     *  @brief  Performs a Gaussian fit to m_histogram and sets m_stdDev.  If m_plot on also plots data.
     */
     void Fit();
 
 // Non trivial setting on initialisation
-    float               m_kineticEnergy;                        ///< Kinetic energy of KaonL
-    float               m_fitPercentage;                        ///< Percentage of data to fit Gaussian to. Percentage with narrowest range fitted
     float               m_eCalToHadResolutionConstant;          ///< Single particel resolution stoichastic coefficient 0.55 default
     float               m_hCalToHadResolutionConstant;          ///< Single particel resolution stoichastic coefficient 0.55 default
+    float               m_iter;                                 ///< Step size for scanning E/HCalMultiplier space
 
 // Trivial setting on initialisation
-    float               m_pfoECalToHadEnergy;                   ///< Tree variable.  Hadronic energy in ECal.
-    float               m_pfoHCalToHadEnergy;                   ///< Tree variable.  Hadronic energy in HCal.
-    float               m_fineGranularityECalMultiplierGuess;   ///< Initial guess for ECal multiplier in FineSearch()
-    float               m_fineGranularityHCalMultiplierGuess;   ///< Initial guess for HCal multiplier in FineSearch()
-
-    float               m_itter;                                ///< Step size for scan E/HCalMultiplierGuess space.  0.025 in CoarseSearch() 0.01 in FineSearch()
+    TH1F               *m_histogram;                            ///< Histogram
+    bool                m_plot;                                 ///< Plot results of fit
     float               m_eCalMultiplierRangeMin;               ///< Lower edge of range of ECal multipliers to scan over
     float               m_hCalMultiplierRangeMin;               ///< Lower edge of range of HCal multipliers to scan over
     float               m_eCalMultiplierRangeMax;               ///< Upper edge of range of ECal multipliers to scan over
     float               m_hCalMultiplierRangeMax;               ///< Upper edge of range of HCal multipliers to scan over
-
-    TChain             *m_pTChain;                              ///< Chain of root files
-    TH1F               *m_histogram;                            ///< Histogram
     float               m_fitRangeLow;                          ///< Low fit edge of m_fitPercentage of data with min RMS
     float               m_fitRangeHigh;                         ///< High fit edge of m_fitPercentage of data with min RMS
-    float               m_rMSFitRange;                          ///< RMS of the m_fitPercentage data
-    int                 m_binNumber;                            ///< Number of bins on m_histogram
-    float               m_maxHistogramEnergy;                   ///< Max energy on m_histogram
-    bool                m_plot;                                 ///< Plot results of fit
-
-    float               m_amplitude;                            ///< Amplitude of Gaussian fit
-    float               m_mean;                                 ///< Mean of Gaussian fit
     float               m_stdDev;                               ///< Standard deviation of Gaussian fit
-    float               m_chi2;                                 ///< Chi squared of Gaussian fit
-    int                 m_nEventsHist;                          ///< Number of events in m_histogram
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -129,7 +116,7 @@ private:
  * 
  *  @param  argc argument count
  *  @param  argv argument vector
- *  @param  eCalDigitisation to receive the application parameters
+ *  @param  totalEnergyMethod to receive the application parameters
  * 
  *  @return success
  */
@@ -142,6 +129,9 @@ int main(int argc, char **argv)
     TApplication *pTApplication = NULL;
 
     gROOT->SetBatch();
+    gROOT->SetStyle("Plain");
+    gStyle->SetOptTitle(0);
+    gStyle->SetOptStat(0);
 
     try
     {
@@ -189,40 +179,28 @@ int main(int argc, char **argv)
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 TotalEnergyMethod::TotalEnergyMethod() :
+    m_trueEnergy(std::numeric_limits<float>::max()),
+    m_inputKaonLRootFiles(""),
+    m_numberHCalLayers(48),
+    m_calibrationAccuracy(0.005),
+    m_outputPath(""),
+    m_fitPercentage(90.f),
     m_minRMS(std::numeric_limits<float>::max()),
     m_minRMSECalMultiplier(std::numeric_limits<float>::max()),
     m_minRMSHCalMultiplier(std::numeric_limits<float>::max()),
     m_minRMSEvents(std::numeric_limits<int>::max()),
-    m_trueEnergy(std::numeric_limits<float>::max()),
-    m_inputKaonLRootFiles(""),
-    m_outputPath(""),
-    m_numberHCalLayers(48),
-    m_kineticEnergy(std::numeric_limits<float>::max()),
-    m_fitPercentage(90.f),
     m_eCalToHadResolutionConstant(0.55),
     m_hCalToHadResolutionConstant(0.55),
-    m_pfoECalToHadEnergy(std::numeric_limits<float>::max()),
-    m_pfoHCalToHadEnergy(std::numeric_limits<float>::max()),
-    m_fineGranularityECalMultiplierGuess(std::numeric_limits<float>::max()),
-    m_fineGranularityHCalMultiplierGuess(std::numeric_limits<float>::max()),
-    m_itter(std::numeric_limits<float>::max()),
+    m_iter(0.05),
+    m_histogram(NULL),
+    m_plot(false),
     m_eCalMultiplierRangeMin(std::numeric_limits<float>::max()),
     m_hCalMultiplierRangeMin(std::numeric_limits<float>::max()),
     m_eCalMultiplierRangeMax(std::numeric_limits<float>::max()),
     m_hCalMultiplierRangeMax(std::numeric_limits<float>::max()),
-    m_pTChain(NULL),
-    m_histogram(NULL),
     m_fitRangeLow(std::numeric_limits<float>::max()),
     m_fitRangeHigh(std::numeric_limits<float>::max()),
-    m_rMSFitRange(std::numeric_limits<float>::max()),
-    m_binNumber(100),
-    m_maxHistogramEnergy(std::numeric_limits<float>::max()),
-    m_plot(false),
-    m_amplitude(std::numeric_limits<float>::max()),
-    m_mean(std::numeric_limits<float>::max()),
-    m_stdDev(std::numeric_limits<float>::max()),
-    m_chi2(std::numeric_limits<float>::max()),
-    m_nEventsHist(0)
+    m_stdDev(std::numeric_limits<float>::max())
 {
 }
 
@@ -236,127 +214,62 @@ TotalEnergyMethod::~TotalEnergyMethod()
 
 void TotalEnergyMethod::Process()
 {
-    m_maxHistogramEnergy = 2.5 * m_trueEnergy;
-    m_kineticEnergy = m_trueEnergy - 0.497672;
-    this->CoarseSearch();
-    this->FineSearch();
+    m_iter = 0.025;
+    this->Search(1.0,1.0);
+    m_iter = 0.01;
+    this->Search(m_minRMSECalMultiplier,m_minRMSHCalMultiplier);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void TotalEnergyMethod::CoarseSearch()
+void TotalEnergyMethod::Search(float eCalMultiplierGuess, float hCalMultiplierGuess)
 {
-    m_itter = 0.025;
-
-    float eCalMultiplierGuess = 1.0;
-    float hCalMultiplierGuess = 1.0;
-
-    m_eCalMultiplierRangeMin = eCalMultiplierGuess - m_itter;
-    m_hCalMultiplierRangeMin = hCalMultiplierGuess - m_itter;
-    m_eCalMultiplierRangeMax = eCalMultiplierGuess + m_itter;
-    m_hCalMultiplierRangeMax = hCalMultiplierGuess + m_itter;
+    m_eCalMultiplierRangeMin = eCalMultiplierGuess - m_iter;
+    m_hCalMultiplierRangeMin = hCalMultiplierGuess - m_iter;
+    m_eCalMultiplierRangeMax = eCalMultiplierGuess + m_iter;
+    m_hCalMultiplierRangeMax = hCalMultiplierGuess + m_iter;
 
     Itterator();
 
     // 0 is false 1 is true
-    Bool_t eCalGuessBig = std::fabs(m_minRMSECalMultiplier - (eCalMultiplierGuess - m_itter)) < m_itter/2.0;
-    Bool_t eCalGuessSmall = std::fabs(m_minRMSECalMultiplier - (eCalMultiplierGuess + m_itter)) < m_itter/2.0;
-    Bool_t hCalGuessBig = std::fabs(m_minRMSHCalMultiplier - (hCalMultiplierGuess - m_itter)) < m_itter/2.0;
-    Bool_t hCalGuessSmall = std::fabs(m_minRMSHCalMultiplier - (hCalMultiplierGuess + m_itter)) < m_itter/2.0;
+    Bool_t eCalGuessBig = std::fabs(m_minRMSECalMultiplier - (eCalMultiplierGuess - m_iter)) < m_iter/2.0;
+    Bool_t eCalGuessSmall = std::fabs(m_minRMSECalMultiplier - (eCalMultiplierGuess + m_iter)) < m_iter/2.0;
+    Bool_t hCalGuessBig = std::fabs(m_minRMSHCalMultiplier - (hCalMultiplierGuess - m_iter)) < m_iter/2.0;
+    Bool_t hCalGuessSmall = std::fabs(m_minRMSHCalMultiplier - (hCalMultiplierGuess + m_iter)) < m_iter/2.0;
     
     while (eCalGuessBig == 1 || eCalGuessSmall == 1 || hCalGuessBig == 1 || hCalGuessSmall == 1)
     {
         if (eCalGuessBig == 1)
         {
-            eCalMultiplierGuess = eCalMultiplierGuess - m_itter;
+            eCalMultiplierGuess = eCalMultiplierGuess - m_iter;
         }
 
         else if (eCalGuessSmall == 1)
         {
-            eCalMultiplierGuess = eCalMultiplierGuess + m_itter;
+            eCalMultiplierGuess = eCalMultiplierGuess + m_iter;
         }
 
         else if (hCalGuessBig == 1)
         {
-            hCalMultiplierGuess = hCalMultiplierGuess - m_itter;
+            hCalMultiplierGuess = hCalMultiplierGuess - m_iter;
         }
 
         else if (hCalGuessSmall == 1)
         {
-            hCalMultiplierGuess = hCalMultiplierGuess + m_itter;
+            hCalMultiplierGuess = hCalMultiplierGuess + m_iter;
         }
 
-        m_eCalMultiplierRangeMin = eCalMultiplierGuess - m_itter;
-        m_hCalMultiplierRangeMin = hCalMultiplierGuess - m_itter;
-        m_eCalMultiplierRangeMax = eCalMultiplierGuess + m_itter;
-        m_hCalMultiplierRangeMax = hCalMultiplierGuess + m_itter;
+        m_eCalMultiplierRangeMin = eCalMultiplierGuess - m_iter;
+        m_hCalMultiplierRangeMin = hCalMultiplierGuess - m_iter;
+        m_eCalMultiplierRangeMax = eCalMultiplierGuess + m_iter;
+        m_hCalMultiplierRangeMax = hCalMultiplierGuess + m_iter;
 
         Itterator();
 
-        eCalGuessBig = std::fabs(m_minRMSECalMultiplier - (eCalMultiplierGuess - m_itter)) < m_itter/2.0;
-        eCalGuessSmall = std::fabs(m_minRMSECalMultiplier - (eCalMultiplierGuess + m_itter)) < m_itter/2.0;
-        hCalGuessBig = std::fabs(m_minRMSHCalMultiplier - (hCalMultiplierGuess - m_itter)) < m_itter/2.0;
-        hCalGuessSmall = std::fabs(m_minRMSHCalMultiplier - (hCalMultiplierGuess + m_itter)) < m_itter/2.0;
-    }
-    m_fineGranularityECalMultiplierGuess = m_minRMSECalMultiplier;
-    m_fineGranularityHCalMultiplierGuess = m_minRMSHCalMultiplier;
-}
-
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-void TotalEnergyMethod::FineSearch()
-{
-    m_itter = 0.01;
-
-    float fineGranularityECalMultiplierGuess = m_fineGranularityECalMultiplierGuess;
-    float fineGranularityHCalMultiplierGuess = m_fineGranularityHCalMultiplierGuess;
-
-    m_eCalMultiplierRangeMin = fineGranularityECalMultiplierGuess - m_itter;
-    m_hCalMultiplierRangeMin = fineGranularityHCalMultiplierGuess - m_itter;
-    m_eCalMultiplierRangeMax = fineGranularityECalMultiplierGuess + m_itter;
-    m_hCalMultiplierRangeMax = fineGranularityHCalMultiplierGuess + m_itter;
-
-    Itterator();
-
-    Bool_t eCalGuessBig = std::fabs(m_minRMSECalMultiplier - (fineGranularityECalMultiplierGuess - m_itter)) < m_itter/2.0;
-    Bool_t eCalGuessSmall = std::fabs(m_minRMSECalMultiplier - (fineGranularityECalMultiplierGuess + m_itter)) < m_itter/2.0;
-    Bool_t hCalGuessBig = std::fabs(m_minRMSHCalMultiplier - (fineGranularityHCalMultiplierGuess - m_itter)) < m_itter/2.0;
-    Bool_t hCalGuessSmall = std::fabs(m_minRMSHCalMultiplier - (fineGranularityHCalMultiplierGuess + m_itter)) < m_itter/2.0;
-
-    while (eCalGuessBig == 1 || eCalGuessSmall == 1 || hCalGuessBig == 1 || hCalGuessSmall == 1)
-    {
-        if (eCalGuessBig == 1)
-        {
-            fineGranularityECalMultiplierGuess = fineGranularityECalMultiplierGuess - m_itter;
-        }
-
-        else if (eCalGuessSmall == 1)
-        {
-            fineGranularityECalMultiplierGuess = fineGranularityECalMultiplierGuess + m_itter;
-        }
-
-        else if (hCalGuessBig == 1)
-        {
-            fineGranularityHCalMultiplierGuess = fineGranularityHCalMultiplierGuess - m_itter;
-        }
-
-        else if (hCalGuessSmall == 1)
-        {
-            fineGranularityHCalMultiplierGuess = fineGranularityHCalMultiplierGuess + m_itter;
-        }
-
-        m_eCalMultiplierRangeMin = fineGranularityECalMultiplierGuess - m_itter;
-        m_hCalMultiplierRangeMin = fineGranularityHCalMultiplierGuess - m_itter;
-        m_eCalMultiplierRangeMax = fineGranularityECalMultiplierGuess + m_itter;
-        m_hCalMultiplierRangeMax = fineGranularityHCalMultiplierGuess + m_itter;
-
-        Itterator();
-
-        eCalGuessBig = std::fabs(m_minRMSECalMultiplier - (fineGranularityECalMultiplierGuess - m_itter)) < m_itter/2.0;
-        eCalGuessSmall = std::fabs(m_minRMSECalMultiplier - (fineGranularityECalMultiplierGuess + m_itter)) < m_itter/2.0;
-        hCalGuessBig = std::fabs(m_minRMSHCalMultiplier - (fineGranularityHCalMultiplierGuess - m_itter)) < m_itter/2.0;
-        hCalGuessSmall = std::fabs(m_minRMSHCalMultiplier - (fineGranularityHCalMultiplierGuess + m_itter)) < m_itter/2.0;
+        eCalGuessBig = std::fabs(m_minRMSECalMultiplier - (eCalMultiplierGuess - m_iter)) < m_iter/2.0;
+        eCalGuessSmall = std::fabs(m_minRMSECalMultiplier - (eCalMultiplierGuess + m_iter)) < m_iter/2.0;
+        hCalGuessBig = std::fabs(m_minRMSHCalMultiplier - (hCalMultiplierGuess - m_iter)) < m_iter/2.0;
+        hCalGuessSmall = std::fabs(m_minRMSHCalMultiplier - (hCalMultiplierGuess + m_iter)) < m_iter/2.0;
     }
 }
 
@@ -364,39 +277,39 @@ void TotalEnergyMethod::FineSearch()
 
 void TotalEnergyMethod::Itterator()
 {
-    m_pTChain = NULL;
-    m_pTChain = new TChain("PfoAnalysisTree");
-    m_pTChain->Add(m_inputKaonLRootFiles.c_str());
+    TChain *pTChain = NULL;
+    pTChain = new TChain("PfoAnalysisTree");
+    pTChain->Add(m_inputKaonLRootFiles.c_str());
 
-    int nPfoTargetsTotal;
-    int nPfoTargetsNeutralHadrons;
-    int nPfosTotal;
-    int nPfosNeutralHadrons;
-    int pfoMinHCalLayerToEdge;
-    const unsigned int nEntries = m_pTChain->GetEntries();
+    int nPfoTargetsTotal, nPfoTargetsNeutralHadrons, nPfosTotal, nPfosNeutralHadrons, pfoMinHCalLayerToEdge;
+    float pfoECalToHadEnergy, pfoHCalToHadEnergy;
+    const unsigned int nEntries = pTChain->GetEntries();
 
-    m_pTChain->SetBranchAddress("pfoECalToHadEnergy",&m_pfoECalToHadEnergy);
-    m_pTChain->SetBranchAddress("pfoHCalToHadEnergy",&m_pfoHCalToHadEnergy);
-    m_pTChain->SetBranchAddress("nPfoTargetsTotal",&nPfoTargetsTotal);
-    m_pTChain->SetBranchAddress("nPfoTargetsNeutralHadrons",&nPfoTargetsNeutralHadrons);
-    m_pTChain->SetBranchAddress("nPfosTotal",&nPfosTotal);
-    m_pTChain->SetBranchAddress("nPfosNeutralHadrons",&nPfosNeutralHadrons);
-    m_pTChain->SetBranchAddress("pfoMinHCalLayerToEdge",&pfoMinHCalLayerToEdge);
+    pTChain->SetBranchAddress("pfoECalToHadEnergy",&pfoECalToHadEnergy);
+    pTChain->SetBranchAddress("pfoHCalToHadEnergy",&pfoHCalToHadEnergy);
+    pTChain->SetBranchAddress("nPfoTargetsTotal",&nPfoTargetsTotal);
+    pTChain->SetBranchAddress("nPfoTargetsNeutralHadrons",&nPfoTargetsNeutralHadrons);
+    pTChain->SetBranchAddress("nPfosTotal",&nPfosTotal);
+    pTChain->SetBranchAddress("nPfosNeutralHadrons",&nPfosNeutralHadrons);
+    pTChain->SetBranchAddress("pfoMinHCalLayerToEdge",&pfoMinHCalLayerToEdge);
+
+    int containedLayerExclusion = ceil(m_numberHCalLayers * 0.1);
+    int binNumber = static_cast<int>( 2.5 / m_calibrationAccuracy );
+    float maxHistogramEnergy = 2.5 * m_trueEnergy;
 
     float eCalMultiplierAverage = (m_eCalMultiplierRangeMin + m_eCalMultiplierRangeMax)/2.0; 
 
-    int containedLayerExclusion = ceil(m_numberHCalLayers * 0.1);
-
-    for (float hCalMultiplier = m_hCalMultiplierRangeMin; hCalMultiplier <= m_hCalMultiplierRangeMax; hCalMultiplier+=m_itter)
+    for (float hCalMultiplier = m_hCalMultiplierRangeMin; hCalMultiplier <= m_hCalMultiplierRangeMax; hCalMultiplier+=m_iter)
     {
-        m_histogram = new TH1F("KaonL Total Energy Histogram", "KaonL Total Energy Histogram", m_binNumber, 0, m_maxHistogramEnergy);
+        m_histogram = new TH1F("KaonL Total Energy Histogram", "KaonL Total Energy Histogram", binNumber, 0, maxHistogramEnergy);
 
         for (unsigned int k = 0; k < nEntries; k++) 
         {
-            m_pTChain->GetEntry(k);
+            pTChain->GetEntry(k);
 
-            if (ThreeSigmaCut() && 1 == nPfoTargetsTotal && 1 == nPfoTargetsNeutralHadrons && 1 == nPfosTotal && 1 == nPfosNeutralHadrons && containedLayerExclusion < pfoMinHCalLayerToEdge)
-                m_histogram->Fill((eCalMultiplierAverage*m_pfoECalToHadEnergy) + (hCalMultiplier*m_pfoHCalToHadEnergy));
+            if (ThreeSigmaCut(pfoECalToHadEnergy,pfoHCalToHadEnergy) && 1 == nPfoTargetsTotal && 1 == nPfoTargetsNeutralHadrons 
+                && 1 == nPfosTotal && 1 == nPfosNeutralHadrons && containedLayerExclusion < pfoMinHCalLayerToEdge)
+                m_histogram->Fill((eCalMultiplierAverage*pfoECalToHadEnergy) + (hCalMultiplier*pfoHCalToHadEnergy));
         }
 
         RMSFitPercentageRange();
@@ -418,17 +331,18 @@ void TotalEnergyMethod::Itterator()
 
     float hCalMultiplierAverage = (m_hCalMultiplierRangeMin + m_hCalMultiplierRangeMax)/2.0; 
 
-// m_itter is 2*m_itter as hCalMultiplierAverage and eCalMultiplierAverage covered in first loop
-    for (float eCalMultiplier = m_eCalMultiplierRangeMin; eCalMultiplier <= m_eCalMultiplierRangeMax; eCalMultiplier+=(2*m_itter))
+    // m_iter is 2*m_iter as hCalMultiplierAverage and eCalMultiplierAverage covered in first loop
+    for (float eCalMultiplier = m_eCalMultiplierRangeMin; eCalMultiplier <= m_eCalMultiplierRangeMax; eCalMultiplier+=(2*m_iter))
     {
-        m_histogram = new TH1F("KaonL Total Energy Histogram", "KaonL Total Energy Histogram", m_binNumber, 0, m_maxHistogramEnergy);
+        m_histogram = new TH1F("KaonL Total Energy Histogram", "KaonL Total Energy Histogram", binNumber, 0, maxHistogramEnergy);
         
         for (unsigned int k = 0; k < nEntries ; k++) 
         {
-            m_pTChain->GetEntry(k);
+            pTChain->GetEntry(k);
 
-            if (ThreeSigmaCut() && 1 == nPfoTargetsTotal && 1 == nPfoTargetsNeutralHadrons && 1 == nPfosTotal && 1 == nPfosNeutralHadrons && containedLayerExclusion < pfoMinHCalLayerToEdge)
-                m_histogram->Fill((eCalMultiplier*m_pfoECalToHadEnergy) + (hCalMultiplierAverage*m_pfoHCalToHadEnergy));
+            if (ThreeSigmaCut(pfoECalToHadEnergy,pfoHCalToHadEnergy) && 1 == nPfoTargetsTotal && 1 == nPfoTargetsNeutralHadrons
+                && 1 == nPfosTotal && 1 == nPfosNeutralHadrons && containedLayerExclusion < pfoMinHCalLayerToEdge)
+                m_histogram->Fill((eCalMultiplier*pfoECalToHadEnergy) + (hCalMultiplierAverage*pfoHCalToHadEnergy));
         }
 
         RMSFitPercentageRange();
@@ -451,16 +365,16 @@ void TotalEnergyMethod::Itterator()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool TotalEnergyMethod::ThreeSigmaCut()
+bool TotalEnergyMethod::ThreeSigmaCut(float pfoECalToHadEnergy, float pfoHCalToHadEnergy)
 {
-    float idealHCalToHadIntercept = m_kineticEnergy;
-    float idealECalToHadIntercept = m_kineticEnergy;
+    float idealHCalToHadIntercept = m_trueEnergy - 0.497672; // Want to reconstruct kinetic energy
+    float idealECalToHadIntercept = m_trueEnergy - 0.497672; // Want to reconstruct kinetic energy
 
-    float pfoECalToHadEnergySigma = m_eCalToHadResolutionConstant * sqrt(m_pfoECalToHadEnergy);
-    float pfoHCalToHadEnergySigma = m_hCalToHadResolutionConstant * sqrt(m_pfoHCalToHadEnergy);
+    float pfoECalToHadEnergySigma = m_eCalToHadResolutionConstant * sqrt(pfoECalToHadEnergy);
+    float pfoHCalToHadEnergySigma = m_hCalToHadResolutionConstant * sqrt(pfoHCalToHadEnergy);
 
     // Formula for perpendicular distance of point m_pfoE/HCalToHad to ideal distribution
-    float perpDist = abs( ( (m_pfoHCalToHadEnergy * idealECalToHadIntercept) + (m_pfoECalToHadEnergy * idealHCalToHadIntercept) - (idealHCalToHadIntercept * idealECalToHadIntercept) ) / sqrt( (idealHCalToHadIntercept * idealHCalToHadIntercept) + (idealECalToHadIntercept * idealECalToHadIntercept) ) );
+    float perpDist = abs( ( (pfoHCalToHadEnergy * idealECalToHadIntercept) + (pfoECalToHadEnergy * idealHCalToHadIntercept) - (idealHCalToHadIntercept * idealECalToHadIntercept) ) / sqrt( (idealHCalToHadIntercept * idealHCalToHadIntercept) + (idealECalToHadIntercept * idealECalToHadIntercept) ) );
     float perpDistSigma = sqrt( ( pow (pfoHCalToHadEnergySigma * idealECalToHadIntercept, 2) + pow(pfoECalToHadEnergySigma * idealHCalToHadIntercept, 2) ) / ( pow(idealHCalToHadIntercept,2) + pow(idealECalToHadIntercept,2) ) );
 
     if ( perpDist <= 3 * perpDistSigma)
@@ -568,9 +482,7 @@ void TotalEnergyMethod::RMSFitPercentageRange()
             m_fitRangeHigh=m_histogram->GetBinLowEdge(iend) + (0.5 * m_histogram->GetBinWidth(iend));
         }
     }
-    
-    m_rMSFitRange = rmsmin;
-    
+
     std::cout << m_histogram->GetName() << " (" << m_histogram->GetEntries() << " entries), rawrms: " << rawRms << ", rmsx: " << rmsmin
               << " (" << low << "-" << high << "), low_fit and high_fit " << " (" << m_fitRangeLow << "-" << m_fitRangeHigh 
               << "), << mean: " << mean << std::endl;
@@ -603,10 +515,6 @@ void TotalEnergyMethod::Fit()
             bool isValidFit = pTFitResultPtr->IsValid();
             int fitQuality = pTFitResultPtr->CovMatrixStatus();
             int count = 0;
-
-            //std::cout << "isValidFit          :" << isValidFit << std::endl;
-            //std::cout << "fitQuality          :" << fitQuality << std::endl;
-            //std::cout << "Count               :" << count << std::endl;
 
             // While loop until fit converges
             while(1 != isValidFit || 3 != fitQuality || gaussianFitFunc->GetParameter(1) < m_fitRangeLow || gaussianFitFunc->GetParameter(1) > m_fitRangeHigh)
@@ -641,18 +549,11 @@ void TotalEnergyMethod::Fit()
                 fitQuality = pTFitResultPtr->CovMatrixStatus();
                 count++;
 
-                //std::cout << "isValidFit          :" << isValidFit << std::endl;
-                //std::cout << "fitQuality          :" << fitQuality << std::endl;
-                //std::cout << "Count               :" << count << std::endl;
-
                 if (count > 1000)
                     throw std::runtime_error("Fitting attempts exceeding maximum limit (1000).");
             }
 
-            m_amplitude = gaussianFitFunc->GetParameter(0);
-            m_mean = gaussianFitFunc->GetParameter(1);
             m_stdDev = std::pow(gaussianFitFunc->GetParameter(2),-0.5);
-            m_chi2 = gaussianFitFunc->GetChisquare();
 
             if (m_plot)
             {
@@ -689,33 +590,57 @@ void TotalEnergyMethod::Fit()
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+
+// Inputs Set By Parsing Command Line
+    float               m_trueEnergy;           ///< Total energy of calibration particle
+    std::string         m_inputKaonLRootFiles;  ///< Input root files - KaonL
+    int                 m_numberHCalLayers;     ///< Number of layers in the HCal
+    float               m_calibrationAccuracy;  ///< Fractional accuracy to calibrate H/ECalToHad to
+    std::string         m_outputPath;           ///< Output path to send plots to
+    float               m_fitPercentage;        ///< Percentage of data to fit Gaussian to. Percentage with narrowest range fitted
+
+// Outputs
+    float               m_minRMS;               ///< Narrowest standard deviation found by rescaling E/HCalToHad independantly
+    float               m_minRMSECalMultiplier; ///< Factor by which ECalToHad energy needs to be scaled by to produce narrowest standard deviation results
+    float               m_minRMSHCalMultiplier; ///< Factor by which HCalToHad energy needs to be scaled by to produce narrowest standard deviation results
+    int                 m_minRMSEvents;         ///< Number of events in histogram with minimum RMS (different numbers pass 3sigma cut, so not constant)
+
+
 bool ParseCommandLine(int argc, char *argv[], TotalEnergyMethod &totalEnergyMethod)
 {
     int c(0);
 
-    while (((c = getopt(argc, argv, "e:i:g:o:f")) != -1) || (argc == 1))
+    while (((c = getopt(argc, argv, "a:b:c:d:e:f:g")) != -1) || (argc == 1))
     {
         switch (c)
         {
-        case 'e':
-            totalEnergyMethod.m_trueEnergy = atof(optarg);
-            break;
-        case 'i':
+        case 'a':
             totalEnergyMethod.m_inputKaonLRootFiles = optarg;
             break;
-        case 'g':
-            totalEnergyMethod.m_numberHCalLayers = atoi(optarg);
+        case 'b':
+            totalEnergyMethod.m_trueEnergy = atof(optarg);
             break;
-        case 'o':
+        case 'c':
+            totalEnergyMethod.m_calibrationAccuracy = atof(optarg);
+            break;
+        case 'd':
             totalEnergyMethod.m_outputPath = optarg;
             break;
+        case 'e':
+            totalEnergyMethod.m_fitPercentage = atof(optarg);
+            break;
         case 'f':
+            totalEnergyMethod.m_numberHCalLayers = atoi(optarg);
+            break;
+        case 'g':
         default:
             std::cout << std::endl << "Calibrate " << std::endl
-                      << "    -e value  (mandatory, true energy of KaonL being used for calibration)" << std::endl
-                      << "    -i        (mandatory, input file name(s), can include wildcards if string is in quotes)" << std::endl
-                      << "    -g value  (mandatory, number of HCal layers in simulation, default 48)" << std::endl
-                      << "    -o value  (mandatory, output path to send results to)" << std::endl
+                      << "    -a        (mandatory, input file name(s), can include wildcards if string is in quotes)           " << std::endl
+                      << "    -b value  (mandatory, true energy of KaonL being used for calibration)                            " << std::endl
+                      << "    -c value  (optional, fractional accuracy to calibrate H/ECalToHad to, default 0.005)              " << std::endl
+                      << "    -d        (mandatory, output path to send results to)                                             " << std::endl
+                      << "    -e value  (optional, fit percentage used for calibration, default 90% of data with narrowest rms) " << std::endl
+                      << "    -f value  (mandatory, number of HCal layers in simulation, default 48)                            " << std::endl
                       << std::endl;
             return false;
         }
