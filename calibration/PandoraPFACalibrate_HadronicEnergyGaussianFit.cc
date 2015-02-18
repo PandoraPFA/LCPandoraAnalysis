@@ -1,7 +1,7 @@
 /**
  *  @file   PandoraAnalysis/calibration/PandoraPFACalibrate_HadronicEnergyGaussianFit.cc
  * 
- *  @brief  Gaussian fit to the hadronic PFO energy for kaonL events, these are used for NLCs
+ *  @brief  Gaussian fit to the hadronic PFO energy for kaonL events.  These are used in application of non linearity corrections.
  * 
  *  $Log: $
  */
@@ -43,20 +43,21 @@ public:
     */
     void Process();
 
+// Inputs Set By Parsing Command Line
+    std::string m_inputKaonLRootFiles;  ///< Input root files - KaonL
+    float       m_trueEnergy;           ///< True energy of particles being simulated
+    float       m_calibrationAccuracy;  ///< Fractional accuracy target for reconstructed energy
+    std::string m_outputPath;           ///< Output path to send plots to
+    float       m_fitPercentage;        ///< Percentage of data to fit Gaussian to. Percentage with narrowest range fitted
+    int         m_numberHCalLayers;     ///< Number of layers in the HCal
+    int         m_nLC;                  ///< Non Linearity Corrections (1==On,0==Off)
+
 // Outputs
     float       m_amplitude;            ///< Amplitude of Gaussian fit
     float       m_mean;                 ///< Mean of Gaussian fit
     float       m_stdDev;               ///< Standard deviation of Gaussian fit
-    float       m_chi2;                 ///< Chi squared of Gaussian fit
     int         m_nEventsECalHist;      ///< Number of events in m_histogram
-    int         m_nLC;                  ///< Non Linearity Corrections (1==On,0==Off)
 
-// Non trivial setting on initialisation
-    float       m_trueEnergy;           ///< True energy of particles being simulated
-    std::string m_inputKaonLRootFiles;  ///< Input root files for ECal digitisatio
-    std::string m_outputPath;           ///< Output path to send plots to
-    float       m_fitPercentage;        ///< Percentage of data to fit Gaussian to. Percentage with narrowest range fitted
-    int         m_numberHCalLayers;     ///< Number of layers in the HCal
 
 private:
     /**
@@ -169,18 +170,35 @@ int main(int argc, char **argv)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
+// Inputs Set By Parsing Command Line
+    std::string m_inputKaonLRootFiles;  ///< Input root files - KaonL
+    float       m_trueEnergy;           ///< True energy of particles being simulated
+    float       m_calibrationAccuracy;  ///< Fractional accuracy target for reconstructed energy
+    std::string m_outputPath;           ///< Output path to send plots to
+    float       m_fitPercentage;        ///< Percentage of data to fit Gaussian to. Percentage with narrowest range fitted
+    int         m_numberHCalLayers;     ///< Number of layers in the HCal
+    int         m_nLC;                  ///< Non Linearity Corrections (1==On,0==Off)
+
+// Outputs
+    float       m_amplitude;            ///< Amplitude of Gaussian fit
+    float       m_mean;                 ///< Mean of Gaussian fit
+    float       m_stdDev;               ///< Standard deviation of Gaussian fit
+    int         m_nEventsECalHist;      ///< Number of events in m_histogram
 
 HadronicEnergyGaussianFit::HadronicEnergyGaussianFit() :
-    m_amplitude(std::numeric_limits<float>::max()),
-    m_mean(std::numeric_limits<float>::max()),
-    m_stdDev(std::numeric_limits<float>::max()),
-    m_chi2(std::numeric_limits<float>::max()),
-    m_nEventsECalHist(std::numeric_limits<int>::max()),
-    m_nLC(std::numeric_limits<int>::max()),
+    m_inputKaonLRootFiles(""),
     m_trueEnergy(std::numeric_limits<float>::max()),
+    m_calibrationAccuracy(0.01),
     m_outputPath(""),
     m_fitPercentage(90.f),
     m_numberHCalLayers(48),
+    m_nLC(std::numeric_limits<int>::max()),
+
+    m_amplitude(std::numeric_limits<float>::max()),
+    m_mean(std::numeric_limits<float>::max()),
+    m_stdDev(std::numeric_limits<float>::max()),
+    m_nEventsECalHist(std::numeric_limits<int>::max()),
+
     m_pTChain(NULL),
     m_histogram(NULL),
     m_fitRangeLow(std::numeric_limits<float>::max()),
@@ -214,13 +232,8 @@ void HadronicEnergyGaussianFit::Process()
 
 void HadronicEnergyGaussianFit::PrepareHistogram()
 {
-    float   pfoEnergyTotal;
-    int     nPfoTargetsTotal;
-    int     nPfoTargetsNeutralHadrons;
-    int     nPfosTotal;
-    int     nPfosNeutralHadrons;
-    int     pfoMinHCalLayerToEdge;
-    float   binWidth = m_trueEnergy / 100.0;
+    float pfoEnergyTotal;
+    int nPfoTargetsTotal, nPfoTargetsNeutralHadrons, nPfosTotal, nPfosNeutralHadrons, pfoMinHCalLayerToEdge;
 
     m_pTChain->SetBranchAddress("pfoEnergyTotal",&pfoEnergyTotal);
     m_pTChain->SetBranchAddress("nPfoTargetsTotal", &nPfoTargetsTotal);
@@ -241,7 +254,6 @@ void HadronicEnergyGaussianFit::PrepareHistogram()
                 m_maxHistogramEnergy = pfoEnergyTotal;
         }
     }
-    m_binNumber = static_cast<int>( (m_maxHistogramEnergy + 0.5) / binWidth );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -263,7 +275,9 @@ void HadronicEnergyGaussianFit::CreateHistogram()
         Title = TString::Format("%i",int(m_trueEnergy + 0.5)) + " GeV KaonL PfoTotalEnergy Histogram";
     }
 
-    m_histogram = new TH1F(Name.c_str(), Title.c_str(), m_binNumber, 0., m_maxHistogramEnergy);
+    int binNumber = static_cast<int>( m_maxHistogramEnergy / ( m_calibrationAccuracy * m_trueEnergy ) );
+
+    m_histogram = new TH1F(Name.c_str(), Title.c_str(), binNumber, 0., m_maxHistogramEnergy);
     m_histogram->GetXaxis()->SetTitle("Calorimeter Hit Energy / GeV");
     m_histogram->GetYaxis()->SetTitle("Entries");
 }
@@ -272,12 +286,8 @@ void HadronicEnergyGaussianFit::CreateHistogram()
 
 void HadronicEnergyGaussianFit::FillHistogram()
 {
-    float   pfoEnergyTotal;
-    int     nPfoTargetsTotal;
-    int     nPfoTargetsNeutralHadrons;
-    int     nPfosTotal;
-    int     nPfosNeutralHadrons;
-    int     pfoMinHCalLayerToEdge;
+    float pfoEnergyTotal;
+    int nPfoTargetsTotal, nPfoTargetsNeutralHadrons, nPfosTotal, nPfosNeutralHadrons, pfoMinHCalLayerToEdge;
 
     m_pTChain->SetBranchAddress("pfoEnergyTotal",&pfoEnergyTotal);
     m_pTChain->SetBranchAddress("nPfoTargetsTotal", &nPfoTargetsTotal);
@@ -485,7 +495,6 @@ void HadronicEnergyGaussianFit::Fit()
             m_amplitude = Gaussian_Fit_Func->GetParameter(0);
             m_mean = Gaussian_Fit_Func->GetParameter(1);
             m_stdDev = std::pow(Gaussian_Fit_Func->GetParameter(2),-0.5);
-            m_chi2 = Gaussian_Fit_Func->GetChisquare();
 
             std::string canvasName = "KaonLPFOEnergyPlots";
             std::string canvasTitle = "KaonL PFO Energy Plots";
@@ -534,37 +543,41 @@ bool ParseCommandLine(int argc, char *argv[], HadronicEnergyGaussianFit &hadroni
 {
     int c(0);
 
-    while (((c = getopt(argc, argv, "e:i:o:c:g:f:h")) != -1) || (argc == 1))
+    while (((c = getopt(argc, argv, "a:b:c:d:e:f:g:i")) != -1) || (argc == 1))
     {
         switch (c)
         {
-        case 'e':
-            hadronicEnergyGaussianFit.m_trueEnergy = atof(optarg);
-            break;
-        case 'i':
+        case 'a':
             hadronicEnergyGaussianFit.m_inputKaonLRootFiles = optarg;
             break;
-        case 'o':
-            hadronicEnergyGaussianFit.m_outputPath = optarg;
+        case 'b':
+            hadronicEnergyGaussianFit.m_trueEnergy = atof(optarg);
             break;
         case 'c':
-            hadronicEnergyGaussianFit.m_nLC = atoi(optarg);
+            hadronicEnergyGaussianFit.m_calibrationAccuracy = atof(optarg);
             break;
-        case 'g':
-            hadronicEnergyGaussianFit.m_numberHCalLayers = atoi(optarg);
+        case 'd':
+            hadronicEnergyGaussianFit.m_outputPath = optarg;
             break;
-        case 'f':
+        case 'e':
             hadronicEnergyGaussianFit.m_fitPercentage = atof(optarg);
             break;
-        case 'h':
+        case 'f':
+            hadronicEnergyGaussianFit.m_numberHCalLayers = atoi(optarg);
+            break;
+        case 'g':
+            hadronicEnergyGaussianFit.m_nLC = atoi(optarg);
+            break;
+        case 'i':
         default:
             std::cout << std::endl << "Calibrate " << std::endl
-                      << "    -e value  (mandatory, true energy of KaonL being used for calibration)" << std::endl
-                      << "    -i        (mandatory, input file name(s), can include wildcards if string is in quotes)" << std::endl
-                      << "    -o        (mandatory, output path to send results to)" << std::endl
-                      << "    -c value  (mandatory, are non linearity corrections on, 1, or off, 0)" << std::endl
-                      << "    -g value  (mandatory, number of HCal layers in simulation, default 48)" << std::endl
-                      << "    -f value  (optional, fit percentage used for calibration,      default 90% of data with narrowest rms)" << std::endl
+                      << "    -a        (mandatory, input file name(s), can include wildcards if string is in quotes)           " << std::endl
+                      << "    -b value  (mandatory, true energy of KaonL being used for calibration)                            " << std::endl
+                      << "    -c value  (optional, fractional accuracy to calibrate KaonL energy to, default 0.01)              " << std::endl
+                      << "    -d        (mandatory, output path to send results to)                                             " << std::endl
+                      << "    -e value  (optional, fit percentage used for calibration, default 90% of data with narrowest rms) " << std::endl
+                      << "    -f value  (mandatory, number of HCal layers in simulation, default 48)                            " << std::endl
+                      << "    -g value  (mandatory, are non linearity corrections on, 1, or off, 0)                             " << std::endl
                       << std::endl;
             return false;
         }

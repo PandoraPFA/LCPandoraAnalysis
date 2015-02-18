@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraAnalysis/calibration/PandoraPFACalibrate_MipResponse.cc
  * 
- *  @brief  Find MIP (Muon Events) peak in direction corrected calo hit energy for HCal ring calibration to set ECalGeVToMIP, 
- *          HCalGeVToMIP and MuonGeVToMIP constants
+ *  @brief  Finds peak in direction corrected calo hit energy.  Used for setting MIP scale in PandoraPFA (ECalGeVToMIP, HCalGeVToMIP 
+ *          and MuonGeVToMIP).
  * 
  *  $Log: $
  */
@@ -44,8 +44,8 @@ public:
     void MakeHistograms();
 
 // Non trivial setting on initialisation
+    std::string     m_inputMuonRootFiles;                       ///< Input root files 
     float           m_trueEnergy;                               ///< True energy (opposed to kinetic) of particle being simulated
-    std::string     m_inputPhotonRootFiles;                     ///< Input root files 
     std::string     m_outputPath;                               ///< Output path to send results
     float           m_PeakECalDirectionCorrectedCaloHitEnergy;  ///< Peak position in m_hECalDirectionCorrectedCaloHitEnergy
     float           m_PeakHCalDirectionCorrectedCaloHitEnergy;  ///< Peak position in m_hHCalDirectionCorrectedCaloHitEnergy
@@ -162,8 +162,8 @@ int main(int argc, char **argv)
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 GeVToMIP::GeVToMIP() :
+    m_inputMuonRootFiles(""),
     m_trueEnergy(std::numeric_limits<float>::max()),
-    m_inputPhotonRootFiles(""),
     m_outputPath(""),
     m_PeakECalDirectionCorrectedCaloHitEnergy(std::numeric_limits<float>::max()),
     m_PeakHCalDirectionCorrectedCaloHitEnergy(std::numeric_limits<float>::max()),
@@ -196,9 +196,9 @@ void GeVToMIP::MakeHistograms()
     m_hMuonDirectionCorrectedCaloHitEnergy->GetXaxis()->SetTitle("Direction Corrected Calo Hit Energy in Muon Chamber");
     m_hMuonDirectionCorrectedCaloHitEnergy->GetYaxis()->SetTitle("Entries");
 
-    unsigned int found_slash = m_inputPhotonRootFiles.find_last_of("/");
-    std::string path = m_inputPhotonRootFiles.substr(0,found_slash);
-    std::string file = m_inputPhotonRootFiles.substr(found_slash+1);
+    unsigned int found_slash = m_inputMuonRootFiles.find_last_of("/");
+    std::string path = m_inputMuonRootFiles.substr(0,found_slash);
+    std::string file = m_inputMuonRootFiles.substr(found_slash+1);
 
     unsigned int found_star = file.find_last_of("*");
     std::string file_prefix = file.substr(0,found_star);
@@ -333,25 +333,25 @@ bool ParseCommandLine(int argc, char *argv[], GeVToMIP &geVToMIP)
 {
     int c(0);
 
-    while (((c = getopt(argc, argv, "e:i:o:f:h")) != -1) || (argc == 1))
+    while (((c = getopt(argc, argv, "a:b:c:d")) != -1) || (argc == 1))
     {
         switch (c)
         {
-        case 'e':
+        case 'a':
+            geVToMIP.m_inputMuonRootFiles = optarg;
+            break;
+        case 'b':
             geVToMIP.m_trueEnergy = atof(optarg);
             break;
-        case 'i':
-            geVToMIP.m_inputPhotonRootFiles = optarg;
-            break;
-        case 'o':
+        case 'c':
             geVToMIP.m_outputPath = optarg;
             break;
-        case 'h':
+        case 'd':
         default:
             std::cout << std::endl << "Calibrate " << std::endl
-                      << "    -e value  (mandatory, true energy of muons being used for calibration)" << std::endl
-                      << "    -i        (mandatory, input file name(s), can include wildcards if string is in quotes)" << std::endl
-                      << "    -o value  (mandatory, output path to send results to)" << std::endl
+                      << "    -a        (mandatory, input file name(s), can include wildcards if string is in quotes)   " << std::endl
+                      << "    -b value  (mandatory, true energy of muons being used for calibration)                    " << std::endl
+                      << "    -c value  (mandatory, output path to send results to)                                     " << std::endl
                       << std::endl;
             return false;
         }

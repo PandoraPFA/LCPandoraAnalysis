@@ -1,7 +1,8 @@
 /**
  *  @file   PandoraAnalysis/calibration/HCalDigitisation_DirectionCorrectionDistribution.cc
  * 
- *  @brief  Generate average direction correction applied to kaonL events in HCal Barrel, EndCap and Other
+ *  @brief  Generate average direction correction applied to kaonL events in HCal Barrel, EndCap and Other.  Used for setting 
+ *          digitisation constant CalibrHCALOther.
  * 
  *  $Log: $
  */
@@ -42,10 +43,12 @@ public:
     */
     void MakeHistograms();
 
-// Non trivial setting on initialisation
+// Inputs Set By Parsing Command Line
+    std::string     m_inputKaonLRootFiles;                  ///< Input root files - KaonL
     float           m_trueEnergy;                           ///< True energy (opposed to kinetic) of particle being simulated
-    std::string     m_inputKaonLRootFiles;                 ///< Input root files for
     std::string     m_outputPath;                           ///< Output path to send results
+
+// Outputs
     TH1F           *m_hHCalBarrelDirectionCorrectionADC;    ///< Histogram of direction corrections applied to SimCalorimeterHits in HCal Barrel
     TH1F           *m_hHCalEndCapDirectionCorrectionADC;    ///< Histogram of direction corrections applied to SimCalorimeterHits in HCal EndCap
     TH1F           *m_hHCalOtherDirectionCorrectionADC;     ///< Histogram of direction corrections applied to SimCalorimeterHits in HCal Other
@@ -126,8 +129,8 @@ int main(int argc, char **argv)
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 HCalDigitisationDCDistribution::HCalDigitisationDCDistribution() :
-    m_trueEnergy(std::numeric_limits<float>::max()),
     m_inputKaonLRootFiles(""),
+    m_trueEnergy(std::numeric_limits<float>::max()),
     m_outputPath(""),
     m_hHCalBarrelDirectionCorrectionADC(NULL),
     m_hHCalEndCapDirectionCorrectionADC(NULL),
@@ -166,13 +169,13 @@ void HCalDigitisationDCDistribution::MakeHistograms()
     std::string file_suffix = file.substr(found_star+1);
 
     TSystemDirectory dir(path.c_str(), path.c_str());
-    TList *files = dir.GetListOfFiles();
+    TList *pTList = dir.GetListOfFiles();
 
-    if (files)
+    if (pTList)
     {
         TSystemFile *pTSystemFile;
         TString fname;
-        TIter next(files);
+        TIter next(pTList);
         while ((pTSystemFile = (TSystemFile*)next()))
         {
             fname = pTSystemFile->GetName();
@@ -180,24 +183,24 @@ void HCalDigitisationDCDistribution::MakeHistograms()
             if (!pTSystemFile->IsDirectory() && fname.EndsWith(file_suffix.c_str()) && fname.BeginsWith(file_prefix.c_str()))
             {
                 TString filename(path + "/" + fname);
-                TFile *i_file = new TFile(filename);
-                TH1F *i_hHCalBarrelDirectionCorrectionADC = (TH1F*) i_file->Get("HCalBarrelDirectionCorrectionADC");
-                TH1F *i_hHCalEndCapDirectionCorrectionADC = (TH1F*) i_file->Get("HCalEndCapDirectionCorrectionADC");
-                TH1F *i_hHCalOtherDirectionCorrectionADC = (TH1F*) i_file->Get("HCalOtherDirectionCorrectionADC");
+                TFile *pTFile = new TFile(filename);
+                TH1F *pTH1FHCalBarrelDirectionCorrectionADC = (TH1F*) pTFile->Get("HCalBarrelDirectionCorrectionADC");
+                TH1F *pTH1FHCalEndCapDirectionCorrectionADC = (TH1F*) pTFile->Get("HCalEndCapDirectionCorrectionADC");
+                TH1F *pTH1FHCalOtherDirectionCorrectionADC = (TH1F*) pTFile->Get("HCalOtherDirectionCorrectionADC");
 
-                if (i_hHCalBarrelDirectionCorrectionADC!=NULL)
-                    m_hHCalBarrelDirectionCorrectionADC->Add(i_hHCalBarrelDirectionCorrectionADC,1.0);
+                if (pTH1FHCalBarrelDirectionCorrectionADC!=NULL)
+                    m_hHCalBarrelDirectionCorrectionADC->Add(pTH1FHCalBarrelDirectionCorrectionADC,1.0);
 
-                if (i_hHCalEndCapDirectionCorrectionADC!=NULL)
-                    m_hHCalEndCapDirectionCorrectionADC->Add(i_hHCalEndCapDirectionCorrectionADC,1.0);
+                if (pTH1FHCalEndCapDirectionCorrectionADC!=NULL)
+                    m_hHCalEndCapDirectionCorrectionADC->Add(pTH1FHCalEndCapDirectionCorrectionADC,1.0);
 
-                if (i_hHCalOtherDirectionCorrectionADC!=NULL)
-                    m_hHCalOtherDirectionCorrectionADC->Add(i_hHCalOtherDirectionCorrectionADC,1.0);
+                if (pTH1FHCalOtherDirectionCorrectionADC!=NULL)
+                    m_hHCalOtherDirectionCorrectionADC->Add(pTH1FHCalOtherDirectionCorrectionADC,1.0);
 
-                delete i_hHCalBarrelDirectionCorrectionADC;
-                delete i_hHCalEndCapDirectionCorrectionADC;
-                delete i_hHCalOtherDirectionCorrectionADC;
-                delete i_file;
+                delete pTH1FHCalBarrelDirectionCorrectionADC;
+                delete pTH1FHCalEndCapDirectionCorrectionADC;
+                delete pTH1FHCalOtherDirectionCorrectionADC;
+                delete pTFile;
             }
         }
     }
@@ -232,25 +235,25 @@ bool ParseCommandLine(int argc, char *argv[], HCalDigitisationDCDistribution &hC
 {
     int c(0);
 
-    while (((c = getopt(argc, argv, "e:i:o:f:h")) != -1) || (argc == 1))
+    while (((c = getopt(argc, argv, "a:b:c:d")) != -1) || (argc == 1))
     {
         switch (c)
         {
-        case 'e':
-            hCalDigitisationDCDistribution.m_trueEnergy = atof(optarg);
-            break;
-        case 'i':
+        case 'a':
             hCalDigitisationDCDistribution.m_inputKaonLRootFiles = optarg;
             break;
-        case 'o':
+        case 'b':
+            hCalDigitisationDCDistribution.m_trueEnergy = atof(optarg);
+            break;
+        case 'c':
             hCalDigitisationDCDistribution.m_outputPath = optarg;
             break;
-        case 'h':
+        case 'd':
         default:
             std::cout << std::endl << "Calibrate " << std::endl
-                      << "    -e value  (mandatory, true energy of kaonL being used for calibration)" << std::endl
-                      << "    -i        (mandatory, input file name(s), can include wildcards if string is in quotes)" << std::endl
-                      << "    -o value  (mandatory, output path to send results to)" << std::endl
+                      << "    -a        (mandatory, input file name(s), can include wildcards if string is in quotes)   " << std::endl
+                      << "    -b value  (mandatory, true energy of kaonL being used for calibration)                    " << std::endl
+                      << "    -c        (mandatory, output path to send results to)                                     " << std::endl
                       << std::endl;
             return false;
         }

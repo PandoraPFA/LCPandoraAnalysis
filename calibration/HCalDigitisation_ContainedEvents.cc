@@ -1,7 +1,8 @@
 /**
  *  @file   PandoraAnalysis/calibration/HCalDigitisation_ContainedEvents.cc
  * 
- *  @brief  Mean calo hit energy for kaonL events contained in HCal
+ *  @brief  Mean calo hit energy for kaonL events contained in HCal.  Used for setting digitisation constant in 
+ *          HCal (CalibrHCALBarrel or CalibrHCALEndcap).
  * 
  *  $Log: $
  */
@@ -41,26 +42,26 @@ public:
     */
     void Process();
 
+// Inputs Set By Parsing Command Line
+    std::string     m_inputKaonLRootFiles;  ///< Input root files - KaonL
+    float           m_trueEnergy;           ///< True energy (opposed to kinetic) of particle being simulated
+    float           m_calibrationAccuracy;  ///< Fractional accuracy target for reconstructed energy
+    std::string     m_outputPath;           ///< Output path to send results
+    float           m_fitPercentage;        ///< Percentage of continuous data with narrowest range for Gaussian fit
+    int             m_numberHCalLayers;     ///< Number of layers in the HCal
+    std::string     m_element;              ///< Detector component (Barrel, EndCap or Other)
+    float           m_lowerCosThetaCut;     ///< Lower cosTheta cut defining m_element
+    float           m_upperCosTheraCut;     ///< Lower cosTheta cut defining m_element
+
 // Outputs
     float           m_amplitude;            ///< Amplitude of Gaussian fit
     float           m_mean;                 ///< Mean of Gaussian fit
     float           m_stdDev;               ///< Standard deviation of Gaussian fit
-    float           m_chi2;                 ///< Chi squared of Gaussian fit
     int             m_nEventsHCalHist;      ///< Number of events in m_histogram
-
-// Non trivial setting on initialisation
-    float           m_trueEnergy;           ///< True energy (opposed to kinetic) of particle being simulated
-    std::string     m_inputKaonLRootFiles;  ///< Input root files
-    std::string     m_outputPath;           ///< Output path to send results
-    std::string     m_element;              ///< Detector component (Barrel, EndCap or Other)
-    float           m_lowerCosThetaCut;     ///< Lower cosTheta cut defining m_element
-    float           m_upperCosTheraCut;     ///< Lower cosTheta cut defining m_element
-    float           m_fitPercentage;        ///< Percentage of continuous data with narrowest range for Gaussian fit
-    int             m_numberHCalLayers;     ///< Number of layers in the HCal
 
 private:
     /**
-     *  @brief  Set m_binNumber and m_maxHistogramEnergy
+     *  @brief  Set m_maxHistogramEnergy
     */
     void PrepareHistogram();
 
@@ -84,13 +85,14 @@ private:
     */
     void Fit();
 
+typedef std::vector<float> FloatVector;
+
 // Trivial setting on initialisation
     TChain         *m_pTChain;              ///< Chain of root files
     TH1F           *m_histogram;            ///< Histogram
     float           m_fitRangeLow;          ///< Low fit edge
     float           m_fitRangeHigh;         ///< High fit edge
     float           m_rMSFitRange;          ///< RMS of the fitRange data
-    int             m_binNumber;            ///< Number of bins on m_histogram
     float           m_maxHistogramEnergy;   ///< Max energy on m_histogram
 };
 
@@ -170,25 +172,24 @@ int main(int argc, char **argv)
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 HCalDigitisation::HCalDigitisation() :
-    m_amplitude(std::numeric_limits<float>::max()),
-    m_mean(std::numeric_limits<float>::max()),
-    m_stdDev(std::numeric_limits<float>::max()),
-    m_chi2(std::numeric_limits<float>::max()),
-    m_nEventsHCalHist(0),
-    m_trueEnergy(0.f),
     m_inputKaonLRootFiles(""),
+    m_trueEnergy(0.f),
+    m_calibrationAccuracy(0.02),
     m_outputPath(""),
+    m_fitPercentage(90.f),
+    m_numberHCalLayers(48),
     m_element(""),
     m_lowerCosThetaCut(0.f),
     m_upperCosTheraCut(1.f),
-    m_fitPercentage(90.f),
-    m_numberHCalLayers(48),
+    m_amplitude(std::numeric_limits<float>::max()),
+    m_mean(std::numeric_limits<float>::max()),
+    m_stdDev(std::numeric_limits<float>::max()),
+    m_nEventsHCalHist(0),
     m_pTChain(NULL),
     m_histogram(NULL),
     m_fitRangeLow(std::numeric_limits<float>::max()),
     m_fitRangeHigh(std::numeric_limits<float>::max()),
     m_rMSFitRange(std::numeric_limits<float>::max()),
-    m_binNumber(std::numeric_limits<int>::max()),
     m_maxHistogramEnergy(0.f)
 {
 }
@@ -216,14 +217,9 @@ void HCalDigitisation::Process()
 
 void HCalDigitisation::PrepareHistogram()
 {
-typedef std::vector<float> FloatVector;
-    float           totalCaloHitEnergy;
-    float           hCalTotalCaloHitEnergy;
-    int             nPfoTargetsTotal;
-    int             nPfoTargetsNeutralHadrons;
-    FloatVector    *pfoTargetCosTheta(NULL);
-    int             pfoMinHCalLayerToEdge;
-    float           binWidth = m_trueEnergy / 100.0;
+    FloatVector *pfoTargetCosTheta(NULL);
+    float totalCaloHitEnergy, hCalTotalCaloHitEnergy;
+    int nPfoTargetsTotal, nPfoTargetsNeutralHadrons, pfoMinHCalLayerToEdge;
 
     m_pTChain->SetBranchAddress("TotalCaloHitEnergy",&totalCaloHitEnergy);
     m_pTChain->SetBranchAddress("HCalTotalCaloHitEnergy",&hCalTotalCaloHitEnergy);
@@ -238,7 +234,7 @@ typedef std::vector<float> FloatVector;
     {
         m_pTChain->GetEntry(i);
 
-        bool isContained(containedLayerExclusion < pfoMinHCalLayerToEdge && (totalCaloHitEnergy-hCalTotalCaloHitEnergy) < (m_trueEnergy*0.01));
+        bool isContained(containedLayerExclusion < pfoMinHCalLayerToEdge && (totalCaloHitEnergy-hCalTotalCaloHitEnergy) < (m_trueEnergy*0.05));
 
         if (1 == nPfoTargetsTotal && 1 == nPfoTargetsNeutralHadrons && isContained)
         {
@@ -253,7 +249,6 @@ typedef std::vector<float> FloatVector;
             }
         }
     }
-    m_binNumber = static_cast<int>( (m_maxHistogramEnergy + 0.5) / binWidth );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -262,7 +257,8 @@ void HCalDigitisation::CreateHistogram()
 {
     std::string Name = "CaloHitEnergyHCal" + m_element;
     std::string Title = "Calorimeter Hit Energy HCal " + m_element + " (1==nPfoTargetsTotal && 1==nPfoTargetsNeutralHadrons && Contained in HCal)";
-    m_histogram = new TH1F(Name.c_str(), Title.c_str(), m_binNumber, 0., m_maxHistogramEnergy);
+    int binNumber = static_cast<int>( m_maxHistogramEnergy / ( m_calibrationAccuracy * m_trueEnergy ) );
+    m_histogram = new TH1F(Name.c_str(), Title.c_str(), binNumber, 0., m_maxHistogramEnergy);
     m_histogram->GetXaxis()->SetTitle("Calorimeter Hit Energy / GeV");
     m_histogram->GetYaxis()->SetTitle("Entries");
 }
@@ -271,13 +267,9 @@ void HCalDigitisation::CreateHistogram()
 
 void HCalDigitisation::FillHistogram()
 {
-typedef std::vector<float> FloatVector;
-    float           totalCaloHitEnergy;
-    float           hCalTotalCaloHitEnergy;
-    int             nPfoTargetsTotal;
-    int             nPfoTargetsNeutralHadrons;
-    FloatVector    *pfoTargetCosTheta(NULL);
-    int             pfoMinHCalLayerToEdge;
+    FloatVector *pfoTargetCosTheta(NULL);
+    float totalCaloHitEnergy, hCalTotalCaloHitEnergy;
+    int nPfoTargetsTotal, nPfoTargetsNeutralHadrons, pfoMinHCalLayerToEdge;
 
     m_pTChain->SetBranchAddress("TotalCaloHitEnergy",&totalCaloHitEnergy);
     m_pTChain->SetBranchAddress("HCalTotalCaloHitEnergy",&hCalTotalCaloHitEnergy);
@@ -292,7 +284,7 @@ typedef std::vector<float> FloatVector;
     {
         m_pTChain->GetEntry(i);
 
-        bool isContained(containedLayerExclusion < pfoMinHCalLayerToEdge && (totalCaloHitEnergy-hCalTotalCaloHitEnergy) < (m_trueEnergy*0.01));
+        bool isContained(containedLayerExclusion < pfoMinHCalLayerToEdge && (totalCaloHitEnergy-hCalTotalCaloHitEnergy) < (m_trueEnergy*0.05));
 
         if (1 == nPfoTargetsTotal && 1 == nPfoTargetsNeutralHadrons && isContained)
         {
@@ -441,10 +433,6 @@ void HCalDigitisation::Fit()
             int FitQuality = pTFitResultPtr->CovMatrixStatus();
             int count = 0;
 
-            //std::cout << "IsValidFit          :" << IsValidFit << std::endl;
-            //std::cout << "FitQuality          :" << FitQuality << std::endl;
-            //std::cout << "Count               :" << count << std::endl;
-
             // While loop until fit converges
             while (
             IsValidFit != 1 ||
@@ -494,7 +482,6 @@ void HCalDigitisation::Fit()
             m_amplitude = Gaussian_Fit_Func->GetParameter(0);
             m_mean = Gaussian_Fit_Func->GetParameter(1);
             m_stdDev = std::pow(Gaussian_Fit_Func->GetParameter(2),-0.5);
-            m_chi2 = Gaussian_Fit_Func->GetChisquare();
 
             std::string canvasName = m_element + "Digitisation";
             std::string canvasTitle = m_element + " Digitisation";
@@ -533,45 +520,49 @@ bool ParseCommandLine(int argc, char *argv[], HCalDigitisation &hCalDigitisation
 {
     int c(0);
 
-    while (((c = getopt(argc, argv, "a:b:c:d:e:f:g:i:j")) != -1) || (argc == 1))
+    while (((c = getopt(argc, argv, "a:b:c:d:e:f:g:i:j:k")) != -1) || (argc == 1))
     {
         switch (c)
         {
         case 'a':
-            hCalDigitisation.m_trueEnergy = atof(optarg);
-            break;
-        case 'b':
             hCalDigitisation.m_inputKaonLRootFiles = optarg;
             break;
+        case 'b':
+            hCalDigitisation.m_trueEnergy = atof(optarg);
+            break;
         case 'c':
-            hCalDigitisation.m_outputPath = optarg;
+            hCalDigitisation.m_calibrationAccuracy = atof(optarg);
             break;
         case 'd':
-            hCalDigitisation.m_element = optarg;
+            hCalDigitisation.m_outputPath = optarg;
             break;
         case 'e':
-            hCalDigitisation.m_lowerCosThetaCut = atof(optarg);
-            break;
-        case 'f':
-            hCalDigitisation.m_upperCosTheraCut = atof(optarg);
-            break;
-        case 'g':
-            hCalDigitisation.m_numberHCalLayers = atoi(optarg);
-            break;
-        case 'i':
             hCalDigitisation.m_fitPercentage = atof(optarg);
             break;
+        case 'f':
+            hCalDigitisation.m_numberHCalLayers = atoi(optarg);
+            break;
+        case 'g':
+            hCalDigitisation.m_element = optarg;
+            break;
+        case 'i':
+            hCalDigitisation.m_lowerCosThetaCut = atof(optarg);
+            break;
         case 'j':
+            hCalDigitisation.m_upperCosTheraCut = atof(optarg);
+            break;
+        case 'k':
         default:
             std::cout << std::endl << "Calibrate " << std::endl
-                      << "    -a value  (mandatory, true energy of kaonL being used for calibration)" << std::endl
-                      << "    -b        (mandatory, input file name(s), can include wildcards if string is in quotes)" << std::endl
-                      << "    -c        (mandatory, output path to send results to)" << std::endl
-                      << "    -d        (mandatory, element of the detector being calibrated (Barrel or EndCap))" << std::endl
-                      << "    -e value  (mandatory, lower abs cos theta cut defining element, default 0)" << std::endl
-                      << "    -f value  (mandatory, upper abs cos theta cut defining element, default 1)" << std::endl
-                      << "    -g value  (mandatory, number of HCal layers in simulation, default 48)" << std::endl
-                      << "    -i value  (optional, fit percentage used for calibration, default 90% of data with narrowest rms)" << std::endl
+                      << "    -a        (mandatory, input file name(s), can include wildcards if string is in quotes)           " << std::endl
+                      << "    -b value  (mandatory, true energy of kaonL being used for calibration)                            " << std::endl
+                      << "    -c value  (optional, fractional accuracy to calibrate CalibrHCAL to, default 0.02)                " << std::endl
+                      << "    -d        (mandatory, output path to send results to)                                             " << std::endl
+                      << "    -e value  (optional, fit percentage used for calibration, default 90% of data with narrowest rms) " << std::endl
+                      << "    -f value  (optional, number of HCal layers in simulation, default 48)                             " << std::endl
+                      << "    -g        (mandatory, element of the detector being calibrated (Barrel or EndCap))                " << std::endl
+                      << "    -i value  (mandatory, lower abs cos theta cut defining element, default 0)                        " << std::endl
+                      << "    -j value  (mandatory, upper abs cos theta cut defining element, default 1)                        " << std::endl
                       << std::endl;
             return false;
         }

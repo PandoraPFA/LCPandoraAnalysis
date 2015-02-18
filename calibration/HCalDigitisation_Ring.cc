@@ -2,7 +2,7 @@
  *  @file   PandoraAnalysis/calibration/HCalDigitisation_Ring.cc
  * 
  *  @brief  Mean of distribution of direction corrections applied to sim calorimeter hits in HCal Barrel, EndCap and Other 
- *          for HCal ring digitisation
+ *          for HCal ring digitisation.
  * 
  *  $Log: $
  */
@@ -43,10 +43,12 @@ public:
     */
     void MakeHistograms();
 
-// Non trivial setting on initialisation
+// Inputs Set By Parsing Command Line
+    std::string     m_inputMuonRootFiles;                   ///< Input root files - Muons
     float           m_trueEnergy;                           ///< True energy (opposed to kinetic) of particle being simulated
-    std::string     m_inputMuonRootFiles;                   ///< Input root files
     std::string     m_outputPath;                           ///< Output path to send results
+
+// Outputs
     float           m_PeakHCalBarrelDirectionCorrectedADC;  ///< Peak position in m_hHCalBarrelDirectionCorrectedADC
     float           m_PeakHCalEndCapDirectionCorrectedADC;  ///< Peak position in m_hHCalEndCapDirectionCorrectedADC
     float           m_PeakHCalOtherDirectionCorrectedADC;   ///< Peak position in m_hHCalOtherDirectionCorrectedADC
@@ -136,8 +138,8 @@ int main(int argc, char **argv)
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 HCalRingDigitisation::HCalRingDigitisation() :
-    m_trueEnergy(std::numeric_limits<float>::max()),
     m_inputMuonRootFiles(""),
+    m_trueEnergy(std::numeric_limits<float>::max()),
     m_outputPath(""),
     m_PeakHCalBarrelDirectionCorrectedADC(std::numeric_limits<float>::max()),
     m_PeakHCalEndCapDirectionCorrectedADC(std::numeric_limits<float>::max()),
@@ -179,13 +181,13 @@ void HCalRingDigitisation::MakeHistograms()
     std::string file_suffix = file.substr(found_star+1);
 
     TSystemDirectory dir(path.c_str(), path.c_str());
-    TList *files = dir.GetListOfFiles();
+    TList *pTList = dir.GetListOfFiles();
 
-    if (files)
+    if (pTList)
     {
         TSystemFile *pTSystemFile;
         TString fname;
-        TIter next(files);
+        TIter next(pTList);
         while ((pTSystemFile = (TSystemFile*)next()))
         {
             fname = pTSystemFile->GetName();
@@ -193,24 +195,24 @@ void HCalRingDigitisation::MakeHistograms()
             if (!pTSystemFile->IsDirectory() && fname.EndsWith(file_suffix.c_str()) && fname.BeginsWith(file_prefix.c_str()))
             {
                 TString filename(path + "/" + fname);
-                TFile *i_file = new TFile(filename);
-                TH1F *i_hHCalBarrelDirectionCorrectedADC = (TH1F*) i_file->Get("HCalDirectionCorrectedADCBarrel");
-                TH1F *i_hHCalEndCapDirectionCorrectedADC = (TH1F*) i_file->Get("HCalDirectionCorrectedADCEndCap");
-                TH1F *i_hHCalOtherDirectionCorrectionADC = (TH1F*) i_file->Get("HCalDirectionCorrectedADCOther");
+                TFile *pTFile = new TFile(filename);
+                TH1F *pTH1FHCalBarrelDirectionCorrectedADC = (TH1F*) pTFile->Get("HCalDirectionCorrectedADCBarrel");
+                TH1F *pTH1FHCalEndCapDirectionCorrectedADC = (TH1F*) pTFile->Get("HCalDirectionCorrectedADCEndCap");
+                TH1F *pTH1FHCalOtherDirectionCorrectionADC = (TH1F*) pTFile->Get("HCalDirectionCorrectedADCOther");
 
-                if (i_hHCalBarrelDirectionCorrectedADC!=NULL)
-                    m_hHCalBarrelDirectionCorrectedADC->Add(i_hHCalBarrelDirectionCorrectedADC,1.0);
+                if (pTH1FHCalBarrelDirectionCorrectedADC!=NULL)
+                    m_hHCalBarrelDirectionCorrectedADC->Add(pTH1FHCalBarrelDirectionCorrectedADC,1.0);
 
-                if (i_hHCalEndCapDirectionCorrectedADC!=NULL)
-                    m_hHCalEndCapDirectionCorrectedADC->Add(i_hHCalEndCapDirectionCorrectedADC,1.0);
+                if (pTH1FHCalEndCapDirectionCorrectedADC!=NULL)
+                    m_hHCalEndCapDirectionCorrectedADC->Add(pTH1FHCalEndCapDirectionCorrectedADC,1.0);
 
-                if (i_hHCalOtherDirectionCorrectionADC!=NULL)
-                    m_hHCalOtherDirectionCorrectedADC->Add(i_hHCalOtherDirectionCorrectionADC,1.0);
+                if (pTH1FHCalOtherDirectionCorrectionADC!=NULL)
+                    m_hHCalOtherDirectionCorrectedADC->Add(pTH1FHCalOtherDirectionCorrectionADC,1.0);
 
-                delete i_hHCalBarrelDirectionCorrectedADC;
-                delete i_hHCalEndCapDirectionCorrectedADC;
-                delete i_hHCalOtherDirectionCorrectionADC;
-                delete i_file;
+                delete pTH1FHCalBarrelDirectionCorrectedADC;
+                delete pTH1FHCalEndCapDirectionCorrectedADC;
+                delete pTH1FHCalOtherDirectionCorrectionADC;
+                delete pTFile;
             }
         }
     }
@@ -250,16 +252,8 @@ int HCalRingDigitisation::PeakFinder(const TH1F *const pTH1F)
 
     const unsigned int nBinsX(p_TH1F->GetNbinsX());
 
-    float   previousBin;
-    float   currentBin;
-    float   nextBin;
-
-    float   previousBinContent;
-    float   currentBinContent;
-    float   nextBinContent;
-
-    float   highestPeak = 0.f;
-    int     highestPeakBin = 0;
+    float previousBin, currentBin, nextBin, previousBinContent, currentBinContent, nextBinContent, highestPeak = 0.f;
+    int highestPeakBin = 0;
 
     for (unsigned int i = 11; i < nBinsX-10; i++)
     {
@@ -287,25 +281,25 @@ bool ParseCommandLine(int argc, char *argv[], HCalRingDigitisation &hCalRingDigi
 {
     int c(0);
 
-    while (((c = getopt(argc, argv, "e:i:o:f:h")) != -1) || (argc == 1))
+    while (((c = getopt(argc, argv, "a:b:c:d")) != -1) || (argc == 1))
     {
         switch (c)
         {
-        case 'e':
-            hCalRingDigitisation.m_trueEnergy = atof(optarg);
-            break;
-        case 'i':
+        case 'a':
             hCalRingDigitisation.m_inputMuonRootFiles = optarg;
             break;
-        case 'o':
+        case 'b':
+            hCalRingDigitisation.m_trueEnergy = atof(optarg);
+            break;
+        case 'c':
             hCalRingDigitisation.m_outputPath = optarg;
             break;
-        case 'h':
+        case 'd':
         default:
             std::cout << std::endl << "Calibrate " << std::endl
-                      << "    -e value  (mandatory, true energy of muons being used for calibration)" << std::endl
-                      << "    -i        (mandatory, input file name(s), can include wildcards if string is in quotes)" << std::endl
-                      << "    -o value  (mandatory, output path to send results to)" << std::endl
+                      << "    -a        (mandatory, input muon file name(s), can include wildcards if string is in quotes)  " << std::endl
+                      << "    -b value  (mandatory, true energy of muons being used for calibration)                        " << std::endl
+                      << "    -c value  (mandatory, output path to send results to)                                         " << std::endl
                       << std::endl;
             return false;
         }
