@@ -47,7 +47,21 @@ ELSE()
     SET( INSTALL_DOC OFF )
 ENDIF()
 
+### CALIBRATION DOCUMENTATION ###############################################
 
+#include directories
+SET( LATEX_OUTPUT_PATH build/doc )
+
+INCLUDE( "${PROJECT_SOURCE_DIR}/cmakemodules/UseLATEX.cmake" )
+
+ADD_LATEX_DOCUMENT(doc/CalibrationPandoraAnalysisExplained.tex
+DEFAULT_PDF
+)
+
+ADD_CUSTOM_COMMAND(TARGET pdf POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy
+                        ${PROJECT_SOURCE_DIR}/build/doc/CalibrationPandoraAnalysisExplained.pdf
+                        ${PROJECT_SOURCE_DIR}/doc/CalibrationPandoraAnalysisExplained.pdf)
 
 ### LIBRARY AND TOOLS #######################################################
 
