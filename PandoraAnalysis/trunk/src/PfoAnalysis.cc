@@ -547,8 +547,16 @@ void PfoAnalysis::MakeQuarkVariables(EVENT::LCEvent *pLCEvent)
 
     if (mcQuarkVector.size() == 2)
     {
-        const float pQ1[3] = {mcQuarkVector[0]->getMomentum()[0], mcQuarkVector[0]->getMomentum()[1], mcQuarkVector[0]->getMomentum()[2]};
-        const float pQ2[3] = {mcQuarkVector[1]->getMomentum()[0], mcQuarkVector[1]->getMomentum()[1], mcQuarkVector[1]->getMomentum()[2]};
+        const float pQ1x = mcQuarkVector[0]->getMomentum()[0];
+        const float pQ1y = mcQuarkVector[0]->getMomentum()[1];
+        const float pQ1z = mcQuarkVector[0]->getMomentum()[2];
+
+        const float pQ2x = mcQuarkVector[1]->getMomentum()[0];
+        const float pQ2y = mcQuarkVector[1]->getMomentum()[1];
+        const float pQ2z = mcQuarkVector[1]->getMomentum()[2];
+
+        const float pQ1[3] = {pQ1x, pQ1y, pQ1z};
+        const float pQ2[3] = {pQ2x, pQ2y, pQ2z};
         const float pQQ[3] = {pQ1[0] + pQ2[0], pQ1[1] + pQ2[1], pQ1[2] + pQ2[2]};
 
         const TLorentzVector q1(pQ1[0], pQ1[1], pQ1[2], mcQuarkVector[0]->getEnergy());
