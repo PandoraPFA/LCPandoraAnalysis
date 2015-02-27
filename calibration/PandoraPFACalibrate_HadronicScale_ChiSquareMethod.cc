@@ -178,9 +178,7 @@ ChiSquaredMethod::ChiSquaredMethod() :
     m_nEntriesHist(0),
     m_hCalToHadResolutionConstant(0.55), // Resolution constants from single particle calibration
     m_eCalToHadResolutionConstant(0.55), // Resolution constants from single particle calibration
-    m_histogram(NULL),
-    m_eCalEnergyAccepted(NULL),
-    m_hCalEnergyAccepted(NULL)
+    m_histogram(NULL)
 {
 }
 
