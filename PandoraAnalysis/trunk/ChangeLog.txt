@@ -1,4 +1,15 @@
 --------------------------------------------------------------------------------------------------------------------------------------------
+TAG v01-00-00
+--------------------------------------------------------------------------------------------------------------------------------------------
+Milestone v01 release.
+Added full set of calibration tools for automated calibration of PandoraPFA in ilcsoft.
+Added calibration documentation.
+Reorganised PandoraAnalysis test applications into calibration and performance directories.
+Tweaked MC Pfo selection mechanisms for filling Pfo analysis tree.
+Addressed issues highlighted by Coverity.
+CMakeLists overhaul.
+
+--------------------------------------------------------------------------------------------------------------------------------------------
 TAG v00-07
 --------------------------------------------------------------------------------------------------------------------------------------------
 Unify MC Pfo selection with approach used within Pandora.
