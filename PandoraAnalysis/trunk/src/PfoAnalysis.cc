@@ -325,6 +325,7 @@ void PfoAnalysis::end()
                   << "Rootfile: " << m_rootFile.c_str() << std::endl;
     }
 
+    m_pTFile->cd();
     m_pTTree->Write();
     m_hPfoEnergySum->Write();
     m_hPfoEnergySumL7A->Write();
