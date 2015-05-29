@@ -559,6 +559,7 @@ void PandoraPFACalibrator::end()
 {
     m_out(DEBUG) << "PandoraPFACalibrator::end()  " << name() << " processed " << m_nEvt << " events in " << m_nRun << " runs " << std::endl;
 
+    m_pTFile->cd();
     m_hPfoEnergy->Write();
     m_hPfoEnergyBarrel->Write();
     m_hPfoEnergy95ECal->Write();
