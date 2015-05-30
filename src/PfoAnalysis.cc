@@ -333,7 +333,6 @@ void PfoAnalysis::end()
     if (m_pCalibrationHelper)
         m_pCalibrationHelper->WriteHistograms();
 
-    m_pTFile->Write();
     m_pTFile->Close();
     delete m_pTFile;
 
