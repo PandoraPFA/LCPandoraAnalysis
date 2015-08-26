@@ -91,6 +91,7 @@ CalibrationHelper::CalibrationHelper(const Settings &settings) :
     m_hHCalBarrelDirectionCorrectedADC(NULL),
     m_hHCalEndCapDirectionCorrectedADC(NULL),
     m_hHCalOtherDirectionCorrectedADC(NULL),
+    m_hECalDirectionCorrectedADC(NULL),
     m_hHCalBarrelDirectionCorrectionADC(NULL),
     m_hHCalEndCapDirectionCorrectionADC(NULL),
     m_hHCalOtherDirectionCorrectionADC(NULL)
@@ -145,6 +146,10 @@ void CalibrationHelper::CreateHistograms()
     m_hHCalOtherDirectionCorrectedADC->GetXaxis()->SetTitle("Direction Corrected ADC Measurement");
     m_hHCalOtherDirectionCorrectedADC->GetYaxis()->SetTitle("Entries");
 
+    m_hECalDirectionCorrectedADC = new TH1F("ECalDirectionCorrectedADC", "Distribution of Direction Corrected ADCs in the ECal (1==nPfoTargetsTotal && 1==nPfoTargetsTracks)", 200, 0., 0.001);
+    m_hECalDirectionCorrectedADC->GetXaxis()->SetTitle("Direction Corrected ADC Measurement");
+    m_hECalDirectionCorrectedADC->GetYaxis()->SetTitle("Entries");
+
     m_hECalDirectionCorrectedCaloHitEnergy = new TH1F("ECalDirectionCorrectedCaloHitEnergy", "1==nPfoTargetsTotal && 1==nPfoTargetsTracks", 500, 0., 0.1);
     m_hECalDirectionCorrectedCaloHitEnergy->GetXaxis()->SetTitle("Direction Corrected Calo Hit Energy in ECal");
     m_hECalDirectionCorrectedCaloHitEnergy->GetYaxis()->SetTitle("Entries");
@@ -168,6 +173,7 @@ void CalibrationHelper::SetHistogramDirectories(TFile *pTFile)
     m_hHCalBarrelDirectionCorrectedADC->SetDirectory(pTFile);
     m_hHCalEndCapDirectionCorrectedADC->SetDirectory(pTFile);
     m_hHCalOtherDirectionCorrectedADC->SetDirectory(pTFile);
+    m_hECalDirectionCorrectedADC->SetDirectory(pTFile);
     m_hECalDirectionCorrectedCaloHitEnergy->SetDirectory(pTFile);
     m_hHCalDirectionCorrectedCaloHitEnergy->SetDirectory(pTFile);
     m_hMuonDirectionCorrectedCaloHitEnergy->SetDirectory(pTFile);
@@ -183,6 +189,7 @@ void CalibrationHelper::WriteHistograms()
     m_hHCalBarrelDirectionCorrectedADC->Write();
     m_hHCalEndCapDirectionCorrectedADC->Write();
     m_hHCalOtherDirectionCorrectedADC->Write();
+    m_hECalDirectionCorrectedADC->Write();
     m_hECalDirectionCorrectedCaloHitEnergy->Write();
     m_hHCalDirectionCorrectedCaloHitEnergy->Write();
     m_hMuonDirectionCorrectedCaloHitEnergy->Write();
@@ -224,6 +231,7 @@ void CalibrationHelper::Calibrate(const EVENT::LCEvent *pLCEvent, const Particle
         this->AddADCEntries(pLCEvent, m_settings.m_hCalBarrelCollectionsADC, 1, m_hHCalBarrelDirectionCorrectedADC);
         this->AddADCEntries(pLCEvent, m_settings.m_hCalEndCapCollectionsADC, 1, m_hHCalEndCapDirectionCorrectedADC);
         this->AddADCEntries(pLCEvent, m_settings.m_hCalOtherCollectionsADC, 1, m_hHCalOtherDirectionCorrectedADC);
+        this->AddADCEntries(pLCEvent, m_settings.m_eCalCollectionsADC, 1, m_hECalDirectionCorrectedADC);
 
         this->AddDirectionCorrectedCaloHitEntries(pLCEvent, m_settings.m_eCalCollections, m_hECalDirectionCorrectedCaloHitEnergy);
         this->AddDirectionCorrectedCaloHitEntries(pLCEvent, m_settings.m_hCalCollections, m_hHCalDirectionCorrectedCaloHitEnergy);

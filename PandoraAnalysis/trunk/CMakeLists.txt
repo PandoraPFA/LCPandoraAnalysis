@@ -36,13 +36,13 @@ SET( PERFORMANCE_PROGRAMS AnalysePerformance
 SET( CALIBRATION_PROGRAMS ECalDigitisation_ContainedEvents
     HCalDigitisation_ContainedEvents
     HCalDigitisation_DirectionCorrectionDistribution
-    HCalDigitisation_Ring
     PandoraPFACalibrate_MipResponse
     PandoraPFACalibrate_EMScale
     PandoraPFACalibrate_HadronicScale_ChiSquareMethod
     PandoraPFACalibrate_HadronicScale_TotalEnergyMethod
     PandoraPFACalibrate_HadronicEnergyGaussianFit
-    RescaleEnergies )
+    RescaleEnergies 
+    SimCaloHitEnergyDistribution )
 SET( PROGRAMS ${PERFORMANCE_PROGRAMS} ${CALIBRATION_PROGRAMS} )
 
 # require proper C++
