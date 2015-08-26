@@ -77,14 +77,14 @@ void AnalysePerformance(TChain *pTChain, const std::string &outputRootFileName)
 
     // Book histograms
     TH1F **pRegionHistograms = new TH1F*[nRegionBins];
-    TH1F *pPFAL7A = new TH1F("fPFA_L7A", "TotalEnergy<0.7A", 10000, 0., 5000.);
+    TH1F *pPFAL7A = new TH1F("fPFA_L7A", "TotalEnergy<0.7A", 100000, 0., 5000.);
 
     for (unsigned int i = 0; i < nRegionBins; ++i)
     {
         std::ostringstream name, title;
         name << "fPFA_" << i;
         title << "TotalEnergy_" << pRegionBinEdges[i] << "-" << pRegionBinEdges[i + 1];
-        pRegionHistograms[i] = new TH1F(name.str().c_str(), title.str().c_str(), 10000, 0., 5000.);
+        pRegionHistograms[i] = new TH1F(name.str().c_str(), title.str().c_str(), 100000, 0., 5000.);
     }
 
     // Loop over entries in pfo analysis tree, creating energy spectra for specified regions

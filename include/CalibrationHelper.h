@@ -180,13 +180,15 @@ private:
     TH1F           *m_hHCalDirectionCorrectedCaloHitEnergy; ///< AddDirectionCorrectedCaloHitEntries
     TH1F           *m_hMuonDirectionCorrectedCaloHitEnergy; ///< AddDirectionCorrectedCaloHitEntries
 
-    TH1F           *m_hHCalBarrelDirectionCorrectedADC;     ///< AddADCEntries setting 0
-    TH1F           *m_hHCalEndCapDirectionCorrectedADC;     ///< AddADCEntries setting 0
-    TH1F           *m_hHCalOtherDirectionCorrectedADC;      ///< AddADCEntries setting 0
+    TH1F           *m_hHCalBarrelDirectionCorrectedADC;     ///< AddADCEntries setting 0, pass HCal Barrel sim calo hit collections
+    TH1F           *m_hHCalEndCapDirectionCorrectedADC;     ///< AddADCEntries setting 0, pass HCal EndCap sim calo hit collections
+    TH1F           *m_hHCalOtherDirectionCorrectedADC;      ///< AddADCEntries setting 0, pass HCal Other sim calo hit collections
 
-    TH1F           *m_hHCalBarrelDirectionCorrectionADC;    ///< AddADCEntries setting 1
-    TH1F           *m_hHCalEndCapDirectionCorrectionADC;    ///< AddADCEntries setting 1
-    TH1F           *m_hHCalOtherDirectionCorrectionADC;     ///< AddADCEntries setting 1
+    TH1F           *m_hECalDirectionCorrectedADC;           ///< AddADCEntries setting 0, pass all ECal sim calo hit collections
+
+    TH1F           *m_hHCalBarrelDirectionCorrectionADC;    ///< AddADCEntries setting 1, pass HCal Barrel sim calo hit collections
+    TH1F           *m_hHCalEndCapDirectionCorrectionADC;    ///< AddADCEntries setting 1, pass HCal EndCap sim calo hit collections
+    TH1F           *m_hHCalOtherDirectionCorrectionADC;     ///< AddADCEntries setting 1, pass HCal Other sim calo hit collections
 };
 
 } // namespace pandora_analysis
