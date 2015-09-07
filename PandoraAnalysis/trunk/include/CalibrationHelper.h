@@ -47,10 +47,10 @@ public:
         LCStrVec    m_lHCalCollections;                     ///< Input calorimeter hit collection names
         LCStrVec    m_lCalCollections;                      ///< Input calorimeter hit collection names
 
-        LCStrVec    m_eCalCollectionsADC;                   ///< Input simcalorimeter hit collection names
-        LCStrVec    m_hCalBarrelCollectionsADC;             ///< Input simcalorimeter hit collection names
-        LCStrVec    m_hCalEndCapCollectionsADC;             ///< Input simcalorimeter hit collection names
-        LCStrVec    m_hCalOtherCollectionsADC;              ///< Input simcalorimeter hit collection names
+        LCStrVec    m_eCalCollectionsSimCaloHit;            ///< Input simcalorimeter hit collection names
+        LCStrVec    m_hCalBarrelCollectionsSimCaloHit;      ///< Input simcalorimeter hit collection names
+        LCStrVec    m_hCalEndCapCollectionsSimCaloHit;      ///< Input simcalorimeter hit collection names
+        LCStrVec    m_hCalOtherCollectionsSimCaloHit;       ///< Input simcalorimeter hit collection names
 
         int         m_hCalRingOuterSymmetryOrder;           ///< HCal ring outer symmetry order from steering file (default 8)
         float       m_hCalRingOuterPhi0;                    ///< HCal ring outer Phi0 from steering file (default 0)
@@ -129,15 +129,15 @@ private:
     void ReadCaloHitEnergies(const EVENT::LCEvent *pLCEvent, const EVENT::LCStrVec &collectionNames, float &hitEnergySum) const;
 
     /**
-     *  @brief  Add the direction corrected ADCs and the direction corrections for a particular collection to separate histograms
+     *  @brief  Add the direction corrected SimCaloHits and the direction corrections for a particular collection to separate histograms
      * 
      *  @param  pLCEvent a collection in the lc event
      *  @param  collectionNames a collection in the lc event
      *  @param  Barrel, Endcap, Other for the HCal collection
-     *  @param  pTH1F_Energy histogram to store direction corrected ADCs
+     *  @param  pTH1F_Energy histogram to store direction corrected SimCaloHits
      *  @param  pTH1F_Direction_Correction histogram to store direction corrections
      */
-    void AddADCEntries(const EVENT::LCEvent *pLCEvent, const EVENT::LCStrVec &collectionNames, const unsigned int ADC_DC, TH1F *pTH1F) const;
+    void AddSimCaloHitEntries(const EVENT::LCEvent *pLCEvent, const EVENT::LCStrVec &collectionNames, const unsigned int SimCaloHit_DC, TH1F *pTH1F) const;
 
     /**
      *  @brief  Add the direction corrected calo hits for a particular collection to a histogram
@@ -164,31 +164,31 @@ private:
      */
     float GetMaximumRadius(const EVENT::CalorimeterHit *const pCaloHit, const unsigned int symmetryOrder, const float phi0) const;
 
-    const Settings  m_settings;                             ///< The calibration helper settings
+    const Settings  m_settings;                                    ///< The calibration helper settings
 
-    int             m_pfoMinHCalLayerToEdge;                ///< GetNHCalLayersFromEdge
+    int             m_pfoMinHCalLayerToEdge;                       ///< GetNHCalLayersFromEdge
 
-    float           m_totalCaloHitEnergy;                   ///< Sum outputs from ReadCaloHitEnergies
-    float           m_eCalTotalCaloHitEnergy;               ///< ReadCaloHitEnergies
-    float           m_hCalTotalCaloHitEnergy;               ///< ReadCaloHitEnergies
-    float           m_muonTotalCaloHitEnergy;               ///< ReadCaloHitEnergies
-    float           m_bCalTotalCaloHitEnergy;               ///< ReadCaloHitEnergies
-    float           m_lHCalTotalCaloHitEnergy;              ///< ReadCaloHitEnergies
-    float           m_lCalTotalCaloHitEnergy;               ///< ReadCaloHitEnergies
+    float           m_totalCaloHitEnergy;                          ///< Sum outputs from ReadCaloHitEnergies
+    float           m_eCalTotalCaloHitEnergy;                      ///< ReadCaloHitEnergies
+    float           m_hCalTotalCaloHitEnergy;                      ///< ReadCaloHitEnergies
+    float           m_muonTotalCaloHitEnergy;                      ///< ReadCaloHitEnergies
+    float           m_bCalTotalCaloHitEnergy;                      ///< ReadCaloHitEnergies
+    float           m_lHCalTotalCaloHitEnergy;                     ///< ReadCaloHitEnergies
+    float           m_lCalTotalCaloHitEnergy;                      ///< ReadCaloHitEnergies
 
-    TH1F           *m_hECalDirectionCorrectedCaloHitEnergy; ///< AddDirectionCorrectedCaloHitEntries
-    TH1F           *m_hHCalDirectionCorrectedCaloHitEnergy; ///< AddDirectionCorrectedCaloHitEntries
-    TH1F           *m_hMuonDirectionCorrectedCaloHitEnergy; ///< AddDirectionCorrectedCaloHitEntries
+    TH1F           *m_hECalDirectionCorrectedCaloHitEnergy;        ///< AddDirectionCorrectedCaloHitEntries
+    TH1F           *m_hHCalDirectionCorrectedCaloHitEnergy;        ///< AddDirectionCorrectedCaloHitEntries
+    TH1F           *m_hMuonDirectionCorrectedCaloHitEnergy;        ///< AddDirectionCorrectedCaloHitEntries
 
-    TH1F           *m_hHCalBarrelDirectionCorrectedADC;     ///< AddADCEntries setting 0, pass HCal Barrel sim calo hit collections
-    TH1F           *m_hHCalEndCapDirectionCorrectedADC;     ///< AddADCEntries setting 0, pass HCal EndCap sim calo hit collections
-    TH1F           *m_hHCalOtherDirectionCorrectedADC;      ///< AddADCEntries setting 0, pass HCal Other sim calo hit collections
+    TH1F           *m_hHCalBarrelDirectionCorrectedSimCaloHit;     ///< AddSimCaloHitEntries setting 0, pass HCal Barrel sim calo hit collections
+    TH1F           *m_hHCalEndCapDirectionCorrectedSimCaloHit;     ///< AddSimCaloHitEntries setting 0, pass HCal EndCap sim calo hit collections
+    TH1F           *m_hHCalOtherDirectionCorrectedSimCaloHit;      ///< AddSimCaloHitEntries setting 0, pass HCal Other sim calo hit collections
 
-    TH1F           *m_hECalDirectionCorrectedADC;           ///< AddADCEntries setting 0, pass all ECal sim calo hit collections
+    TH1F           *m_hECalDirectionCorrectedSimCaloHit;           ///< AddSimCaloHitEntries setting 0, pass all ECal sim calo hit collections
 
-    TH1F           *m_hHCalBarrelDirectionCorrectionADC;    ///< AddADCEntries setting 1, pass HCal Barrel sim calo hit collections
-    TH1F           *m_hHCalEndCapDirectionCorrectionADC;    ///< AddADCEntries setting 1, pass HCal EndCap sim calo hit collections
-    TH1F           *m_hHCalOtherDirectionCorrectionADC;     ///< AddADCEntries setting 1, pass HCal Other sim calo hit collections
+    TH1F           *m_hHCalBarrelDirectionCorrectionSimCaloHit;    ///< AddSimCaloHitEntries setting 1, pass HCal Barrel sim calo hit collections
+    TH1F           *m_hHCalEndCapDirectionCorrectionSimCaloHit;    ///< AddSimCaloHitEntries setting 1, pass HCal EndCap sim calo hit collections
+    TH1F           *m_hHCalOtherDirectionCorrectionSimCaloHit;     ///< AddSimCaloHitEntries setting 1, pass HCal Other sim calo hit collections
 };
 
 } // namespace pandora_analysis

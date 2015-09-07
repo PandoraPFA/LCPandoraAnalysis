@@ -175,27 +175,27 @@ PfoAnalysis::PfoAnalysis() :
                            LCStrVec());
 
     registerInputCollections(LCIO::SIMCALORIMETERHIT, 
-                           "ECalCollectionsADC" , 
+                           "ECalCollectionsSimCaloHit" , 
                            "Name of the ECal collection post Mokka, pre digitisation" , 
-                           m_calibrationHelperSettings.m_eCalCollectionsADC , 
+                           m_calibrationHelperSettings.m_eCalCollectionsSimCaloHit , 
                            LCStrVec());
 
     registerInputCollections(LCIO::SIMCALORIMETERHIT, 
-                           "HCalBarrelCollectionsADC" , 
+                           "HCalBarrelCollectionsSimCaloHit" , 
                            "Name of the HCal Barrel collection post Mokka, pre digitisation" , 
-                           m_calibrationHelperSettings.m_hCalBarrelCollectionsADC , 
+                           m_calibrationHelperSettings.m_hCalBarrelCollectionsSimCaloHit , 
                            LCStrVec());
 
     registerInputCollections(LCIO::SIMCALORIMETERHIT, 
-                           "HCalEndCapCollectionsADC" , 
+                           "HCalEndCapCollectionsSimCaloHit" , 
                            "Name of the HCal EndCap collection post Mokka, pre digitisation" , 
-                           m_calibrationHelperSettings.m_hCalEndCapCollectionsADC , 
+                           m_calibrationHelperSettings.m_hCalEndCapCollectionsSimCaloHit , 
                            LCStrVec());
 
     registerInputCollections(LCIO::SIMCALORIMETERHIT, 
-                           "HCalOtherCollectionsADC" , 
+                           "HCalOtherCollectionsSimCaloHit" , 
                            "Name of the HCal Other collection post Mokka, pre digitisation" , 
-                           m_calibrationHelperSettings.m_hCalOtherCollectionsADC , 
+                           m_calibrationHelperSettings.m_hCalOtherCollectionsSimCaloHit , 
                            LCStrVec());
 }
 

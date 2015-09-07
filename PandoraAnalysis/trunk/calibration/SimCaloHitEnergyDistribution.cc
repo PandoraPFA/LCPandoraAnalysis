@@ -49,10 +49,10 @@ public:
     std::string     m_outputPath;                           ///< Output path to send results
 
 // Outputs
-    float           m_PeakHCalBarrelDirectionCorrectedADC;  ///< Peak position in m_hHCalBarrelDirectionCorrectedADC
-    float           m_PeakHCalEndCapDirectionCorrectedADC;  ///< Peak position in m_hHCalEndCapDirectionCorrectedADC
-    float           m_PeakHCalOtherDirectionCorrectedADC;   ///< Peak position in m_hHCalOtherDirectionCorrectedADC
-    float           m_PeakECalDirectionCorrectedADC;        ///< Peak position in m_hECalDirectionCorrectedADC
+    float           m_PeakHCalBarrelDirectionCorrectedSimCaloHit;  ///< Peak position in m_hHCalBarrelDirectionCorrectedSimCaloHit
+    float           m_PeakHCalEndCapDirectionCorrectedSimCaloHit;  ///< Peak position in m_hHCalEndCapDirectionCorrectedSimCaloHit
+    float           m_PeakHCalOtherDirectionCorrectedSimCaloHit;   ///< Peak position in m_hHCalOtherDirectionCorrectedSimCaloHit
+    float           m_PeakECalDirectionCorrectedSimCaloHit;        ///< Peak position in m_hECalDirectionCorrectedSimCaloHit
 
 private:
     /**
@@ -60,10 +60,10 @@ private:
     */
     int PeakFinder(const TH1F *const pTH1F);
 
-    TH1F           *m_hHCalBarrelDirectionCorrectedADC;     ///< Histogram of direction corrected SimCalorimeterHit energy (ADC) in HCal Barrel
-    TH1F           *m_hHCalEndCapDirectionCorrectedADC;     ///< Histogram of direction corrected SimCalorimeterHit energy (ADC) in HCal EndCap
-    TH1F           *m_hHCalOtherDirectionCorrectedADC;      ///< Histogram of direction corrected SimCalorimeterHit energy (ADC) in HCal Other
-    TH1F           *m_hECalDirectionCorrectedADC;           ///< Histogram of direction corrected SimCalorimeterHit energy (ADC) in ECal
+    TH1F           *m_hHCalBarrelDirectionCorrectedSimCaloHit;     ///< Histogram of direction corrected SimCalorimeterHit energy (SimCaloHit) in HCal Barrel
+    TH1F           *m_hHCalEndCapDirectionCorrectedSimCaloHit;     ///< Histogram of direction corrected SimCalorimeterHit energy (SimCaloHit) in HCal EndCap
+    TH1F           *m_hHCalOtherDirectionCorrectedSimCaloHit;      ///< Histogram of direction corrected SimCalorimeterHit energy (SimCaloHit) in HCal Other
+    TH1F           *m_hECalDirectionCorrectedSimCaloHit;           ///< Histogram of direction corrected SimCalorimeterHit energy (SimCaloHit) in ECal
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -109,20 +109,20 @@ int main(int argc, char **argv)
         data_file << "Digitisation of the HCal Ring                      : " << std::endl << std::endl;
         data_file << "For Muons with energy                              : " << simCaloHitEnergyDistribution.m_trueEnergy << " : " <<std::endl;
         data_file << "The MIP peaks for each part of the HCal were found : " << std::endl;
-        data_file << "to occur at the following ADC values:              : " << std::endl;
-        data_file << "HCal Barrel MIP Peak:                              : " << simCaloHitEnergyDistribution.m_PeakHCalBarrelDirectionCorrectedADC << " : " <<std::endl;
-        data_file << "HCal EndCap MIP Peak:                              : " << simCaloHitEnergyDistribution.m_PeakHCalEndCapDirectionCorrectedADC << " : " <<std::endl;
-        data_file << "HCal Ring MIP Peak:                                : " << simCaloHitEnergyDistribution.m_PeakHCalOtherDirectionCorrectedADC << " : " <<std::endl;
-        data_file << "ECal MIP Peak:                                     : " << simCaloHitEnergyDistribution.m_PeakECalDirectionCorrectedADC << " : " <<std::endl;
+        data_file << "to occur at the following SimCaloHit values:              : " << std::endl;
+        data_file << "HCal Barrel MIP Peak:                              : " << simCaloHitEnergyDistribution.m_PeakHCalBarrelDirectionCorrectedSimCaloHit << " : " <<std::endl;
+        data_file << "HCal EndCap MIP Peak:                              : " << simCaloHitEnergyDistribution.m_PeakHCalEndCapDirectionCorrectedSimCaloHit << " : " <<std::endl;
+        data_file << "HCal Ring MIP Peak:                                : " << simCaloHitEnergyDistribution.m_PeakHCalOtherDirectionCorrectedSimCaloHit << " : " <<std::endl;
+        data_file << "ECal MIP Peak:                                     : " << simCaloHitEnergyDistribution.m_PeakECalDirectionCorrectedSimCaloHit << " : " <<std::endl;
 
         std::cout << "Digitisation of the HCal Ring                      : " << std::endl << std::endl;
         std::cout << "For Muons with energy                              : " << simCaloHitEnergyDistribution.m_trueEnergy << " : " <<std::endl;
         std::cout << "The MIP peaks for each part of the HCal were found : " << std::endl;
-        std::cout << "to occur at the following ADC values:              : " << std::endl;
-        std::cout << "HCal Barrel MIP Peak:                              : " << simCaloHitEnergyDistribution.m_PeakHCalBarrelDirectionCorrectedADC << " : " <<std::endl;
-        std::cout << "HCal EndCap MIP Peak:                              : " << simCaloHitEnergyDistribution.m_PeakHCalEndCapDirectionCorrectedADC << " : " <<std::endl;
-        std::cout << "HCal Ring MIP Peak:                                : " << simCaloHitEnergyDistribution.m_PeakHCalOtherDirectionCorrectedADC << " : " <<std::endl;
-        std::cout << "ECal MIP Peak:                                     : " << simCaloHitEnergyDistribution.m_PeakECalDirectionCorrectedADC << " : " <<std::endl;
+        std::cout << "to occur at the following SimCaloHit values:              : " << std::endl;
+        std::cout << "HCal Barrel MIP Peak:                              : " << simCaloHitEnergyDistribution.m_PeakHCalBarrelDirectionCorrectedSimCaloHit << " : " <<std::endl;
+        std::cout << "HCal EndCap MIP Peak:                              : " << simCaloHitEnergyDistribution.m_PeakHCalEndCapDirectionCorrectedSimCaloHit << " : " <<std::endl;
+        std::cout << "HCal Ring MIP Peak:                                : " << simCaloHitEnergyDistribution.m_PeakHCalOtherDirectionCorrectedSimCaloHit << " : " <<std::endl;
+        std::cout << "ECal MIP Peak:                                     : " << simCaloHitEnergyDistribution.m_PeakECalDirectionCorrectedSimCaloHit << " : " <<std::endl;
 
         data_file.close();
         delete pTApplication;
@@ -145,14 +145,14 @@ SimCaloHitEnergyDistribution::SimCaloHitEnergyDistribution() :
     m_inputMuonRootFiles(""),
     m_trueEnergy(std::numeric_limits<float>::max()),
     m_outputPath(""),
-    m_PeakHCalBarrelDirectionCorrectedADC(std::numeric_limits<float>::max()),
-    m_PeakHCalEndCapDirectionCorrectedADC(std::numeric_limits<float>::max()),
-    m_PeakHCalOtherDirectionCorrectedADC(std::numeric_limits<float>::max()),
-    m_PeakECalDirectionCorrectedADC(std::numeric_limits<float>::max()),
-    m_hHCalBarrelDirectionCorrectedADC(NULL),
-    m_hHCalEndCapDirectionCorrectedADC(NULL),
-    m_hHCalOtherDirectionCorrectedADC(NULL),
-    m_hECalDirectionCorrectedADC(NULL)
+    m_PeakHCalBarrelDirectionCorrectedSimCaloHit(std::numeric_limits<float>::max()),
+    m_PeakHCalEndCapDirectionCorrectedSimCaloHit(std::numeric_limits<float>::max()),
+    m_PeakHCalOtherDirectionCorrectedSimCaloHit(std::numeric_limits<float>::max()),
+    m_PeakECalDirectionCorrectedSimCaloHit(std::numeric_limits<float>::max()),
+    m_hHCalBarrelDirectionCorrectedSimCaloHit(NULL),
+    m_hHCalEndCapDirectionCorrectedSimCaloHit(NULL),
+    m_hHCalOtherDirectionCorrectedSimCaloHit(NULL),
+    m_hECalDirectionCorrectedSimCaloHit(NULL)
 {
 }
 
@@ -166,21 +166,21 @@ SimCaloHitEnergyDistribution::~SimCaloHitEnergyDistribution()
 
 void SimCaloHitEnergyDistribution::MakeHistograms()
 {
-    m_hHCalBarrelDirectionCorrectedADC = new TH1F("HCalDirectionCorrectedADCBarrel", "Distribution of Direction Corrected ADCs in the HCal Barrel (1==nPfoTargetsTotal && 1==nPfoTargetsTracks)", 200, 0., 0.001);
-    m_hHCalBarrelDirectionCorrectedADC->GetXaxis()->SetTitle("Direction Corrected ADC Measurement");
-    m_hHCalBarrelDirectionCorrectedADC->GetYaxis()->SetTitle("Entries");
+    m_hHCalBarrelDirectionCorrectedSimCaloHit = new TH1F("HCalDirectionCorrectedSimCaloHitBarrel", "Distribution of Direction Corrected SimCaloHits in the HCal Barrel (1==nPfoTargetsTotal && 1==nPfoTargetsTracks)", 200, 0., 0.001);
+    m_hHCalBarrelDirectionCorrectedSimCaloHit->GetXaxis()->SetTitle("Direction Corrected SimCaloHit Measurement");
+    m_hHCalBarrelDirectionCorrectedSimCaloHit->GetYaxis()->SetTitle("Entries");
 
-    m_hHCalEndCapDirectionCorrectedADC = new TH1F("HCalDirectionCorrectedADCEndCap", "Distribution of Direction Corrected ADCs in the HCal EndCap (1==nPfoTargetsTotal && 1==nPfoTargetsTracks)", 200, 0., 0.001);
-    m_hHCalEndCapDirectionCorrectedADC->GetXaxis()->SetTitle("Direction Corrected ADC Measurement");
-    m_hHCalEndCapDirectionCorrectedADC->GetYaxis()->SetTitle("Entries");
+    m_hHCalEndCapDirectionCorrectedSimCaloHit = new TH1F("HCalDirectionCorrectedSimCaloHitEndCap", "Distribution of Direction Corrected SimCaloHits in the HCal EndCap (1==nPfoTargetsTotal && 1==nPfoTargetsTracks)", 200, 0., 0.001);
+    m_hHCalEndCapDirectionCorrectedSimCaloHit->GetXaxis()->SetTitle("Direction Corrected SimCaloHit Measurement");
+    m_hHCalEndCapDirectionCorrectedSimCaloHit->GetYaxis()->SetTitle("Entries");
 
-    m_hHCalOtherDirectionCorrectedADC = new TH1F("HCalDirectionCorrectedADCOther", "Distribution of Direction Corrected ADCs in the HCal Other (1==nPfoTargetsTotal && 1==nPfoTargetsTracks)", 200, 0., 0.005);
-    m_hHCalOtherDirectionCorrectedADC->GetXaxis()->SetTitle("Direction Corrected ADC Measurement");
-    m_hHCalOtherDirectionCorrectedADC->GetYaxis()->SetTitle("Entries");
+    m_hHCalOtherDirectionCorrectedSimCaloHit = new TH1F("HCalDirectionCorrectedSimCaloHitOther", "Distribution of Direction Corrected SimCaloHits in the HCal Other (1==nPfoTargetsTotal && 1==nPfoTargetsTracks)", 200, 0., 0.005);
+    m_hHCalOtherDirectionCorrectedSimCaloHit->GetXaxis()->SetTitle("Direction Corrected SimCaloHit Measurement");
+    m_hHCalOtherDirectionCorrectedSimCaloHit->GetYaxis()->SetTitle("Entries");
 
-    m_hECalDirectionCorrectedADC = new TH1F("ECalDirectionCorrectedADC", "Distribution of Direction Corrected ADCs in the ECal (1==nPfoTargetsTotal && 1==nPfoTargetsTracks)", 200, 0., 0.001);
-    m_hECalDirectionCorrectedADC->GetXaxis()->SetTitle("Direction Corrected ADC Measurement");
-    m_hECalDirectionCorrectedADC->GetYaxis()->SetTitle("Entries");
+    m_hECalDirectionCorrectedSimCaloHit = new TH1F("ECalDirectionCorrectedSimCaloHit", "Distribution of Direction Corrected SimCaloHits in the ECal (1==nPfoTargetsTotal && 1==nPfoTargetsTracks)", 200, 0., 0.001);
+    m_hECalDirectionCorrectedSimCaloHit->GetXaxis()->SetTitle("Direction Corrected SimCaloHit Measurement");
+    m_hECalDirectionCorrectedSimCaloHit->GetYaxis()->SetTitle("Entries");
 
     unsigned int found_slash = m_inputMuonRootFiles.find_last_of("/");
     std::string path = m_inputMuonRootFiles.substr(0,found_slash);
@@ -206,48 +206,48 @@ void SimCaloHitEnergyDistribution::MakeHistograms()
             {
                 TString filename(path + "/" + fname);
                 TFile *pTFile = new TFile(filename);
-                TH1F *pTH1FHCalBarrelDirectionCorrectedADC = (TH1F*) pTFile->Get("HCalDirectionCorrectedADCBarrel");
-                TH1F *pTH1FHCalEndCapDirectionCorrectedADC = (TH1F*) pTFile->Get("HCalDirectionCorrectedADCEndCap");
-                TH1F *pTH1FHCalOtherDirectionCorrectionADC = (TH1F*) pTFile->Get("HCalDirectionCorrectedADCOther");
-                TH1F *pTH1FECalDirectionCorrectionADC = (TH1F*) pTFile->Get("ECalDirectionCorrectedADC");
+                TH1F *pTH1FHCalBarrelDirectionCorrectedSimCaloHit = (TH1F*) pTFile->Get("HCalDirectionCorrectedSimCaloHitBarrel");
+                TH1F *pTH1FHCalEndCapDirectionCorrectedSimCaloHit = (TH1F*) pTFile->Get("HCalDirectionCorrectedSimCaloHitEndCap");
+                TH1F *pTH1FHCalOtherDirectionCorrectionSimCaloHit = (TH1F*) pTFile->Get("HCalDirectionCorrectedSimCaloHitOther");
+                TH1F *pTH1FECalDirectionCorrectionSimCaloHit = (TH1F*) pTFile->Get("ECalDirectionCorrectedSimCaloHit");
 
-                if (pTH1FHCalBarrelDirectionCorrectedADC!=NULL)
-                    m_hHCalBarrelDirectionCorrectedADC->Add(pTH1FHCalBarrelDirectionCorrectedADC,1.0);
+                if (pTH1FHCalBarrelDirectionCorrectedSimCaloHit!=NULL)
+                    m_hHCalBarrelDirectionCorrectedSimCaloHit->Add(pTH1FHCalBarrelDirectionCorrectedSimCaloHit,1.0);
 
-                if (pTH1FHCalEndCapDirectionCorrectedADC!=NULL)
-                    m_hHCalEndCapDirectionCorrectedADC->Add(pTH1FHCalEndCapDirectionCorrectedADC,1.0);
+                if (pTH1FHCalEndCapDirectionCorrectedSimCaloHit!=NULL)
+                    m_hHCalEndCapDirectionCorrectedSimCaloHit->Add(pTH1FHCalEndCapDirectionCorrectedSimCaloHit,1.0);
 
-                if (pTH1FHCalOtherDirectionCorrectionADC!=NULL)
-                    m_hHCalOtherDirectionCorrectedADC->Add(pTH1FHCalOtherDirectionCorrectionADC,1.0);
+                if (pTH1FHCalOtherDirectionCorrectionSimCaloHit!=NULL)
+                    m_hHCalOtherDirectionCorrectedSimCaloHit->Add(pTH1FHCalOtherDirectionCorrectionSimCaloHit,1.0);
 
-                if (pTH1FECalDirectionCorrectionADC!=NULL)
-                    m_hECalDirectionCorrectedADC->Add(pTH1FECalDirectionCorrectionADC,1.0);
+                if (pTH1FECalDirectionCorrectionSimCaloHit!=NULL)
+                    m_hECalDirectionCorrectedSimCaloHit->Add(pTH1FECalDirectionCorrectionSimCaloHit,1.0);
 
-                delete pTH1FHCalBarrelDirectionCorrectedADC;
-                delete pTH1FHCalEndCapDirectionCorrectedADC;
-                delete pTH1FHCalOtherDirectionCorrectionADC;
-                delete pTH1FECalDirectionCorrectionADC;
+                delete pTH1FHCalBarrelDirectionCorrectedSimCaloHit;
+                delete pTH1FHCalEndCapDirectionCorrectedSimCaloHit;
+                delete pTH1FHCalOtherDirectionCorrectionSimCaloHit;
+                delete pTH1FECalDirectionCorrectionSimCaloHit;
                 delete pTFile;
             }
         }
     }
 
-    m_hHCalBarrelDirectionCorrectedADC->Sumw2();
-    m_hHCalEndCapDirectionCorrectedADC->Sumw2();
-    m_hHCalOtherDirectionCorrectedADC->Sumw2();
-    m_hECalDirectionCorrectedADC->Sumw2();
+    m_hHCalBarrelDirectionCorrectedSimCaloHit->Sumw2();
+    m_hHCalEndCapDirectionCorrectedSimCaloHit->Sumw2();
+    m_hHCalOtherDirectionCorrectedSimCaloHit->Sumw2();
+    m_hECalDirectionCorrectedSimCaloHit->Sumw2();
 
     TCanvas *pCanvas = new TCanvas("Direction_Corrected_SimCalorimeterHit_Energy_Distribution_HCal", "Direction Corrected SimCalorimeterHit Energy Distribution HCal", 5000, 5000);
     pCanvas->Divide(1,3);
 
     pCanvas->cd(1);
-    m_hHCalBarrelDirectionCorrectedADC->Draw();
+    m_hHCalBarrelDirectionCorrectedSimCaloHit->Draw();
 
     pCanvas->cd(2);
-    m_hHCalEndCapDirectionCorrectedADC->Draw();
+    m_hHCalEndCapDirectionCorrectedSimCaloHit->Draw();
 
     pCanvas->cd(3);
-    m_hHCalOtherDirectionCorrectedADC->Draw();
+    m_hHCalOtherDirectionCorrectedSimCaloHit->Draw();
 
     TString pngOutputFilename = m_outputPath + "Direction_Corrected_SimCalorimeterHit_Energy_Distribution_HCal_" + TString::Format("%i",int(m_trueEnergy + 0.5)) + "_GeV_Muons.png";
     TString dotCOutputFilename = m_outputPath + "Direction_Corrected_SimCalorimeterHit_Energy_Distribution_HCal_" + TString::Format("%i",int(m_trueEnergy + 0.5)) + "_GeV_Muons.C";
@@ -256,7 +256,7 @@ void SimCaloHitEnergyDistribution::MakeHistograms()
     pCanvas->SaveAs(dotCOutputFilename);
 
     TCanvas *pCanvas2 = new TCanvas("Direction_Corrected_SimCalorimeterHit_Energy_Distribution_ECal", "Direction Corrected SimCalorimeterHit Energy Distribution ECal", 5000, 5000);
-    m_hECalDirectionCorrectedADC->Draw();
+    m_hECalDirectionCorrectedSimCaloHit->Draw();
 
     TString pngOutputFilename2 = m_outputPath + "Direction_Corrected_SimCalorimeterHit_Energy_Distribution_ECal_" + TString::Format("%i",int(m_trueEnergy + 0.5)) + "_GeV_Muons.png";
     TString dotCOutputFilename2 = m_outputPath + "Direction_Corrected_SimCalorimeterHit_Energy_Distribution_ECal_" + TString::Format("%i",int(m_trueEnergy + 0.5)) + "_GeV_Muons.C";
@@ -264,10 +264,10 @@ void SimCaloHitEnergyDistribution::MakeHistograms()
     pCanvas2->SaveAs(pngOutputFilename2);
     pCanvas2->SaveAs(dotCOutputFilename2);
 
-    m_PeakHCalBarrelDirectionCorrectedADC = m_hHCalBarrelDirectionCorrectedADC->GetXaxis()->GetBinCenter(PeakFinder(m_hHCalBarrelDirectionCorrectedADC));
-    m_PeakHCalEndCapDirectionCorrectedADC = m_hHCalEndCapDirectionCorrectedADC->GetXaxis()->GetBinCenter(PeakFinder(m_hHCalEndCapDirectionCorrectedADC));
-    m_PeakHCalOtherDirectionCorrectedADC = m_hHCalOtherDirectionCorrectedADC->GetXaxis()->GetBinCenter(PeakFinder(m_hHCalOtherDirectionCorrectedADC));
-    m_PeakECalDirectionCorrectedADC = m_hECalDirectionCorrectedADC->GetXaxis()->GetBinCenter(PeakFinder(m_hECalDirectionCorrectedADC));
+    m_PeakHCalBarrelDirectionCorrectedSimCaloHit = m_hHCalBarrelDirectionCorrectedSimCaloHit->GetXaxis()->GetBinCenter(PeakFinder(m_hHCalBarrelDirectionCorrectedSimCaloHit));
+    m_PeakHCalEndCapDirectionCorrectedSimCaloHit = m_hHCalEndCapDirectionCorrectedSimCaloHit->GetXaxis()->GetBinCenter(PeakFinder(m_hHCalEndCapDirectionCorrectedSimCaloHit));
+    m_PeakHCalOtherDirectionCorrectedSimCaloHit = m_hHCalOtherDirectionCorrectedSimCaloHit->GetXaxis()->GetBinCenter(PeakFinder(m_hHCalOtherDirectionCorrectedSimCaloHit));
+    m_PeakECalDirectionCorrectedSimCaloHit = m_hECalDirectionCorrectedSimCaloHit->GetXaxis()->GetBinCenter(PeakFinder(m_hECalDirectionCorrectedSimCaloHit));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
