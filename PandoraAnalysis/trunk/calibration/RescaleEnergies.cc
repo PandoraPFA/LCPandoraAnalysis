@@ -18,6 +18,7 @@
 
 #include <cmath>
 #include <cstdlib>
+#include <unistd.h>
 #include <fcntl.h>
 #include <iostream>
 #include <string>
