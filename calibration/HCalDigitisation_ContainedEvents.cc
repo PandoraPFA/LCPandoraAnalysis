@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <unistd.h>
 #include <fstream>
 #include <limits>
 #include <stdexcept>
