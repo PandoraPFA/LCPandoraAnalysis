@@ -50,9 +50,9 @@ public:
     std::string     m_outputPath;                           ///< Output path to send results
 
 // Outputs
-    TH1F           *m_hHCalBarrelDirectionCorrectionADC;    ///< Histogram of direction corrections applied to SimCalorimeterHits in HCal Barrel
-    TH1F           *m_hHCalEndCapDirectionCorrectionADC;    ///< Histogram of direction corrections applied to SimCalorimeterHits in HCal EndCap
-    TH1F           *m_hHCalOtherDirectionCorrectionADC;     ///< Histogram of direction corrections applied to SimCalorimeterHits in HCal Other
+    TH1F           *m_hHCalBarrelDirectionCorrectionSimCaloHit;    ///< Histogram of direction corrections applied to SimCalorimeterHits in HCal Barrel
+    TH1F           *m_hHCalEndCapDirectionCorrectionSimCaloHit;    ///< Histogram of direction corrections applied to SimCalorimeterHits in HCal EndCap
+    TH1F           *m_hHCalOtherDirectionCorrectionSimCaloHit;     ///< Histogram of direction corrections applied to SimCalorimeterHits in HCal Other
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -95,22 +95,22 @@ int main(int argc, char **argv)
         data_file << "The average direction correction applied to KaonL  : " << std::endl;
         data_file << "events with energy:                                : " << hCalDigitisationDCDistribution.m_trueEnergy << " : /GeV" <<std::endl;
         data_file << "in the HCal EndCap is given by:                    : " << std::endl;
-        data_file << "Mean Direction Correction HCalEndCap:              : " << hCalDigitisationDCDistribution.m_hHCalEndCapDirectionCorrectionADC->GetMean() << " : " <<std::endl<<std::endl;
+        data_file << "Mean Direction Correction HCalEndCap:              : " << hCalDigitisationDCDistribution.m_hHCalEndCapDirectionCorrectionSimCaloHit->GetMean() << " : " <<std::endl<<std::endl;
 
         std::cout << "The average direction correction applied to KaonL  : " << std::endl;
         std::cout << "events with energy:                                : " << hCalDigitisationDCDistribution.m_trueEnergy << " : /GeV" <<std::endl;
         std::cout << "in the HCal EndCap is given by:                    : " << std::endl;
-        std::cout << "Mean Direction Correction HCalEndCap:              : " << hCalDigitisationDCDistribution.m_hHCalEndCapDirectionCorrectionADC->GetMean() << " : " <<std::endl<<std::endl;
+        std::cout << "Mean Direction Correction HCalEndCap:              : " << hCalDigitisationDCDistribution.m_hHCalEndCapDirectionCorrectionSimCaloHit->GetMean() << " : " <<std::endl<<std::endl;
 
         data_file << "The average direction correction applied to KaonL  : " << std::endl;
         data_file << "events with energy:                                : " << hCalDigitisationDCDistribution.m_trueEnergy << " : /GeV" <<std::endl;
         data_file << "in the HCalOther (i.e. HCal Ring) is given by:     : " << std::endl;
-        data_file << "Mean Direction Correction HCalOther:               : " << hCalDigitisationDCDistribution.m_hHCalOtherDirectionCorrectionADC->GetMean() << " : " <<std::endl<<std::endl;
+        data_file << "Mean Direction Correction HCalOther:               : " << hCalDigitisationDCDistribution.m_hHCalOtherDirectionCorrectionSimCaloHit->GetMean() << " : " <<std::endl<<std::endl;
 
         std::cout << "The average direction correction applied to KaonL  : " << std::endl;
         std::cout << "events with energy:                                : " << hCalDigitisationDCDistribution.m_trueEnergy << " : /GeV" <<std::endl;
         std::cout << "in the HCalOther (i.e. HCal Ring) is given by:     : " << std::endl;
-        std::cout << "Mean Direction Correction HCalOther:               : " << hCalDigitisationDCDistribution.m_hHCalOtherDirectionCorrectionADC->GetMean() << " : " <<std::endl<<std::endl;
+        std::cout << "Mean Direction Correction HCalOther:               : " << hCalDigitisationDCDistribution.m_hHCalOtherDirectionCorrectionSimCaloHit->GetMean() << " : " <<std::endl<<std::endl;
 
         data_file.close();
         delete pTApplication;
@@ -133,9 +133,9 @@ HCalDigitisationDCDistribution::HCalDigitisationDCDistribution() :
     m_inputKaonLRootFiles(""),
     m_trueEnergy(std::numeric_limits<float>::max()),
     m_outputPath(""),
-    m_hHCalBarrelDirectionCorrectionADC(NULL),
-    m_hHCalEndCapDirectionCorrectionADC(NULL),
-    m_hHCalOtherDirectionCorrectionADC(NULL)
+    m_hHCalBarrelDirectionCorrectionSimCaloHit(NULL),
+    m_hHCalEndCapDirectionCorrectionSimCaloHit(NULL),
+    m_hHCalOtherDirectionCorrectionSimCaloHit(NULL)
 {
 }
 
@@ -149,17 +149,17 @@ HCalDigitisationDCDistribution::~HCalDigitisationDCDistribution()
 
 void HCalDigitisationDCDistribution::MakeHistograms()
 {
-    m_hHCalBarrelDirectionCorrectionADC = new TH1F("HCalBarrelDirectionCorrectionADC", "Distribution of Direction Corrections for ADCs in the HCal Barrel (1==nPfoTargetsTotal && 1==nPfoTargetsNeutralHadrons && Contained in HCal)", 200, 0., 1.0);
-    m_hHCalBarrelDirectionCorrectionADC->GetXaxis()->SetTitle("Sim Calo Hit Direction Correction");
-    m_hHCalBarrelDirectionCorrectionADC->GetYaxis()->SetTitle("Entries");
+    m_hHCalBarrelDirectionCorrectionSimCaloHit = new TH1F("HCalBarrelDirectionCorrectionSimCaloHit", "Distribution of Direction Corrections for SimCaloHits in the HCal Barrel (1==nPfoTargetsTotal && 1==nPfoTargetsNeutralHadrons && Contained in HCal)", 200, 0., 1.0);
+    m_hHCalBarrelDirectionCorrectionSimCaloHit->GetXaxis()->SetTitle("Sim Calo Hit Direction Correction");
+    m_hHCalBarrelDirectionCorrectionSimCaloHit->GetYaxis()->SetTitle("Entries");
 
-    m_hHCalEndCapDirectionCorrectionADC = new TH1F("HCalEndCapDirectionCorrectionADC", "Distribution of Direction Corrections for ADCs in the HCal EndCap (1==nPfoTargetsTotal && 1==nPfoTargetsNeutralHadrons && Contained in HCal)", 200, 0., 1.0);
-    m_hHCalEndCapDirectionCorrectionADC->GetXaxis()->SetTitle("Sim Calo Hit Direction Correction");
-    m_hHCalEndCapDirectionCorrectionADC->GetYaxis()->SetTitle("Entries");
+    m_hHCalEndCapDirectionCorrectionSimCaloHit = new TH1F("HCalEndCapDirectionCorrectionSimCaloHit", "Distribution of Direction Corrections for SimCaloHits in the HCal EndCap (1==nPfoTargetsTotal && 1==nPfoTargetsNeutralHadrons && Contained in HCal)", 200, 0., 1.0);
+    m_hHCalEndCapDirectionCorrectionSimCaloHit->GetXaxis()->SetTitle("Sim Calo Hit Direction Correction");
+    m_hHCalEndCapDirectionCorrectionSimCaloHit->GetYaxis()->SetTitle("Entries");
 
-    m_hHCalOtherDirectionCorrectionADC = new TH1F("HCalOtherDirectionCorrectionADC", "Distribution of Direction Corrections for ADCs in the HCal Other (1==nPfoTargetsTotal && 1==nPfoTargetsNeutralHadrons && Contained in HCal)", 200, 0., 1.0);
-    m_hHCalOtherDirectionCorrectionADC->GetXaxis()->SetTitle("Sim Calo Hit Direction Correction");
-    m_hHCalOtherDirectionCorrectionADC->GetYaxis()->SetTitle("Entries");
+    m_hHCalOtherDirectionCorrectionSimCaloHit = new TH1F("HCalOtherDirectionCorrectionSimCaloHit", "Distribution of Direction Corrections for SimCaloHits in the HCal Other (1==nPfoTargetsTotal && 1==nPfoTargetsNeutralHadrons && Contained in HCal)", 200, 0., 1.0);
+    m_hHCalOtherDirectionCorrectionSimCaloHit->GetXaxis()->SetTitle("Sim Calo Hit Direction Correction");
+    m_hHCalOtherDirectionCorrectionSimCaloHit->GetYaxis()->SetTitle("Entries");
 
     unsigned int found_slash = m_inputKaonLRootFiles.find_last_of("/");
     std::string path = m_inputKaonLRootFiles.substr(0,found_slash);
@@ -185,42 +185,42 @@ void HCalDigitisationDCDistribution::MakeHistograms()
             {
                 TString filename(path + "/" + fname);
                 TFile *pTFile = new TFile(filename);
-                TH1F *pTH1FHCalBarrelDirectionCorrectionADC = (TH1F*) pTFile->Get("HCalBarrelDirectionCorrectionADC");
-                TH1F *pTH1FHCalEndCapDirectionCorrectionADC = (TH1F*) pTFile->Get("HCalEndCapDirectionCorrectionADC");
-                TH1F *pTH1FHCalOtherDirectionCorrectionADC = (TH1F*) pTFile->Get("HCalOtherDirectionCorrectionADC");
+                TH1F *pTH1FHCalBarrelDirectionCorrectionSimCaloHit = (TH1F*) pTFile->Get("HCalBarrelDirectionCorrectionSimCaloHit");
+                TH1F *pTH1FHCalEndCapDirectionCorrectionSimCaloHit = (TH1F*) pTFile->Get("HCalEndCapDirectionCorrectionSimCaloHit");
+                TH1F *pTH1FHCalOtherDirectionCorrectionSimCaloHit = (TH1F*) pTFile->Get("HCalOtherDirectionCorrectionSimCaloHit");
 
-                if (pTH1FHCalBarrelDirectionCorrectionADC!=NULL)
-                    m_hHCalBarrelDirectionCorrectionADC->Add(pTH1FHCalBarrelDirectionCorrectionADC,1.0);
+                if (pTH1FHCalBarrelDirectionCorrectionSimCaloHit!=NULL)
+                    m_hHCalBarrelDirectionCorrectionSimCaloHit->Add(pTH1FHCalBarrelDirectionCorrectionSimCaloHit,1.0);
 
-                if (pTH1FHCalEndCapDirectionCorrectionADC!=NULL)
-                    m_hHCalEndCapDirectionCorrectionADC->Add(pTH1FHCalEndCapDirectionCorrectionADC,1.0);
+                if (pTH1FHCalEndCapDirectionCorrectionSimCaloHit!=NULL)
+                    m_hHCalEndCapDirectionCorrectionSimCaloHit->Add(pTH1FHCalEndCapDirectionCorrectionSimCaloHit,1.0);
 
-                if (pTH1FHCalOtherDirectionCorrectionADC!=NULL)
-                    m_hHCalOtherDirectionCorrectionADC->Add(pTH1FHCalOtherDirectionCorrectionADC,1.0);
+                if (pTH1FHCalOtherDirectionCorrectionSimCaloHit!=NULL)
+                    m_hHCalOtherDirectionCorrectionSimCaloHit->Add(pTH1FHCalOtherDirectionCorrectionSimCaloHit,1.0);
 
-                delete pTH1FHCalBarrelDirectionCorrectionADC;
-                delete pTH1FHCalEndCapDirectionCorrectionADC;
-                delete pTH1FHCalOtherDirectionCorrectionADC;
+                delete pTH1FHCalBarrelDirectionCorrectionSimCaloHit;
+                delete pTH1FHCalEndCapDirectionCorrectionSimCaloHit;
+                delete pTH1FHCalOtherDirectionCorrectionSimCaloHit;
                 delete pTFile;
             }
         }
     }
 
-    m_hHCalBarrelDirectionCorrectionADC->Sumw2();
-    m_hHCalEndCapDirectionCorrectionADC->Sumw2();
-    m_hHCalOtherDirectionCorrectionADC->Sumw2();
+    m_hHCalBarrelDirectionCorrectionSimCaloHit->Sumw2();
+    m_hHCalEndCapDirectionCorrectionSimCaloHit->Sumw2();
+    m_hHCalOtherDirectionCorrectionSimCaloHit->Sumw2();
 
     TCanvas *pCanvas = new TCanvas("Canvas", "Canvas", 5000, 5000);
     pCanvas->Divide(1,3);
 
     pCanvas->cd(1);
-    m_hHCalBarrelDirectionCorrectionADC->Draw();
+    m_hHCalBarrelDirectionCorrectionSimCaloHit->Draw();
 
     pCanvas->cd(2);
-    m_hHCalEndCapDirectionCorrectionADC->Draw();
+    m_hHCalEndCapDirectionCorrectionSimCaloHit->Draw();
 
     pCanvas->cd(3);
-    m_hHCalOtherDirectionCorrectionADC->Draw();
+    m_hHCalOtherDirectionCorrectionSimCaloHit->Draw();
 
     TString pngOutputFilename = m_outputPath + "Direction_Correction_Distribution_HCal_" + TString::Format("%i",int(m_trueEnergy + 0.5)) + "_GeV_KaonL.png";
     TString dotCOutputFilename = m_outputPath + "Direction_Correction_Distribution_HCal_" + TString::Format("%i",int(m_trueEnergy + 0.5)) + "_GeV_KaonL.C";
