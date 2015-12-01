@@ -74,15 +74,13 @@ OPTION( INSTALL_DOC "Set to OFF to skip build/install Documentation" OFF )
 
 IF( INSTALL_DOC AND EXISTS "${PROJECT_SOURCE_DIR}/doc/CMakeLists.txt" )
     ADD_SUBDIRECTORY( ./doc )
+    INCLUDE( "${PROJECT_SOURCE_DIR}/cmakemodules/UseLATEX.cmake" )
+    SET( LATEX_OUTPUT_PATH build/doc )
+    ADD_LATEX_DOCUMENT( doc/CalibrationPandoraAnalysisExplained.tex DEFAULT_PDF )
 ELSE()
     MESSAGE( STATUS "INSTALL_DOC set to OFF" )
     SET( INSTALL_DOC OFF )
 ENDIF()
-
-INCLUDE( "${PROJECT_SOURCE_DIR}/cmakemodules/UseLATEX.cmake" )
-SET( LATEX_OUTPUT_PATH build/doc )
-ADD_LATEX_DOCUMENT( doc/CalibrationPandoraAnalysisExplained.tex DEFAULT_PDF )
-
 
 ### OUTPUT ##################################################################
 
