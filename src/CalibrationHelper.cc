@@ -424,7 +424,7 @@ void CalibrationHelper::ReadCaloHitEnergies(const EVENT::LCEvent *pLCEvent, cons
 
                     if (NULL == pCalorimeterHit)
                     {
-                        m_out(ERROR) << "Collection type mismatch " << (*iter) << " expected to contain objects of type CalorimeterHit " << std::endl;
+                        streamlog_out(ERROR) << "Collection type mismatch " << (*iter) << " expected to contain objects of type CalorimeterHit " << std::endl;
                         throw;
                     }
 
@@ -435,7 +435,7 @@ void CalibrationHelper::ReadCaloHitEnergies(const EVENT::LCEvent *pLCEvent, cons
         }
         catch (DataNotAvailableException &)
         {
-            m_out(DEBUG) << "No Collection : " << (*iter) << std::endl;
+            streamlog_out(DEBUG) << "No Collection : " << (*iter) << std::endl;
         }
     }
 }
@@ -463,7 +463,7 @@ void CalibrationHelper::AddSimCaloHitEntries(const EVENT::LCEvent *pLCEvent, con
 
                     if (NULL == pSimCalorimeterHit)
                     {
-                        m_out(ERROR) << "Collection type mismatch " << (*iter) << " expected to contain objects of type SimCalorimeterHit " << std::endl;
+                        streamlog_out(ERROR) << "Collection type mismatch " << (*iter) << " expected to contain objects of type SimCalorimeterHit " << std::endl;
                         throw;
                     }
 
@@ -491,7 +491,7 @@ void CalibrationHelper::AddSimCaloHitEntries(const EVENT::LCEvent *pLCEvent, con
         }
         catch (DataNotAvailableException &)
         {
-            m_out(DEBUG) << "No Collection : " << *iter << std::endl;
+            streamlog_out(DEBUG) << "No Collection : " << *iter << std::endl;
         }
     }
 }
@@ -519,7 +519,7 @@ void CalibrationHelper::AddDirectionCorrectedCaloHitEntries(const EVENT::LCEvent
 
                     if (NULL == pCalorimeterHit)
                     {
-                        m_out(ERROR) << "Collection type mismatch " << (*iter) << " expected to contain objects of type CalorimeterHit " << std::endl;
+                        streamlog_out(ERROR) << "Collection type mismatch " << (*iter) << " expected to contain objects of type CalorimeterHit " << std::endl;
                         throw;
                     }
 
@@ -543,7 +543,7 @@ void CalibrationHelper::AddDirectionCorrectedCaloHitEntries(const EVENT::LCEvent
         }
         catch (DataNotAvailableException &)
         {
-            m_out(DEBUG) << "No Collection : " << (*iter) << std::endl;
+            streamlog_out(DEBUG) << "No Collection : " << (*iter) << std::endl;
         }
     }
 }

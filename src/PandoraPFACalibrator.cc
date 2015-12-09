@@ -315,7 +315,7 @@ void PandoraPFACalibrator::init()
 void PandoraPFACalibrator::processRunHeader(LCRunHeader *pLCRunHeader)
 {
     m_nRun++;
-    m_out(DEBUG) << " DETECTOR : " << pLCRunHeader->getDetectorName() << std::endl;
+    streamlog_out(DEBUG) << " DETECTOR : " << pLCRunHeader->getDetectorName() << std::endl;
 
     const gear::CalorimeterParameters &ecalEndCapParameters(marlin::Global::GEAR->getEcalEndcapParameters());
     m_zOfEndCap = static_cast<float>(ecalEndCapParameters.getExtent()[2]);
@@ -422,7 +422,7 @@ void PandoraPFACalibrator::ReadMCParticles(LCEvent *pLCEvent, const LCStrVec &co
 
                     if (NULL == pReconstructedParticle)
                     {
-                        m_out(ERROR) << "Collection type mismatch " << (*iter) << " expected to contain objects of type ReconstructedParticle " << std::endl;
+                        streamlog_out(ERROR) << "Collection type mismatch " << (*iter) << " expected to contain objects of type ReconstructedParticle " << std::endl;
                         throw;
                     }
 
@@ -436,7 +436,7 @@ void PandoraPFACalibrator::ReadMCParticles(LCEvent *pLCEvent, const LCStrVec &co
         }
         catch (DataNotAvailableException &)
         {
-            m_out(DEBUG) << "No Collection : " << (*iter) << std::endl;
+            streamlog_out(DEBUG) << "No Collection : " << (*iter) << std::endl;
         }
     }
 }
@@ -467,7 +467,7 @@ void PandoraPFACalibrator::ReadHitEnergies(LCEvent *pLCEvent, const LCStrVec &co
 
                     if (NULL == pCalorimeterHit)
                     {
-                        m_out(ERROR) << "Collection type mismatch " << (*iter) << " expected to contain objects of type CalorimeterHit " << std::endl;
+                        streamlog_out(ERROR) << "Collection type mismatch " << (*iter) << " expected to contain objects of type CalorimeterHit " << std::endl;
                         throw;
                     }
 
@@ -500,7 +500,7 @@ void PandoraPFACalibrator::ReadHitEnergies(LCEvent *pLCEvent, const LCStrVec &co
         }
         catch (DataNotAvailableException &)
         {
-            m_out(DEBUG) << "No Collection : " << (*iter) << std::endl;
+            streamlog_out(DEBUG) << "No Collection : " << (*iter) << std::endl;
         }
     }
 }
@@ -526,7 +526,7 @@ void PandoraPFACalibrator::ReadPfoCollections(LCEvent *pLCEvent, const LCStrVec 
 
                     if (NULL == pReconstructedParticle)
                     {
-                        m_out(ERROR) << "Collection type mismatch " << m_particleCollectionName << " expected to contain objects of type ReconstructedParticle " << std::endl;
+                        streamlog_out(ERROR) << "Collection type mismatch " << m_particleCollectionName << " expected to contain objects of type ReconstructedParticle " << std::endl;
                         throw;
                     }
 
@@ -542,7 +542,7 @@ void PandoraPFACalibrator::ReadPfoCollections(LCEvent *pLCEvent, const LCStrVec 
         }
         catch (DataNotAvailableException &)
         {
-            m_out(DEBUG) << "No Collection : " << (*iter) << std::endl;
+            streamlog_out(DEBUG) << "No Collection : " << (*iter) << std::endl;
         }
     }
 }
@@ -557,7 +557,7 @@ void PandoraPFACalibrator::check(LCEvent *pLCEvent)
 
 void PandoraPFACalibrator::end()
 {
-    m_out(DEBUG) << "PandoraPFACalibrator::end()  " << name() << " processed " << m_nEvt << " events in " << m_nRun << " runs " << std::endl;
+    streamlog_out(DEBUG) << "PandoraPFACalibrator::end()  " << name() << " processed " << m_nEvt << " events in " << m_nRun << " runs " << std::endl;
 
     m_pTFile->cd();
     m_hPfoEnergy->Write();
