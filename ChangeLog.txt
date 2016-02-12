@@ -1,5 +1,13 @@
 --------------------------------------------------------------------------------------------------------------------------------------------
-TAG v01-00-01
+TAG v01-02-00
+--------------------------------------------------------------------------------------------------------------------------------------------
+Changed AnalysePerformanceFull to use energy bins of 0.05 GeV to match those used in AnalysePerformance.
+Replaced obsolete m_out w/ streamlog_out
+Correction to CMakeList regarding building of the calibration pdf.
+Corrected the HCalDigitisation_DirectionCorrectionDistribution script to refer to SimCaloHit instead of ADC in naming structure.
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+TAG v01-01-00
 --------------------------------------------------------------------------------------------------------------------------------------------
 Fix production of output root files when using multiple instances of the PfoAnalysis processor.
 
