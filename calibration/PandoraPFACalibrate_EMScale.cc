@@ -129,7 +129,7 @@ int main(int argc, char **argv)
         eCalToEM.Process();
 
         std::string dataFileName(eCalToEM.m_outputPath+"Calibration.txt");
-        ofstream data_file(dataFileName.c_str(), std::ios_base::app);
+        std::ofstream data_file(dataFileName.c_str(), std::ios_base::app);
 
         data_file << "_____________________________________________________________________________________" << std::endl;
         data_file << "Electromagnetic Energy Scale PandoraPFA Calibration." << std::endl << std::endl;

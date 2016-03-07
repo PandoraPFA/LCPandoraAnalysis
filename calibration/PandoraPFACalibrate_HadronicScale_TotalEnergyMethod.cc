@@ -146,7 +146,7 @@ int main(int argc, char **argv)
         totalEnergyMethod.Process();
 
         std::string dataFileName(totalEnergyMethod.m_outputPath + "Calibration.txt");
-        ofstream data_file(dataFileName.c_str(), std::ios_base::app);
+        std::ofstream data_file(dataFileName.c_str(), std::ios_base::app);
         data_file << "_____________________________________________________________________________________" << std::endl;
         data_file << "Hadronic Energy Scale PandoraPFA Calibration performed using the Total Energy Method." << std::endl << std::endl;
         data_file << "For kaon energy                                    : " << totalEnergyMethod.m_trueEnergy << " : " <<std::endl;

@@ -90,7 +90,7 @@ int main(int argc, char **argv)
         hCalDigitisationDCDistribution.MakeHistograms();
 
         std::string dataFileName(hCalDigitisationDCDistribution.m_outputPath + "Calibration.txt");
-        ofstream    data_file(dataFileName.c_str(), std::ios_base::app);
+        std::ofstream data_file(dataFileName.c_str(), std::ios_base::app);
 
         data_file << "The average direction correction applied to KaonL  : " << std::endl;
         data_file << "events with energy:                                : " << hCalDigitisationDCDistribution.m_trueEnergy << " : /GeV" <<std::endl;

@@ -46,7 +46,7 @@ SET( CALIBRATION_PROGRAMS ECalDigitisation_ContainedEvents
 SET( PROGRAMS ${PERFORMANCE_PROGRAMS} ${CALIBRATION_PROGRAMS} )
 
 # require proper C++
-ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
+ADD_DEFINITIONS( "-Wall -pedantic" )
 
 # need long long for int64 for now
 ADD_DEFINITIONS( "-Wno-long-long -Wno-sign-compare -fno-strict-aliasing" )
