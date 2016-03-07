@@ -131,7 +131,7 @@ int main(int argc, char **argv)
         hCalDigitisation.Process();
 
         std::string dataFileName(hCalDigitisation.m_outputPath + "Calibration.txt");
-        ofstream    data_file(dataFileName.c_str(), std::ios_base::app);
+        std::ofstream data_file(dataFileName.c_str(), std::ios_base::app);
         data_file << "_____________________________________________________________________________________" << std::endl;
         std::cout << "_____________________________________________________________________________________" << std::endl;
 
