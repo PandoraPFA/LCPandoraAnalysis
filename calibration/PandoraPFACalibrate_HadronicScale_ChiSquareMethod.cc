@@ -135,7 +135,7 @@ int main(int argc, char **argv)
         chiSquaredMethod.Process();
 
         std::string dataFileName(chiSquaredMethod.m_outputPath + "Calibration.txt");
-        ofstream data_file(dataFileName.c_str(), std::ios_base::app);
+        std::ofstream data_file(dataFileName.c_str(), std::ios_base::app);
         data_file << "_____________________________________________________________________________________" << std::endl;
         data_file << "Hadronic Energy Scale PandoraPFA Calibration performed using the Chi Squared Method." << std::endl << std::endl;
         data_file << "For kaon energy                                    : " << chiSquaredMethod.m_trueEnergy << " : " <<std::endl;

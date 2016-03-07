@@ -98,7 +98,7 @@ int main(int argc, char **argv)
         geVToMIP.MakeHistograms();
 
         std::string dataFileName(geVToMIP.m_outputPath + "Calibration.txt");
-        ofstream    data_file(dataFileName.c_str(), std::ios_base::app);
+        std::ofstream data_file(dataFileName.c_str(), std::ios_base::app);
 
         data_file << "_____________________________________________________________________________________" << std::endl;
         std::cout << "_____________________________________________________________________________________" << std::endl;

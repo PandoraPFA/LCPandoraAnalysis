@@ -130,7 +130,7 @@ int main(int argc, char **argv)
         hadronicEnergyGaussianFit.Process();
 
         std::string dataFileName(hadronicEnergyGaussianFit.m_outputPath + "Calibration.txt");
-        ofstream data_file(dataFileName.c_str(), std::ios_base::app);
+        std::ofstream data_file(dataFileName.c_str(), std::ios_base::app);
 
         if (hadronicEnergyGaussianFit.m_nLC!=0)
         {
