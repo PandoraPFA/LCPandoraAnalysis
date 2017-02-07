@@ -413,7 +413,6 @@ int CalibrationHelper::GetNHCalLayersFromEdge(const EVENT::CalorimeterHit *const
     }
     else
     {
-      std::cout<<"in the exception stuff"<<std::endl;     
         /* Could throw an exception here*/
         throw HCalHitPositionException();
     }
