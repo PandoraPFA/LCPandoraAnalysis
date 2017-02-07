@@ -38,7 +38,7 @@ public:
     ~ECalDigitisation();
 
     /**
-     *  @brief  Create histogram, find the limits for the percentage fit and perform Gaussian fit over this range
+     *  @brief  Createhistogram, find the limits for the percentage fit and perform Gaussian fit over this range
     */
     void Process();
 
@@ -90,6 +90,7 @@ typedef std::vector<float> FloatVector;
     float           m_fitRangeHigh;         ///< High fit edge
     float           m_rMSFitRange;          ///< RMS of the fitRange data
     float           m_maxHistogramEnergy;   ///< Max energy on m_histogram
+    float           m_minHistogramEnergy;   ///< Max energy on m_histogram  
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -182,7 +183,9 @@ ECalDigitisation::ECalDigitisation() :
     m_fitRangeLow(std::numeric_limits<float>::max()),
     m_fitRangeHigh(std::numeric_limits<float>::max()),
     m_rMSFitRange(std::numeric_limits<float>::max()),
-    m_maxHistogramEnergy(0.f)
+    m_maxHistogramEnergy(0.f),
+    m_minHistogramEnergy(std::numeric_limits<float>::max())
+
 {
 }
 
@@ -227,7 +230,10 @@ void ECalDigitisation::PrepareHistogram()
         bool isContained((totalCaloHitEnergy-eCalTotalCaloHitEnergy) < (0.01*m_trueEnergy) && (CosTheta < 0.95));
 
         if (1 == nPfoTargetsTotal && 1 == nPfoTargetsPhotons && isContained)
-        {
+	  {
+	    if (eCalTotalCaloHitEnergy < m_minHistogramEnergy)
+	    m_minHistogramEnergy = eCalTotalCaloHitEnergy;
+
             if (eCalTotalCaloHitEnergy > m_maxHistogramEnergy)
                 m_maxHistogramEnergy = eCalTotalCaloHitEnergy;
         }
@@ -241,7 +247,10 @@ void ECalDigitisation::CreateHistogram()
     std::string Name = "CaloHitEnergyECal";
     std::string Title = "Calorimeter Hit Energy ECal (1==nPfoTargetsTotal && 1==nPfoTargetsPhotons && Contained in ECal)";
     int binNumber = static_cast<int>( m_maxHistogramEnergy / ( m_calibrationAccuracy * m_trueEnergy ) );
-    m_histogram = new TH1F(Name.c_str(), Title.c_str(), binNumber, 0., m_maxHistogramEnergy);
+    if(binNumber<50){
+      binNumber=50;
+    }
+    m_histogram = new TH1F(Name.c_str(), Title.c_str(), binNumber, m_minHistogramEnergy, m_maxHistogramEnergy);
     m_histogram->GetXaxis()->SetTitle("Calorimeter Hit Energy / GeV");
     m_histogram->GetYaxis()->SetTitle("Entries");
 }
