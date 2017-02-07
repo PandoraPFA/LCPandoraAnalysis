@@ -13,8 +13,9 @@
 #include "EVENT/ReconstructedParticle.h"
 #include "UTIL/CellIDDecoder.h"
 
-#include "gear/GEAR.h"
-#include "gear/CalorimeterParameters.h"
+#include "DD4hep/DD4hepUnits.h"
+#include "DDRec/DetectorData.h"
+#include "DD4hep/DetType.h"
 
 #include "marlin/Global.h"
 
@@ -33,6 +34,9 @@
 PandoraPFACalibrator aPandoraPFACalibrator;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
+
+
+DD4hep::DDRec::LayeredCalorimeterData * getExtension(unsigned int includeFlag, unsigned int excludeFlag=0);
 
 PandoraPFACalibrator::PandoraPFACalibrator() :
     Processor("PandoraPFACalibrator"),
@@ -317,8 +321,10 @@ void PandoraPFACalibrator::processRunHeader(LCRunHeader *pLCRunHeader)
     m_nRun++;
     streamlog_out(DEBUG) << " DETECTOR : " << pLCRunHeader->getDetectorName() << std::endl;
 
-    const gear::CalorimeterParameters &ecalEndCapParameters(marlin::Global::GEAR->getEcalEndcapParameters());
-    m_zOfEndCap = static_cast<float>(ecalEndCapParameters.getExtent()[2]);
+
+      const DD4hep::DDRec::LayeredCalorimeterData * eCalEndcapExtension= getExtension( ( DD4hep::DetType::CALORIMETER | DD4hep::DetType::ELECTROMAGNETIC | DD4hep::DetType::ENDCAP), ( DD4hep::DetType::AUXILIARY  |  DD4hep::DetType::FORWARD ) );
+
+      m_zOfEndCap = static_cast<float>(eCalEndcapExtension->extent[2]/dd4hep::mm);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
