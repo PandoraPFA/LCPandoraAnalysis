@@ -189,13 +189,13 @@ private:
     float           m_lHCalTotalCaloHitEnergy;                     ///< ReadCaloHitEnergies
     float           m_lCalTotalCaloHitEnergy;                      ///< ReadCaloHitEnergies
 
-    float           m_totalSimCaloHitEnergy;                          ///< Sum outputs from ReadSimCaloHitEnergies
-    float           m_eCalTotalSimCaloHitEnergy;                      ///< ReadSimCaloHitEnergies
-    float           m_hCalTotalSimCaloHitEnergy;                      ///< ReadSimCaloHitEnergies
-    float           m_muonTotalSimCaloHitEnergy;                      ///< ReadSimCaloHitEnergies
-    float           m_bCalTotalSimCaloHitEnergy;                      ///< ReadSimCaloHitEnergies
-    float           m_lHCalTotalSimCaloHitEnergy;                     ///< ReadSimCaloHitEnergies
-    float           m_lCalTotalSimCaloHitEnergy;                      ///< ReadSimCaloHitEnergies
+    float           m_totalSimCaloHitEnergy;                       ///< Sum outputs from ReadSimCaloHitEnergies
+    float           m_eCalTotalSimCaloHitEnergy;                   ///< ReadSimCaloHitEnergies
+    float           m_hCalTotalSimCaloHitEnergy;                   ///< ReadSimCaloHitEnergies
+    float           m_muonTotalSimCaloHitEnergy;                   ///< ReadSimCaloHitEnergies
+    float           m_bCalTotalSimCaloHitEnergy;                   ///< ReadSimCaloHitEnergies
+    float           m_lHCalTotalSimCaloHitEnergy;                  ///< ReadSimCaloHitEnergies
+    float           m_lCalTotalSimCaloHitEnergy;                   ///< ReadSimCaloHitEnergies
 
     TH1F           *m_hECalDirectionCorrectedCaloHitEnergy;        ///< AddDirectionCorrectedCaloHitEntries
     TH1F           *m_hHCalDirectionCorrectedCaloHitEnergy;        ///< AddDirectionCorrectedCaloHitEntries

@@ -259,7 +259,7 @@ void CalibrationHelper::Calibrate(const EVENT::LCEvent *pLCEvent, const Particle
         m_lHCalTotalCaloHitEnergy + m_lCalTotalCaloHitEnergy;
 
     if (1==nPfoTargetsTotal && 1==nPfoTargetsTracks)
-      {
+    {
         this->AddSimCaloHitEntries(pLCEvent, m_settings.m_hCalBarrelCollectionsSimCaloHit, 1, m_hHCalBarrelDirectionCorrectedSimCaloHit);
         this->AddSimCaloHitEntries(pLCEvent, m_settings.m_hCalEndCapCollectionsSimCaloHit, 1, m_hHCalEndCapDirectionCorrectedSimCaloHit);
         this->AddSimCaloHitEntries(pLCEvent, m_settings.m_hCalOtherCollectionsSimCaloHit, 1, m_hHCalOtherDirectionCorrectedSimCaloHit);
@@ -268,14 +268,14 @@ void CalibrationHelper::Calibrate(const EVENT::LCEvent *pLCEvent, const Particle
         this->AddDirectionCorrectedCaloHitEntries(pLCEvent, m_settings.m_eCalCollections, m_hECalDirectionCorrectedCaloHitEnergy);
         this->AddDirectionCorrectedCaloHitEntries(pLCEvent, m_settings.m_hCalCollections, m_hHCalDirectionCorrectedCaloHitEnergy);
         this->AddDirectionCorrectedCaloHitEntries(pLCEvent, m_settings.m_muonCollections, m_hMuonDirectionCorrectedCaloHitEnergy);
-      }
+    }
 
     if (1==nPfoTargetsTotal && 1==nPfoTargetsNeutralHadrons && ((m_totalCaloHitEnergy-m_hCalTotalCaloHitEnergy) < (0.01*pfoTargetsEnergyTotal)) && m_pfoMinHCalLayerToEdge > 5 )
-      {
+    {
         this->AddSimCaloHitEntries(pLCEvent, m_settings.m_hCalBarrelCollectionsSimCaloHit, 0, m_hHCalBarrelDirectionCorrectionSimCaloHit);
         this->AddSimCaloHitEntries(pLCEvent, m_settings.m_hCalEndCapCollectionsSimCaloHit, 0, m_hHCalEndCapDirectionCorrectionSimCaloHit);
         this->AddSimCaloHitEntries(pLCEvent, m_settings.m_hCalOtherCollectionsSimCaloHit, 0, m_hHCalOtherDirectionCorrectionSimCaloHit);
-      }
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -476,36 +476,35 @@ void CalibrationHelper::ReadCaloHitEnergies(const EVENT::LCEvent *pLCEvent, cons
 
 void CalibrationHelper::ReadSimCaloHitEnergies(const EVENT::LCEvent *pLCEvent, const EVENT::LCStrVec &collectionNames, float &hitEnergySum) const
 {
-  for (EVENT::LCStrVec::const_iterator iter = collectionNames.begin(), iterEnd = collectionNames.end(); iter != iterEnd; ++iter)
+    for (EVENT::LCStrVec::const_iterator iter = collectionNames.begin(), iterEnd = collectionNames.end(); iter != iterEnd; ++iter)
     {
         try
-	  {
-	      
+        {
             const EVENT::LCCollection *pLCCollection = pLCEvent->getCollection(*iter);
 
             if (NULL != pLCCollection)
-	      {
+            {
                 const int nElements(pLCCollection->getNumberOfElements());
 
                 for (int iHit = 0; iHit < nElements; ++iHit)
-		  {
+                {
                     const SimCalorimeterHit *pSimCalorimeterHit = dynamic_cast<const SimCalorimeterHit*>( pLCCollection->getElementAt(iHit));
 
                     if (NULL == pSimCalorimeterHit)
-		      {
+                    {
                         streamlog_out(ERROR) << "Collection type mismatch " << (*iter) << " expected to contain objects of type CalorimeterHit " << std::endl;
                         throw;
-		      }
+                    }
 
                     const float hitEnergy(pSimCalorimeterHit->getEnergy());
                     hitEnergySum += hitEnergy;
-		  }
-	      }
-	  }
+                }
+            }
+        }
         catch (DataNotAvailableException &)
-	  {
+        {
             streamlog_out(DEBUG) << "No Collection : " << (*iter) << std::endl;
-	  }
+        }
     }
 }
 
