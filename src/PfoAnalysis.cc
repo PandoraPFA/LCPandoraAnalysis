@@ -197,6 +197,30 @@ PfoAnalysis::PfoAnalysis() :
                            "Name of the HCal Other collection post Mokka, pre digitisation" , 
                            m_calibrationHelperSettings.m_hCalOtherCollectionsSimCaloHit , 
                            LCStrVec());
+
+    registerInputCollections(LCIO::SIMCALORIMETERHIT,
+                           "MuonCollectionsSimCaloHit" ,
+                           "Name of the Muon collection post Mokka, pre digitisation" ,
+                           m_calibrationHelperSettings.m_muonCollectionsSimCaloHit ,
+                           LCStrVec());
+
+    registerInputCollections(LCIO::SIMCALORIMETERHIT,
+                           "BCalCollectionsSimCaloHit" ,
+                           "Name of the BeamCal collection post Mokka, pre digitisation" ,
+                           m_calibrationHelperSettings.m_bCalCollectionsSimCaloHit ,
+                           LCStrVec());
+
+    registerInputCollections(LCIO::SIMCALORIMETERHIT,
+                           "LHCalCollectionsSimCaloHit" ,
+                           "Name of the LHCal collection post Mokka, pre digitisation" ,
+                           m_calibrationHelperSettings.m_lHCalCollectionsSimCaloHit ,
+                           LCStrVec());
+
+    registerInputCollections(LCIO::SIMCALORIMETERHIT,
+                           "LCalCollectionsSimCaloHit" ,
+                           "Name of the LCal collection post Mokka, pre digitisation" ,
+                           m_calibrationHelperSettings.m_lCalCollectionsSimCaloHit ,
+                           LCStrVec());
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
