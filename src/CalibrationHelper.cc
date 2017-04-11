@@ -85,6 +85,13 @@ CalibrationHelper::CalibrationHelper(const Settings &settings) :
     m_bCalTotalCaloHitEnergy(0.f),
     m_lHCalTotalCaloHitEnergy(0.f),
     m_lCalTotalCaloHitEnergy(0.f),
+    m_totalSimCaloHitEnergy(0.f),
+    m_eCalTotalSimCaloHitEnergy(0.f),
+    m_hCalTotalSimCaloHitEnergy(0.f),
+    m_muonTotalSimCaloHitEnergy(0.f),
+    m_bCalTotalSimCaloHitEnergy(0.f),
+    m_lHCalTotalSimCaloHitEnergy(0.f),
+    m_lCalTotalSimCaloHitEnergy(0.f),
     m_hECalDirectionCorrectedCaloHitEnergy(NULL),
     m_hHCalDirectionCorrectedCaloHitEnergy(NULL),
     m_hMuonDirectionCorrectedCaloHitEnergy(NULL),
@@ -116,6 +123,13 @@ void CalibrationHelper::SetBranchAddresses(TTree *pTTree)
     pTTree->Branch("BCalTotalCaloHitEnergy", &m_bCalTotalCaloHitEnergy, "BCalTotalCaloHitEnergy/F");
     pTTree->Branch("LHCalTotalCaloHitEnergy", &m_lHCalTotalCaloHitEnergy, "LHCalTotalCaloHitEnergy/F");
     pTTree->Branch("LCalTotalCaloHitEnergy", &m_lCalTotalCaloHitEnergy, "LCalTotalCaloHitEnergy/F");
+    pTTree->Branch("TotalSimCaloHitEnergy", &m_totalSimCaloHitEnergy, "TotalSimCaloHitEnergy/F");
+    pTTree->Branch("ECalTotalSimCaloHitEnergy", &m_eCalTotalSimCaloHitEnergy, "ECalTotalSimCaloHitEnergy/F");
+    pTTree->Branch("HCalTotalSimCaloHitEnergy", &m_hCalTotalSimCaloHitEnergy, "HCalTotalSimCaloHitEnergy/F");
+    pTTree->Branch("MuonTotalSimCaloHitEnergy", &m_muonTotalSimCaloHitEnergy, "MuonTotalSimCaloHitEnergy/F");
+    pTTree->Branch("BCalTotalSimCaloHitEnergy", &m_bCalTotalSimCaloHitEnergy, "BCalTotalSimCaloHitEnergy/F");
+    pTTree->Branch("LHCalTotalSimCaloHitEnergy", &m_lHCalTotalSimCaloHitEnergy, "LHCalTotalSimCaloHitEnergy/F");
+    pTTree->Branch("LCalTotalSimCaloHitEnergy", &m_lCalTotalSimCaloHitEnergy, "LCalTotalSimCaloHitEnergy/F");
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -207,6 +221,13 @@ void CalibrationHelper::Clear()
     m_bCalTotalCaloHitEnergy = 0.f;
     m_lHCalTotalCaloHitEnergy = 0.f;
     m_lCalTotalCaloHitEnergy = 0.f;
+    m_totalSimCaloHitEnergy = 0.f;
+    m_eCalTotalSimCaloHitEnergy = 0.f;
+    m_hCalTotalSimCaloHitEnergy = 0.f;
+    m_muonTotalSimCaloHitEnergy = 0.f;
+    m_bCalTotalSimCaloHitEnergy = 0.f;
+    m_lHCalTotalSimCaloHitEnergy = 0.f;
+    m_lCalTotalSimCaloHitEnergy = 0.f;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -215,6 +236,17 @@ void CalibrationHelper::Calibrate(const EVENT::LCEvent *pLCEvent, const Particle
     const int nPfoTargetsTotal, const int nPfoTargetsTracks, const int nPfoTargetsNeutralHadrons, const float pfoTargetsEnergyTotal)
 {
     m_pfoMinHCalLayerToEdge = this->GetMinNHCalLayersFromEdge(particleVector, m_settings.m_hCalRingOuterSymmetryOrder, m_settings.m_hCalRingOuterPhi0);
+
+    this->ReadSimCaloHitEnergies(pLCEvent, m_settings.m_eCalCollectionsSimCaloHit, m_eCalTotalSimCaloHitEnergy);
+    this->ReadSimCaloHitEnergies(pLCEvent, m_settings.m_hCalBarrelCollectionsSimCaloHit, m_hCalTotalSimCaloHitEnergy);
+    this->ReadSimCaloHitEnergies(pLCEvent, m_settings.m_hCalEndCapCollectionsSimCaloHit, m_hCalTotalSimCaloHitEnergy);
+    this->ReadSimCaloHitEnergies(pLCEvent, m_settings.m_hCalOtherCollectionsSimCaloHit,  m_hCalTotalSimCaloHitEnergy);
+    this->ReadSimCaloHitEnergies(pLCEvent, m_settings.m_muonCollectionsSimCaloHit, m_muonTotalSimCaloHitEnergy);
+    this->ReadSimCaloHitEnergies(pLCEvent, m_settings.m_bCalCollectionsSimCaloHit, m_bCalTotalSimCaloHitEnergy);
+    this->ReadSimCaloHitEnergies(pLCEvent, m_settings.m_lHCalCollectionsSimCaloHit, m_lHCalTotalSimCaloHitEnergy);
+    this->ReadSimCaloHitEnergies(pLCEvent, m_settings.m_lCalCollectionsSimCaloHit, m_lCalTotalSimCaloHitEnergy);
+
+    m_totalSimCaloHitEnergy = m_eCalTotalSimCaloHitEnergy + m_hCalTotalSimCaloHitEnergy + m_muonTotalSimCaloHitEnergy + m_bCalTotalSimCaloHitEnergy + m_lHCalTotalSimCaloHitEnergy + m_lCalTotalSimCaloHitEnergy;
 
     this->ReadCaloHitEnergies(pLCEvent, m_settings.m_eCalCollections, m_eCalTotalCaloHitEnergy);
     this->ReadCaloHitEnergies(pLCEvent, m_settings.m_hCalCollections, m_hCalTotalCaloHitEnergy);
@@ -429,6 +461,42 @@ void CalibrationHelper::ReadCaloHitEnergies(const EVENT::LCEvent *pLCEvent, cons
                     }
 
                     const float hitEnergy(pCalorimeterHit->getEnergy());
+                    hitEnergySum += hitEnergy;
+                }
+            }
+        }
+        catch (DataNotAvailableException &)
+        {
+            streamlog_out(DEBUG) << "No Collection : " << (*iter) << std::endl;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void CalibrationHelper::ReadSimCaloHitEnergies(const EVENT::LCEvent *pLCEvent, const EVENT::LCStrVec &collectionNames, float &hitEnergySum) const
+{
+    for (EVENT::LCStrVec::const_iterator iter = collectionNames.begin(), iterEnd = collectionNames.end(); iter != iterEnd; ++iter)
+    {
+        try
+        {
+            const EVENT::LCCollection *pLCCollection = pLCEvent->getCollection(*iter);
+
+            if (NULL != pLCCollection)
+            {
+                const int nElements(pLCCollection->getNumberOfElements());
+
+                for (int iHit = 0; iHit < nElements; ++iHit)
+                {
+                    const SimCalorimeterHit *pSimCalorimeterHit = dynamic_cast<const SimCalorimeterHit*>( pLCCollection->getElementAt(iHit));
+
+                    if (NULL == pSimCalorimeterHit)
+                    {
+                        streamlog_out(ERROR) << "Collection type mismatch " << (*iter) << " expected to contain objects of type CalorimeterHit " << std::endl;
+                        throw;
+                    }
+
+                    const float hitEnergy(pSimCalorimeterHit->getEnergy());
                     hitEnergySum += hitEnergy;
                 }
             }

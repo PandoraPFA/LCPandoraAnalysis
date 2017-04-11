@@ -51,6 +51,10 @@ public:
         LCStrVec    m_hCalBarrelCollectionsSimCaloHit;      ///< Input simcalorimeter hit collection names
         LCStrVec    m_hCalEndCapCollectionsSimCaloHit;      ///< Input simcalorimeter hit collection names
         LCStrVec    m_hCalOtherCollectionsSimCaloHit;       ///< Input simcalorimeter hit collection names
+        LCStrVec    m_muonCollectionsSimCaloHit;            ///< Input simcalorimeter hit collection names
+        LCStrVec    m_bCalCollectionsSimCaloHit;            ///< Input simcalorimeter hit collection names
+        LCStrVec    m_lHCalCollectionsSimCaloHit;           ///< Input simcalorimeter hit collection names
+        LCStrVec    m_lCalCollectionsSimCaloHit;            ///< Input simcalorimeter hit collection names
 
         int         m_hCalRingOuterSymmetryOrder;           ///< HCal ring outer symmetry order from steering file (default 8)
         float       m_hCalRingOuterPhi0;                    ///< HCal ring outer Phi0 from steering file (default 0)
@@ -129,6 +133,15 @@ private:
     void ReadCaloHitEnergies(const EVENT::LCEvent *pLCEvent, const EVENT::LCStrVec &collectionNames, float &hitEnergySum) const;
 
     /**
+     *  @brief  Read and save the simcalorimeter hit information for a specific collection
+     * 
+     *  @param  pLCEvent the lc event
+     *  @param  collectionNames the collection to be read
+     *  @param  hitEnergySum the sum of the hit energy for the collection
+     */
+    void ReadSimCaloHitEnergies(const EVENT::LCEvent *pLCEvent, const EVENT::LCStrVec &collectionNames, float &hitEnergySum) const;
+
+    /**
      *  @brief  Add the direction corrected SimCaloHits and the direction corrections for a particular collection to separate histograms
      * 
      *  @param  pLCEvent a collection in the lc event
@@ -175,6 +188,14 @@ private:
     float           m_bCalTotalCaloHitEnergy;                      ///< ReadCaloHitEnergies
     float           m_lHCalTotalCaloHitEnergy;                     ///< ReadCaloHitEnergies
     float           m_lCalTotalCaloHitEnergy;                      ///< ReadCaloHitEnergies
+
+    float           m_totalSimCaloHitEnergy;                       ///< Sum outputs from ReadSimCaloHitEnergies
+    float           m_eCalTotalSimCaloHitEnergy;                   ///< ReadSimCaloHitEnergies
+    float           m_hCalTotalSimCaloHitEnergy;                   ///< ReadSimCaloHitEnergies
+    float           m_muonTotalSimCaloHitEnergy;                   ///< ReadSimCaloHitEnergies
+    float           m_bCalTotalSimCaloHitEnergy;                   ///< ReadSimCaloHitEnergies
+    float           m_lHCalTotalSimCaloHitEnergy;                  ///< ReadSimCaloHitEnergies
+    float           m_lCalTotalSimCaloHitEnergy;                   ///< ReadSimCaloHitEnergies
 
     TH1F           *m_hECalDirectionCorrectedCaloHitEnergy;        ///< AddDirectionCorrectedCaloHitEntries
     TH1F           *m_hHCalDirectionCorrectedCaloHitEnergy;        ///< AddDirectionCorrectedCaloHitEntries
