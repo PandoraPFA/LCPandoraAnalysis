@@ -12,6 +12,12 @@
 #include "marlin/Processor.h"
 
 #include <vector>
+#include "DD4hep/DD4hepUnits.h"
+#include "DDRec/DetectorData.h"
+#include "DD4hep/DetType.h"
+#include "DD4hep/LCDD.h"
+#include "DD4hep/DetectorSelector.h"
+
 
 class TFile;
 class TH1F;
@@ -136,6 +142,8 @@ private:
      *  @param  cosTheta
      */
     void ReadPfoCollections(LCEvent *pLCEvent, const LCStrVec &collectionNames, float &pfoEnergySum, float &cosTheta) const;
+
+    DD4hep::DDRec::LayeredCalorimeterData * getExtension(unsigned int includeFlag, unsigned int excludeFlag=0) const;
 
     LCStrVec        m_inputMCParticleCollections;                   ///< Legacy parameter only
     std::string     m_particleCollectionName;                       ///< Legacy parameter only
