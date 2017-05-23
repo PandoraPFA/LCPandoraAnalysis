@@ -128,16 +128,6 @@ PfoAnalysis::PfoAnalysis() :
                            m_collectCalibrationDetails,
                            int(0));
 
-    registerProcessorParameter("HCalRingOuterSymmetryOrder",
-                           "Set the HCalRingOuterSymmetryOrder",
-                           m_calibrationHelperSettings.m_hCalRingOuterSymmetryOrder,
-                           int(8));
-
-    registerProcessorParameter("HCalRingOuterPhi0",
-                           "Set the HCalRingOuterPhi0",
-                           m_calibrationHelperSettings.m_hCalRingOuterPhi0,
-                           float(0));
-
     registerInputCollections(LCIO::CALORIMETERHIT,
                            "ECalCollections", 
                            "Name of the ECal collection of calo hits used to form clusters",

@@ -11,6 +11,13 @@
 
 #include "marlin/Processor.h"
 
+#include "DD4hep/DD4hepUnits.h"
+#include "DDRec/DetectorData.h"
+#include "DD4hep/DetType.h"
+#include "DD4hep/LCDD.h"
+#include "DD4hep/DetectorSelector.h"
+
+
 #include <set>
 #include <vector>
 
@@ -55,9 +62,6 @@ public:
         LCStrVec    m_bCalCollectionsSimCaloHit;            ///< Input simcalorimeter hit collection names
         LCStrVec    m_lHCalCollectionsSimCaloHit;           ///< Input simcalorimeter hit collection names
         LCStrVec    m_lCalCollectionsSimCaloHit;            ///< Input simcalorimeter hit collection names
-
-        int         m_hCalRingOuterSymmetryOrder;           ///< HCal ring outer symmetry order from steering file (default 8)
-        float       m_hCalRingOuterPhi0;                    ///< HCal ring outer Phi0 from steering file (default 0)
     };
 
     typedef std::vector<const EVENT::ReconstructedParticle *> ParticleVector;
@@ -121,7 +125,7 @@ private:
      * 
      *  @param  pParticleVector to be examined
      */
-    int GetMinNHCalLayersFromEdge(const ParticleVector &pParticleVector, const int m_hCalRingOuterSymmetryOrder, const float m_hCalRingOuterPhi0) const;
+    int GetMinNHCalLayersFromEdge(const ParticleVector &pParticleVector) const;
 
     /**
      *  @brief  Read and save the calorimeter hit information for a specific collection
@@ -166,7 +170,7 @@ private:
      * 
      *  @param  pCaloHit to be examined
      */
-    int GetNHCalLayersFromEdge(const EVENT::CalorimeterHit *const pCaloHit, const int m_hCalRingOuterSymmetryOrder, const float m_hCalRingOuterPhi0) const;
+    int GetNHCalLayersFromEdge(const EVENT::CalorimeterHit *const pCaloHit) const;
 
     /**
      *  @brief  Get the radial distance between a calo hit in the HCal and the edge of the HCal
@@ -176,6 +180,14 @@ private:
      *  @param  phi0 of the region of the HCal the hit is in i.e. Barrel, Endcap, Ring
      */
     float GetMaximumRadius(const EVENT::CalorimeterHit *const pCaloHit, const unsigned int symmetryOrder, const float phi0) const;
+
+    /**
+     *  @brief A helper function to access geometry information via DD4HEP 
+     *
+     *  @param includeFlag calorimeter propereties to include
+     *  @param excludeFlag calorimeter propereties to exclude
+     */
+    DD4hep::DDRec::LayeredCalorimeterData *GetExtension(unsigned int includeFlag, unsigned int excludeFlag = 0) const;
 
     const Settings  m_settings;                                    ///< The calibration helper settings
 

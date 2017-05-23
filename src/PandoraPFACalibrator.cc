@@ -13,9 +13,6 @@
 #include "EVENT/ReconstructedParticle.h"
 #include "UTIL/CellIDDecoder.h"
 
-#include "gear/GEAR.h"
-#include "gear/CalorimeterParameters.h"
-
 #include "marlin/Global.h"
 
 #include "TH1.h"
@@ -317,8 +314,8 @@ void PandoraPFACalibrator::processRunHeader(LCRunHeader *pLCRunHeader)
     m_nRun++;
     streamlog_out(DEBUG) << " DETECTOR : " << pLCRunHeader->getDetectorName() << std::endl;
 
-    const gear::CalorimeterParameters &ecalEndCapParameters(marlin::Global::GEAR->getEcalEndcapParameters());
-    m_zOfEndCap = static_cast<float>(ecalEndCapParameters.getExtent()[2]);
+    const DD4hep::DDRec::LayeredCalorimeterData *pECalEndcapExtension(this->GetExtension((DD4hep::DetType::CALORIMETER | DD4hep::DetType::ELECTROMAGNETIC | DD4hep::DetType::ENDCAP), ( DD4hep::DetType::AUXILIARY | DD4hep::DetType::FORWARD)));
+    m_zOfEndCap = static_cast<float>(pECalEndcapExtension->extent[2]/dd4hep::mm);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -597,3 +594,29 @@ void PandoraPFACalibrator::end()
 
     delete m_pTFile;
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+DD4hep::DDRec::LayeredCalorimeterData *PandoraPFACalibrator::GetExtension(unsigned int includeFlag, unsigned int excludeFlag) const
+{
+    DD4hep::DDRec::LayeredCalorimeterData *pExtension(NULL);
+    DD4hep::Geometry::LCDD &lcdd = DD4hep::Geometry::LCDD::getInstance();
+    const std::vector< DD4hep::Geometry::DetElement> &theDetectors(DD4hep::Geometry::DetectorSelector(lcdd).detectors(  includeFlag, excludeFlag ));
+    streamlog_out( DEBUG2 ) << " GetExtension :  includeFlag: " << DD4hep::DetType( includeFlag ) << " excludeFlag: " << DD4hep::DetType( excludeFlag )
+                            << "  found : " << theDetectors.size() << "  - first det: " << theDetectors.at(0).name() << std::endl ;
+
+    if(theDetectors.size()  != 1)
+    {
+        std::stringstream es;
+        es << " GetExtension: selection is not unique (or empty)  includeFlag: " << DD4hep::DetType( includeFlag ) << " excludeFlag: " << DD4hep::DetType( excludeFlag ) << " --- found detectors : " ;
+
+        for(unsigned int i = 0, N = theDetectors.size(); i<N; ++i)
+        {
+            es << theDetectors.at(i).name() << ", " ;
+        }
+        throw std::runtime_error(es.str());
+    }
+    pExtension = theDetectors.at(0).extension<DD4hep::DDRec::LayeredCalorimeterData>();
+    return pExtension;
+}
+
