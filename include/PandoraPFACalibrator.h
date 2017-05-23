@@ -143,7 +143,13 @@ private:
      */
     void ReadPfoCollections(LCEvent *pLCEvent, const LCStrVec &collectionNames, float &pfoEnergySum, float &cosTheta) const;
 
-    DD4hep::DDRec::LayeredCalorimeterData * getExtension(unsigned int includeFlag, unsigned int excludeFlag=0) const;
+    /**
+     *  @brief A helper function to access geometry information via DD4HEP
+     *
+     *  @param includeFlag calorimeter propereties to include
+     *  @param excludeFlag calorimeter propereties to exclude
+     */
+    DD4hep::DDRec::LayeredCalorimeterData *GetExtension(unsigned int includeFlag, unsigned int excludeFlag = 0) const;
 
     LCStrVec        m_inputMCParticleCollections;                   ///< Legacy parameter only
     std::string     m_particleCollectionName;                       ///< Legacy parameter only
