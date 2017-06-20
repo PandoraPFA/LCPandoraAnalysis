@@ -15,7 +15,7 @@
 #include "DD4hep/DD4hepUnits.h"
 #include "DDRec/DetectorData.h"
 #include "DD4hep/DetType.h"
-#include "DD4hep/LCDD.h"
+#include "DD4hep/Detector.h"
 #include "DD4hep/DetectorSelector.h"
 
 
@@ -149,7 +149,7 @@ private:
      *  @param includeFlag calorimeter propereties to include
      *  @param excludeFlag calorimeter propereties to exclude
      */
-    DD4hep::DDRec::LayeredCalorimeterData *GetExtension(unsigned int includeFlag, unsigned int excludeFlag = 0) const;
+    dd4hep::rec::LayeredCalorimeterData *GetExtension(unsigned int includeFlag, unsigned int excludeFlag = 0) const;
 
     LCStrVec        m_inputMCParticleCollections;                   ///< Legacy parameter only
     std::string     m_particleCollectionName;                       ///< Legacy parameter only
