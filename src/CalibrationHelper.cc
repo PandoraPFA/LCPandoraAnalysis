@@ -24,6 +24,8 @@
 
 #include "CalibrationHelper.h"
 
+using dd4hep::DetType;
+
 namespace pandora_analysis
 {
 
@@ -335,32 +337,32 @@ int CalibrationHelper::GetNHCalLayersFromEdge(const EVENT::CalorimeterHit *const
 
     // Geometry information from dd4hep
     // Get Ring HCal Extension
-    const DD4hep::DDRec::LayeredCalorimeterData *pHCalRingExtension(this->GetExtension( ( DD4hep::DetType::CALORIMETER | DD4hep::DetType::HADRONIC | DD4hep::DetType::ENDCAP | DD4hep::DetType::AUXILIARY ),( DD4hep::DetType::FORWARD )));
+    const dd4hep::rec::LayeredCalorimeterData *pHCalRingExtension(this->GetExtension( ( DetType::CALORIMETER | DetType::HADRONIC | DetType::ENDCAP | DetType::AUXILIARY ),( DetType::FORWARD )));
     const unsigned int hCalRingOuterSymmetryOrder(pHCalRingExtension->outer_symmetry);
     const float hCalRingOuterPhi0(pHCalRingExtension->outer_phi0);
     const float hCalRingOuterR(pHCalRingExtension->extent[1]/dd4hep::mm);
     const float hCalRingInnerZ(pHCalRingExtension->extent[2]/dd4hep::mm);
     const float hCalRingOuterZ(pHCalRingExtension->extent[3]/dd4hep::mm);
-    const std::vector<DD4hep::DDRec::LayeredCalorimeterStruct::Layer> &hCalRingLayers(this->GetExtension(( DD4hep::DetType::CALORIMETER | DD4hep::DetType::HADRONIC | DD4hep::DetType::ENDCAP | DD4hep::DetType::AUXILIARY ), ( DD4hep::DetType::FORWARD ))->layers);
+    const std::vector<dd4hep::rec::LayeredCalorimeterStruct::Layer> &hCalRingLayers(this->GetExtension(( DetType::CALORIMETER | DetType::HADRONIC | DetType::ENDCAP | DetType::AUXILIARY ), ( DetType::FORWARD ))->layers);
     const float hCalRingLayerThickness((hCalRingLayers.back().inner_thickness+hCalRingLayers.back().outer_thickness)/dd4hep::mm);
 
     // Get HCal Barrel Extension
-    const DD4hep::DDRec::LayeredCalorimeterData *pHCalBarrelExtension(this->GetExtension( ( DD4hep::DetType::CALORIMETER | DD4hep::DetType::HADRONIC | DD4hep::DetType::BARREL), (DD4hep::DetType::AUXILIARY |  DD4hep::DetType::FORWARD ) ));
+    const dd4hep::rec::LayeredCalorimeterData *pHCalBarrelExtension(this->GetExtension( ( DetType::CALORIMETER | DetType::HADRONIC | DetType::BARREL), (DetType::AUXILIARY |  DetType::FORWARD ) ));
     const unsigned int hCalBarrelOuterSymmetry(pHCalBarrelExtension->outer_symmetry);
     const float hCalBarrelOuterPhi0(pHCalBarrelExtension->outer_phi0);
     const float hCalBarrelOuterR(pHCalBarrelExtension->extent[1]/dd4hep::mm);
     const float hCalBarrelOuterZ(pHCalBarrelExtension->extent[3]/dd4hep::mm);
-    const std::vector<DD4hep::DDRec::LayeredCalorimeterStruct::Layer> &hCalBarrelLayers(this->GetExtension(( DD4hep::DetType::CALORIMETER | DD4hep::DetType::HADRONIC | DD4hep::DetType::BARREL), ( DD4hep::DetType::AUXILIARY | DD4hep::DetType::FORWARD ))->layers);
+    const std::vector<dd4hep::rec::LayeredCalorimeterStruct::Layer> &hCalBarrelLayers(this->GetExtension(( DetType::CALORIMETER | DetType::HADRONIC | DetType::BARREL), ( DetType::AUXILIARY | DetType::FORWARD ))->layers);
     const float hCalBarrelLayerThickness((hCalBarrelLayers.back().inner_thickness+hCalBarrelLayers.back().outer_thickness)/dd4hep::mm);
 
     // Get Ring HCal Endcap Extension
-    const DD4hep::DDRec::LayeredCalorimeterData *pHCalEndcapExtension(this->GetExtension(( DD4hep::DetType::CALORIMETER | DD4hep::DetType::HADRONIC | DD4hep::DetType::ENDCAP),( DD4hep::DetType::AUXILIARY | DD4hep::DetType::FORWARD )));
+    const dd4hep::rec::LayeredCalorimeterData *pHCalEndcapExtension(this->GetExtension(( DetType::CALORIMETER | DetType::HADRONIC | DetType::ENDCAP),( DetType::AUXILIARY | DetType::FORWARD )));
     const unsigned int hCalEndCapOuterSymmetryOrder(pHCalEndcapExtension->outer_symmetry);
     const float hCalEndCapOuterPhiCoordinate(pHCalEndcapExtension->outer_phi0);
     const float hCalEndCapOuterR(pHCalEndcapExtension->extent[1]/dd4hep::mm);
     const float hCalEndCapInnerZ(pHCalEndcapExtension->extent[2]/dd4hep::mm);
     const float hCalEndCapOuterZ(pHCalEndcapExtension->extent[3]/dd4hep::mm);
-    const std::vector<DD4hep::DDRec::LayeredCalorimeterStruct::Layer> &hCalEndCapLayers(this->GetExtension(( DD4hep::DetType::CALORIMETER | DD4hep::DetType::HADRONIC | DD4hep::DetType::ENDCAP), ( DD4hep::DetType::AUXILIARY | DD4hep::DetType::FORWARD ))->layers);
+    const std::vector<dd4hep::rec::LayeredCalorimeterStruct::Layer> &hCalEndCapLayers(this->GetExtension(( DetType::CALORIMETER | DetType::HADRONIC | DetType::ENDCAP), ( DetType::AUXILIARY | DetType::FORWARD ))->layers);
     const float hCalEndCapLayerThickness((hCalEndCapLayers.back().inner_thickness+hCalEndCapLayers.back().outer_thickness)/dd4hep::mm);
 
     /* TODO maybe sanity-check any variables here*/
@@ -438,18 +440,18 @@ float CalibrationHelper::GetMaximumRadius(const EVENT::CalorimeterHit *const pCa
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-DD4hep::DDRec::LayeredCalorimeterData *CalibrationHelper::GetExtension(unsigned int includeFlag, unsigned int excludeFlag) const
+dd4hep::rec::LayeredCalorimeterData *CalibrationHelper::GetExtension(unsigned int includeFlag, unsigned int excludeFlag) const
 {
-    DD4hep::DDRec::LayeredCalorimeterData *pExtension(NULL);
-    DD4hep::Geometry::LCDD &lcdd = DD4hep::Geometry::LCDD::getInstance();
-    const std::vector< DD4hep::Geometry::DetElement> &theDetectors(DD4hep::Geometry::DetectorSelector(lcdd).detectors(  includeFlag, excludeFlag ));
-    streamlog_out( DEBUG2 ) << " GetExtension :  includeFlag: " << DD4hep::DetType( includeFlag ) << " excludeFlag: " << DD4hep::DetType( excludeFlag )
+    dd4hep::rec::LayeredCalorimeterData *pExtension(NULL);
+    dd4hep::Detector &theDetector = dd4hep::Detector::getInstance();
+    const std::vector< dd4hep::DetElement> &theDetectors(dd4hep::DetectorSelector(theDetector).detectors(  includeFlag, excludeFlag ));
+    streamlog_out( DEBUG2 ) << " GetExtension :  includeFlag: " << DetType( includeFlag ) << " excludeFlag: " << DetType( excludeFlag )
                             << "  found : " << theDetectors.size() << "  - first det: " << theDetectors.at(0).name() << std::endl ;
 
     if(theDetectors.size()  != 1)
     {
         std::stringstream es;
-        es << " GetExtension: selection is not unique (or empty)  includeFlag: " << DD4hep::DetType( includeFlag ) << " excludeFlag: " << DD4hep::DetType( excludeFlag ) << " --- found detectors : " ;
+        es << " GetExtension: selection is not unique (or empty)  includeFlag: " << DetType( includeFlag ) << " excludeFlag: " << DetType( excludeFlag ) << " --- found detectors : " ;
 
         for(unsigned int i = 0, N = theDetectors.size(); i<N; ++i)
         {
@@ -457,7 +459,7 @@ DD4hep::DDRec::LayeredCalorimeterData *CalibrationHelper::GetExtension(unsigned 
         }
         throw std::runtime_error(es.str());
     }
-    pExtension = theDetectors.at(0).extension<DD4hep::DDRec::LayeredCalorimeterData>();
+    pExtension = theDetectors.at(0).extension<dd4hep::rec::LayeredCalorimeterData>();
     return pExtension;
 }
 
@@ -537,7 +539,7 @@ void CalibrationHelper::ReadSimCaloHitEnergies(const EVENT::LCEvent *pLCEvent, c
 
 void CalibrationHelper::AddSimCaloHitEntries(const EVENT::LCEvent *pLCEvent, const EVENT::LCStrVec &collectionNames, const unsigned int SimCaloHit_DC, TH1F *pTH1F) const
 {
-    const DD4hep::DDRec::LayeredCalorimeterData *pECalEndcapExtension(this->GetExtension((DD4hep::DetType::CALORIMETER | DD4hep::DetType::ELECTROMAGNETIC | DD4hep::DetType::ENDCAP), ( DD4hep::DetType::AUXILIARY | DD4hep::DetType::FORWARD)));
+    const dd4hep::rec::LayeredCalorimeterData *pECalEndcapExtension(this->GetExtension((DetType::CALORIMETER | DetType::ELECTROMAGNETIC | DetType::ENDCAP), ( DetType::AUXILIARY | DetType::FORWARD)));
     const float zOfEndCap(static_cast<float>(pECalEndcapExtension->extent[2]/dd4hep::mm));
 
     for (EVENT::LCStrVec::const_iterator iter = collectionNames.begin(), iterEnd = collectionNames.end(); iter != iterEnd; ++iter)
@@ -593,7 +595,7 @@ void CalibrationHelper::AddSimCaloHitEntries(const EVENT::LCEvent *pLCEvent, con
 
 void CalibrationHelper::AddDirectionCorrectedCaloHitEntries(const EVENT::LCEvent *pLCEvent, const EVENT::LCStrVec &collectionNames, TH1F *pTH1F) const
 {
-    const DD4hep::DDRec::LayeredCalorimeterData *pECalEndcapExtension(this->GetExtension((DD4hep::DetType::CALORIMETER | DD4hep::DetType::ELECTROMAGNETIC | DD4hep::DetType::ENDCAP), ( DD4hep::DetType::AUXILIARY | DD4hep::DetType::FORWARD)));
+    const dd4hep::rec::LayeredCalorimeterData *pECalEndcapExtension(this->GetExtension((DetType::CALORIMETER | DetType::ELECTROMAGNETIC | DetType::ENDCAP), ( DetType::AUXILIARY | DetType::FORWARD)));
     const float zOfEndCap(static_cast<float>(pECalEndcapExtension->extent[2]/dd4hep::mm));
    
     for (EVENT::LCStrVec::const_iterator iter = collectionNames.begin(), iterEnd = collectionNames.end(); iter != iterEnd; ++iter)
