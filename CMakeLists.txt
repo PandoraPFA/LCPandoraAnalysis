@@ -62,7 +62,7 @@ FIND_PACKAGE( DD4hep REQUIRED )
 
 FOREACH( pkg Marlin MarlinUtil LCIO ROOT DD4hep)
     IF( ${pkg}_FOUND )
-        INCLUDE_DIRECTORIES( ${${pkg}_INCLUDE_DIRS} )
+        INCLUDE_DIRECTORIES( SYSTEM ${${pkg}_INCLUDE_DIRS} )
         LINK_LIBRARIES( ${${pkg}_LIBRARIES} )
         ADD_DEFINITIONS ( ${${pkg}_DEFINITIONS} )
     ENDIF()
