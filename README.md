@@ -1,4 +1,6 @@
 # LCPandoraAnalysis
+[![Build Status](https://travis-ci.org/PandoraPFA/LCPandoraAnalysis.svg?branch=master)](https://travis-ci.org/PandoraPFA/LCPandoraAnalysis)
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/13061/badge.svg)](https://scan.coverity.com/projects/pandorapfa-lcpandoraanalysis)
 
 Pandora calibration and analysis tools in iLCSoft / Marlin framework 
 
