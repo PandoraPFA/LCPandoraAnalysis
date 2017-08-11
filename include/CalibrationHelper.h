@@ -1,6 +1,6 @@
 /**
  *  @file   PandoraAnalysis/include/CalibrationHelper.h
- * 
+ *
  *  @brief  Header file for the calibration helper class.
  */
 
@@ -57,6 +57,9 @@ public:
         LCStrVec    m_hCalBarrelCollectionsSimCaloHit;      ///< Input simcalorimeter hit collection names
         LCStrVec    m_hCalEndCapCollectionsSimCaloHit;      ///< Input simcalorimeter hit collection names
         LCStrVec    m_hCalOtherCollectionsSimCaloHit;       ///< Input simcalorimeter hit collection names
+        LCStrVec    m_eCalBarrelCollectionsSimCaloHit;      ///< Input simcalorimeter hit collection names
+        LCStrVec    m_eCalEndCapCollectionsSimCaloHit;      ///< Input simcalorimeter hit collection names
+        LCStrVec    m_eCalOtherCollectionsSimCaloHit;       ///< Input simcalorimeter hit collection names
         LCStrVec    m_muonCollectionsSimCaloHit;            ///< Input simcalorimeter hit collection names
         LCStrVec    m_bCalCollectionsSimCaloHit;            ///< Input simcalorimeter hit collection names
         LCStrVec    m_lHCalCollectionsSimCaloHit;           ///< Input simcalorimeter hit collection names
@@ -67,7 +70,7 @@ public:
 
     /**
      *  @brief  Constructor
-     * 
+     *
      *  @param  settings the settings
      */
     CalibrationHelper(const Settings &settings);
@@ -79,19 +82,20 @@ public:
 
     /**
      *  @brief  Produces the calibration data
-     * 
+     *
      *  @param  pLCEvent the lc event
      *  @param  particleVector reconstructed particle vector for the lc event
      *  @param  nPfoTargetsTotal number of total targets
      *  @param  nPfoTargetsTracks number of target tracks
      *  @param  nPfoTargetsNeutralHadrons of target neutral hadrons
+     *  @param  nPfoTargetsPhotons of target photons
      *  @param  pfoTargetsEnergyTotal total targets energy
      */
-    void Calibrate(const EVENT::LCEvent *pLCEvent, const ParticleVector &particleVector, const int nPfoTargetsTotal, const int nPfoTargetsTracks, const int nPfoTargetsNeutralHadrons, const float pfoTargetsEnergyTotal);
+    void Calibrate(const EVENT::LCEvent *pLCEvent, const ParticleVector &particleVector, const int nPfoTargetsTotal, const int nPfoTargetsTracks, const int nPfoTargetsNeutralHadrons, const int nPfoTargetsPhotons, const float pfoTargetsEnergyTotal);
 
     /**
      *  @brief  Set branch addresses for calibration variables
-     * 
+     *
      *  @param  pTTree tree to set branch addresses to
      */
     void SetBranchAddresses(TTree *pTTree);
@@ -103,7 +107,7 @@ public:
 
     /**
      *  @brief  Set directory for calibration histograms
-     * 
+     *
      *  @param  pTFile directory to set histograms to
      */
     void SetHistogramDirectories(TFile *pTFile);
@@ -121,14 +125,14 @@ public:
 private:
     /**
      *  @brief  Get the minimum number of HCal layers between any calo hit in the ParticleVector and the edge of the detector
-     * 
+     *
      *  @param  pParticleVector to be examined
      */
     int GetMinNHCalLayersFromEdge(const ParticleVector &pParticleVector) const;
 
     /**
      *  @brief  Read and save the calorimeter hit information for a specific collection
-     * 
+     *
      *  @param  pLCEvent the lc event
      *  @param  collectionNames the collection to be read
      *  @param  hitEnergySum the sum of the hit energy for the collection
@@ -137,7 +141,7 @@ private:
 
     /**
      *  @brief  Read and save the simcalorimeter hit information for a specific collection
-     * 
+     *
      *  @param  pLCEvent the lc event
      *  @param  collectionNames the collection to be read
      *  @param  hitEnergySum the sum of the hit energy for the collection
@@ -146,7 +150,7 @@ private:
 
     /**
      *  @brief  Add the direction corrected SimCaloHits and the direction corrections for a particular collection to separate histograms
-     * 
+     *
      *  @param  pLCEvent a collection in the lc event
      *  @param  collectionNames a collection in the lc event
      *  @param  Barrel, Endcap, Other for the HCal collection
@@ -157,7 +161,7 @@ private:
 
     /**
      *  @brief  Add the direction corrected calo hits for a particular collection to a histogram
-     * 
+     *
      *  @param  pLCEvent a collection in the lc event
      *  @param  collectionNames a collection in the lc event
      *  @param  pTH1F histogram to store direction corrected calo hits
@@ -166,14 +170,14 @@ private:
 
     /**
      *  @brief  Get the minimum number of HCal layers between a calo hit and the edge of the detector
-     * 
+     *
      *  @param  pCaloHit to be examined
      */
     int GetNHCalLayersFromEdge(const EVENT::CalorimeterHit *const pCaloHit) const;
 
     /**
      *  @brief  Get the radial distance between a calo hit in the HCal and the edge of the HCal
-     * 
+     *
      *  @param  pCaloHit to be examined
      *  @param  symmetryOrder of the region of the HCal the hit is in i.e. Barrel, Endcap, Ring
      *  @param  phi0 of the region of the HCal the hit is in i.e. Barrel, Endcap, Ring
@@ -181,7 +185,7 @@ private:
     float GetMaximumRadius(const EVENT::CalorimeterHit *const pCaloHit, const unsigned int symmetryOrder, const float phi0) const;
 
     /**
-     *  @brief A helper function to access geometry information via DD4HEP 
+     *  @brief A helper function to access geometry information via DD4HEP
      *
      *  @param includeFlag calorimeter propereties to include
      *  @param excludeFlag calorimeter propereties to exclude
@@ -221,6 +225,10 @@ private:
     TH1F           *m_hHCalBarrelDirectionCorrectionSimCaloHit;    ///< AddSimCaloHitEntries setting 1, pass HCal Barrel sim calo hit collections
     TH1F           *m_hHCalEndCapDirectionCorrectionSimCaloHit;    ///< AddSimCaloHitEntries setting 1, pass HCal EndCap sim calo hit collections
     TH1F           *m_hHCalOtherDirectionCorrectionSimCaloHit;     ///< AddSimCaloHitEntries setting 1, pass HCal Other sim calo hit collections
+
+    TH1F           *m_hECalBarrelDirectionCorrectionSimCaloHit;    ///< AddSimCaloHitEntries setting 1, pass ECal Barrel sim calo hit collections
+    TH1F           *m_hECalEndCapDirectionCorrectionSimCaloHit;    ///< AddSimCaloHitEntries setting 1, pass ECal EndCap sim calo hit collections
+    TH1F           *m_hECalOtherDirectionCorrectionSimCaloHit;     ///< AddSimCaloHitEntries setting 1, pass ECal Other sim calo hit collections
 };
 
 } // namespace pandora_analysis

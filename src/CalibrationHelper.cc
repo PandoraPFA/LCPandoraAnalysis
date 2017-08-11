@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraAnalysis/src/CalibrationHelper.cc
- * 
+ *
  *  @brief  Implementation of the calibration helper class.
- * 
+ *
  *  $Log: $
  */
 
@@ -98,7 +98,10 @@ CalibrationHelper::CalibrationHelper(const Settings &settings) :
     m_hECalDirectionCorrectedSimCaloHit(NULL),
     m_hHCalBarrelDirectionCorrectionSimCaloHit(NULL),
     m_hHCalEndCapDirectionCorrectionSimCaloHit(NULL),
-    m_hHCalOtherDirectionCorrectionSimCaloHit(NULL)
+    m_hHCalOtherDirectionCorrectionSimCaloHit(NULL),
+    m_hECalBarrelDirectionCorrectionSimCaloHit(NULL),
+    m_hECalEndCapDirectionCorrectionSimCaloHit(NULL),
+    m_hECalOtherDirectionCorrectionSimCaloHit(NULL)
 {
 }
 
@@ -145,6 +148,18 @@ void CalibrationHelper::CreateHistograms()
     m_hHCalOtherDirectionCorrectionSimCaloHit->GetXaxis()->SetTitle("Direction Correction -> (DirCorr * SimCaloHit)");
     m_hHCalOtherDirectionCorrectionSimCaloHit->GetYaxis()->SetTitle("Entries");
 
+    m_hECalBarrelDirectionCorrectionSimCaloHit = new TH1F("ECalBarrelDirectionCorrectionSimCaloHit", "Distribution of Direction Corrections for SimCaloHits in the ECal Barrel (1==nPfoTargetsTotal && 1==nPfoTargetsPhotons && Contained in ECal)", 200, 0., 1.0);
+    m_hECalBarrelDirectionCorrectionSimCaloHit->GetXaxis()->SetTitle("Direction Correction -> (DirCorr * SimCaloHit)");
+    m_hECalBarrelDirectionCorrectionSimCaloHit->GetYaxis()->SetTitle("Entries");
+
+    m_hECalEndCapDirectionCorrectionSimCaloHit = new TH1F("ECalEndCapDirectionCorrectionSimCaloHit", "Distribution of Direction Corrections for SimCaloHits in the ECal EndCap (1==nPfoTargetsTotal && 1==nPfoTargetsPhotons && Contained in ECal)", 200, 0., 1.0);
+    m_hECalEndCapDirectionCorrectionSimCaloHit->GetXaxis()->SetTitle("Direction Correction -> (DirCorr * SimCaloHit)");
+    m_hECalEndCapDirectionCorrectionSimCaloHit->GetYaxis()->SetTitle("Entries");
+
+    m_hECalOtherDirectionCorrectionSimCaloHit = new TH1F("ECalOtherDirectionCorrectionSimCaloHit", "Distribution of Direction Corrections for SimCaloHits in the ECal Other (1==nPfoTargetsTotal && 1==nPfoTargetsPhotons && Contained in ECal)", 200, 0., 1.0);
+    m_hECalOtherDirectionCorrectionSimCaloHit->GetXaxis()->SetTitle("Direction Correction -> (DirCorr * SimCaloHit)");
+    m_hECalOtherDirectionCorrectionSimCaloHit->GetYaxis()->SetTitle("Entries");
+
     m_hHCalBarrelDirectionCorrectedSimCaloHit = new TH1F("HCalDirectionCorrectedSimCaloHitBarrel", "Distribution of Direction Corrected SimCaloHits in the HCal Barrel (1==nPfoTargetsTotal && 1==nPfoTargetsTracks)", 200, 0., 0.001);
     m_hHCalBarrelDirectionCorrectedSimCaloHit->GetXaxis()->SetTitle("Direction Corrected SimCaloHit Measurement");
     m_hHCalBarrelDirectionCorrectedSimCaloHit->GetYaxis()->SetTitle("Entries");
@@ -181,6 +196,9 @@ void CalibrationHelper::SetHistogramDirectories(TFile *pTFile)
     m_hHCalBarrelDirectionCorrectionSimCaloHit->SetDirectory(pTFile);
     m_hHCalEndCapDirectionCorrectionSimCaloHit->SetDirectory(pTFile);
     m_hHCalOtherDirectionCorrectionSimCaloHit->SetDirectory(pTFile);
+    m_hECalBarrelDirectionCorrectionSimCaloHit->SetDirectory(pTFile);
+    m_hECalEndCapDirectionCorrectionSimCaloHit->SetDirectory(pTFile);
+    m_hECalOtherDirectionCorrectionSimCaloHit->SetDirectory(pTFile);
     m_hHCalBarrelDirectionCorrectedSimCaloHit->SetDirectory(pTFile);
     m_hHCalEndCapDirectionCorrectedSimCaloHit->SetDirectory(pTFile);
     m_hHCalOtherDirectionCorrectedSimCaloHit->SetDirectory(pTFile);
@@ -197,6 +215,9 @@ void CalibrationHelper::WriteHistograms()
     m_hHCalBarrelDirectionCorrectionSimCaloHit->Write();
     m_hHCalEndCapDirectionCorrectionSimCaloHit->Write();
     m_hHCalOtherDirectionCorrectionSimCaloHit->Write();
+    m_hECalBarrelDirectionCorrectionSimCaloHit->Write();
+    m_hECalEndCapDirectionCorrectionSimCaloHit->Write();
+    m_hECalOtherDirectionCorrectionSimCaloHit->Write();
     m_hHCalBarrelDirectionCorrectedSimCaloHit->Write();
     m_hHCalEndCapDirectionCorrectedSimCaloHit->Write();
     m_hHCalOtherDirectionCorrectedSimCaloHit->Write();
@@ -229,8 +250,9 @@ void CalibrationHelper::Clear()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void CalibrationHelper::Calibrate(const EVENT::LCEvent *pLCEvent, const ParticleVector &particleVector, 
-    const int nPfoTargetsTotal, const int nPfoTargetsTracks, const int nPfoTargetsNeutralHadrons, const float pfoTargetsEnergyTotal)
+void CalibrationHelper::Calibrate(const EVENT::LCEvent *pLCEvent, const ParticleVector &particleVector,
+    const int nPfoTargetsTotal, const int nPfoTargetsTracks, const int nPfoTargetsNeutralHadrons, const int nPfoTargetsPhotons,
+    const float pfoTargetsEnergyTotal)
 {
     m_pfoMinHCalLayerToEdge = this->GetMinNHCalLayersFromEdge(particleVector);
 
@@ -272,6 +294,13 @@ void CalibrationHelper::Calibrate(const EVENT::LCEvent *pLCEvent, const Particle
         this->AddSimCaloHitEntries(pLCEvent, m_settings.m_hCalBarrelCollectionsSimCaloHit, 0, m_hHCalBarrelDirectionCorrectionSimCaloHit);
         this->AddSimCaloHitEntries(pLCEvent, m_settings.m_hCalEndCapCollectionsSimCaloHit, 0, m_hHCalEndCapDirectionCorrectionSimCaloHit);
         this->AddSimCaloHitEntries(pLCEvent, m_settings.m_hCalOtherCollectionsSimCaloHit, 0, m_hHCalOtherDirectionCorrectionSimCaloHit);
+    }
+
+    if(1==nPfoTargetsTotal && 1==nPfoTargetsPhotons && ((m_totalCaloHitEnergy-m_eCalTotalCaloHitEnergy) < (0.01*pfoTargetsEnergyTotal)))
+    {
+        this->AddSimCaloHitEntries(pLCEvent, m_settings.m_eCalBarrelCollectionsSimCaloHit, 0, m_hECalBarrelDirectionCorrectionSimCaloHit);
+        this->AddSimCaloHitEntries(pLCEvent, m_settings.m_eCalEndCapCollectionsSimCaloHit, 0, m_hECalEndCapDirectionCorrectionSimCaloHit);
+        this->AddSimCaloHitEntries(pLCEvent, m_settings.m_eCalOtherCollectionsSimCaloHit, 0, m_hECalOtherDirectionCorrectionSimCaloHit);
     }
 }
 
@@ -329,7 +358,7 @@ int CalibrationHelper::GetNHCalLayersFromEdge(const EVENT::CalorimeterHit *const
 
     CHT cht(pCaloHit->getType());
 
-  
+
     if (cht.is(CHT::hcal) != true)
     {
         throw CaloHitException();
@@ -597,7 +626,7 @@ void CalibrationHelper::AddDirectionCorrectedCaloHitEntries(const EVENT::LCEvent
 {
     const dd4hep::rec::LayeredCalorimeterData *pECalEndcapExtension(this->GetExtension((DetType::CALORIMETER | DetType::ELECTROMAGNETIC | DetType::ENDCAP), ( DetType::AUXILIARY | DetType::FORWARD)));
     const float zOfEndCap(static_cast<float>(pECalEndcapExtension->extent[2]/dd4hep::mm));
-   
+
     for (EVENT::LCStrVec::const_iterator iter = collectionNames.begin(), iterEnd = collectionNames.end(); iter != iterEnd; ++iter)
     {
         try
