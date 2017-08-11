@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraAnalysis/src/PfoAnalysis.cc
- * 
+ *
  *  @brief  Implementation of the pfo analysis class.
- * 
+ *
  *  $Log: $
  */
 
@@ -129,64 +129,82 @@ PfoAnalysis::PfoAnalysis() :
                            int(0));
 
     registerInputCollections(LCIO::CALORIMETERHIT,
-                           "ECalCollections", 
+                           "ECalCollections",
                            "Name of the ECal collection of calo hits used to form clusters",
                            m_calibrationHelperSettings.m_eCalCollections,
                            LCStrVec());
 
     registerInputCollections(LCIO::CALORIMETERHIT,
-                           "HCalCollections", 
+                           "HCalCollections",
                            "Name of the HCal collection of calo hits used to form clusters",
                            m_calibrationHelperSettings.m_hCalCollections,
                            LCStrVec());
 
     registerInputCollections(LCIO::CALORIMETERHIT,
-                           "MuonCollections", 
+                           "MuonCollections",
                            "Name of the Muon collection of calo hits used to form clusters",
                            m_calibrationHelperSettings.m_muonCollections,
                            LCStrVec());
 
     registerInputCollections(LCIO::CALORIMETERHIT,
-                           "BCalCollections", 
+                           "BCalCollections",
                            "Name of the BCal collection of calo hits used to form clusters",
                            m_calibrationHelperSettings.m_bCalCollections,
                            LCStrVec());
 
     registerInputCollections(LCIO::CALORIMETERHIT,
-                           "LHCalCollections", 
+                           "LHCalCollections",
                            "Name of the LHCal collection of calo hits used to form clusters",
                            m_calibrationHelperSettings.m_lHCalCollections,
                            LCStrVec());
 
     registerInputCollections(LCIO::CALORIMETERHIT,
-                           "LCalCollections", 
+                           "LCalCollections",
                            "Name of the LCal collection of calo hits used to form clusters",
                            m_calibrationHelperSettings.m_lCalCollections,
                            LCStrVec());
 
-    registerInputCollections(LCIO::SIMCALORIMETERHIT, 
-                           "ECalCollectionsSimCaloHit" , 
-                           "Name of the ECal collection post Mokka, pre digitisation" , 
-                           m_calibrationHelperSettings.m_eCalCollectionsSimCaloHit , 
+    registerInputCollections(LCIO::SIMCALORIMETERHIT,
+                           "ECalCollectionsSimCaloHit" ,
+                           "Name of the ECal collection post Mokka, pre digitisation" ,
+                           m_calibrationHelperSettings.m_eCalCollectionsSimCaloHit ,
                            LCStrVec());
 
-    registerInputCollections(LCIO::SIMCALORIMETERHIT, 
-                           "HCalBarrelCollectionsSimCaloHit" , 
-                           "Name of the HCal Barrel collection post Mokka, pre digitisation" , 
-                           m_calibrationHelperSettings.m_hCalBarrelCollectionsSimCaloHit , 
+    registerInputCollections(LCIO::SIMCALORIMETERHIT,
+                           "HCalBarrelCollectionsSimCaloHit" ,
+                           "Name of the HCal Barrel collection post Mokka, pre digitisation" ,
+                           m_calibrationHelperSettings.m_hCalBarrelCollectionsSimCaloHit ,
                            LCStrVec());
 
-    registerInputCollections(LCIO::SIMCALORIMETERHIT, 
-                           "HCalEndCapCollectionsSimCaloHit" , 
-                           "Name of the HCal EndCap collection post Mokka, pre digitisation" , 
-                           m_calibrationHelperSettings.m_hCalEndCapCollectionsSimCaloHit , 
+    registerInputCollections(LCIO::SIMCALORIMETERHIT,
+                           "HCalEndCapCollectionsSimCaloHit" ,
+                           "Name of the HCal EndCap collection post Mokka, pre digitisation" ,
+                           m_calibrationHelperSettings.m_hCalEndCapCollectionsSimCaloHit ,
                            LCStrVec());
 
-    registerInputCollections(LCIO::SIMCALORIMETERHIT, 
-                           "HCalOtherCollectionsSimCaloHit" , 
-                           "Name of the HCal Other collection post Mokka, pre digitisation" , 
-                           m_calibrationHelperSettings.m_hCalOtherCollectionsSimCaloHit , 
+    registerInputCollections(LCIO::SIMCALORIMETERHIT,
+                           "HCalOtherCollectionsSimCaloHit" ,
+                           "Name of the HCal Other collection post Mokka, pre digitisation" ,
+                           m_calibrationHelperSettings.m_hCalOtherCollectionsSimCaloHit ,
                            LCStrVec());
+
+     registerInputCollections(LCIO::SIMCALORIMETERHIT,
+                            "ECalBarrelCollectionsSimCaloHit" ,
+                            "Name of the ECal Barrel collection post Mokka, pre digitisation" ,
+                            m_calibrationHelperSettings.m_eCalBarrelCollectionsSimCaloHit ,
+                            LCStrVec());
+
+     registerInputCollections(LCIO::SIMCALORIMETERHIT,
+                            "ECalEndCapCollectionsSimCaloHit" ,
+                            "Name of the ECal EndCap collection post Mokka, pre digitisation" ,
+                            m_calibrationHelperSettings.m_eCalEndCapCollectionsSimCaloHit ,
+                            LCStrVec());
+
+     registerInputCollections(LCIO::SIMCALORIMETERHIT,
+                            "ECalOtherCollectionsSimCaloHit" ,
+                            "Name of the ECal Other collection post Mokka, pre digitisation" ,
+                            m_calibrationHelperSettings.m_eCalOtherCollectionsSimCaloHit ,
+                            LCStrVec());
 
     registerInputCollections(LCIO::SIMCALORIMETERHIT,
                            "MuonCollectionsSimCaloHit" ,
@@ -318,7 +336,7 @@ void PfoAnalysis::processEvent(EVENT::LCEvent *pLCEvent)
     this->PerformPfoAnalysis();
 
     if (m_pCalibrationHelper)
-        m_pCalibrationHelper->Calibrate(pLCEvent, m_pfoVector, m_nPfoTargetsTotal, m_nPfoTargetsTracks, m_nPfoTargetsNeutralHadrons, m_pfoTargetsEnergyTotal);
+        m_pCalibrationHelper->Calibrate(pLCEvent, m_pfoVector, m_nPfoTargetsTotal, m_nPfoTargetsTracks, m_nPfoTargetsNeutralHadrons, m_nPfoTargetsPhotons, m_pfoTargetsEnergyTotal);
 
     m_pTTree->Fill();
 }
