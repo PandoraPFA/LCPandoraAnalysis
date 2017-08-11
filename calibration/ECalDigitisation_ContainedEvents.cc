@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraAnalysis/calibration/ECalDigitisation_ContainedEvents.cc
- *
+ * 
  *  @brief  Mean calo hit energy for photon events contained in ECal.  Used for setting digitisation constant in ECal (CalibrECAL).
- *
+ * 
  *  $Log: $
  */
 
@@ -24,7 +24,7 @@
 /**
  *  @brief  ECalDigitisation class
  */
-class ECalDigitisation
+class ECalDigitisation 
 {
 public:
     /**
@@ -48,9 +48,9 @@ public:
     float           m_calibrationAccuracy;  ///< Fractional accuracy target for reconstructed energy
     std::string     m_outputPath;           ///< Output path to send results
     float           m_fitPercentage;        ///< Percentage of continuous data with narrowest range for Gaussian fit
-    std::string     m_element;              ///< Detector component (Barrel, EndCap or Other)
+    std::string     m_element;              ///< Detector component (Barrel or EndCap)
     float           m_lowerCosThetaCut;     ///< Lower cosTheta cut defining m_element
-    float           m_upperCosTheraCut;     ///< Lower cosTheta cut defining m_element
+    float           m_upperCosThetaCut;     ///< Upper cosTheta cut defining m_element
 
 // Outputs
     float           m_amplitude;            ///< Amplitude of Gaussian fit
@@ -70,7 +70,7 @@ private:
     void CreateHistogram();
 
     /**
-     *  @brief  Fill ECal calo hit energy histogram
+     *  @brief  Fill ECal calo hit energy histogram 
     */
     void FillHistogram();
 
@@ -100,11 +100,11 @@ typedef std::vector<float> FloatVector;
 
 /**
  *  @brief  Parse the command line arguments, setting the application parameters
- *
+ * 
  *  @param  argc argument count
  *  @param  argv argument vector
  *  @param  eCalDigitisation to receive the application parameters
- *
+ * 
  *  @return success
  */
 bool ParseCommandLine(int argc, char *argv[], ECalDigitisation &eCalDigitisation);
@@ -137,7 +137,7 @@ int main(int argc, char **argv)
         data_file << "Digitisation of the ECal " + eCalDigitisation.m_element + "                    : " << std::endl;
         data_file << "Element                                            : " << eCalDigitisation.m_element << std::endl;
         data_file << "Lower abs(cosTheta) cut defining element           : " << eCalDigitisation.m_lowerCosThetaCut << std::endl;
-        data_file << "Upper abs(cosTheta) cut defining element           : " << eCalDigitisation.m_upperCosTheraCut << std::endl;
+        data_file << "Upper abs(cosTheta) cut defining element           : " << eCalDigitisation.m_upperCosThetaCut << std::endl;
         data_file << "For Photon energy                                  : " << eCalDigitisation.m_trueEnergy << " : /GeV" <<std::endl;
         data_file << "Gaussian fit to ECal calorimeter hit energy has    : " << std::endl;
         data_file << "the following parameters, fit uses 90% data with   : " << std::endl;
@@ -150,7 +150,7 @@ int main(int argc, char **argv)
         std::cout << "Digitisation of the ECal " + eCalDigitisation.m_element + "                    : " << std::endl;
         std::cout << "Element                                            : " << eCalDigitisation.m_element << std::endl;
         std::cout << "Lower abs(cosTheta) cut defining element           : " << eCalDigitisation.m_lowerCosThetaCut << std::endl;
-        std::cout << "Upper abs(cosTheta) cut defining element           : " << eCalDigitisation.m_upperCosTheraCut << std::endl;
+        std::cout << "Upper abs(cosTheta) cut defining element           : " << eCalDigitisation.m_upperCosThetaCut << std::endl;
         std::cout << "For Photon energy                                  : " << eCalDigitisation.m_trueEnergy << " : /GeV" <<std::endl;
         std::cout << "Gaussian fit to ECal calorimeter hit energy has    : " << std::endl;
         std::cout << "the following parameters, fit uses 90% data with   : " << std::endl;
@@ -184,7 +184,7 @@ ECalDigitisation::ECalDigitisation() :
     m_fitPercentage(90.f),
     m_element(""),
     m_lowerCosThetaCut(0.f),
-    m_upperCosTheraCut(1.f),
+    m_upperCosThetaCut(1.f),
     m_amplitude(std::numeric_limits<float>::max()),
     m_mean(std::numeric_limits<float>::max()),
     m_stdDev(std::numeric_limits<float>::max()),
@@ -240,7 +240,7 @@ void ECalDigitisation::PrepareHistogram()
 
         if (1 == nPfoTargetsTotal && 1 == nPfoTargetsPhotons && isContained)
         {
-            if (m_lowerCosThetaCut < CosTheta && CosTheta < m_upperCosTheraCut)
+            if (m_lowerCosThetaCut < CosTheta && CosTheta < m_upperCosThetaCut)
             {
                 if (eCalTotalCaloHitEnergy > m_maxHistogramEnergy)
                     m_maxHistogramEnergy = eCalTotalCaloHitEnergy;
@@ -275,7 +275,7 @@ void ECalDigitisation::FillHistogram()
     m_pTChain->SetBranchAddress("nPfoTargetsPhotons",&nPfoTargetsPhotons);
     m_pTChain->SetBranchAddress("pfoTargetCosTheta", &pfoTargetCosTheta);
 
-    for (unsigned int i = 0; i < m_pTChain->GetEntries(); i++)
+    for (unsigned int i = 0; i < m_pTChain->GetEntries(); i++) 
     {
         m_pTChain->GetEntry(i);
 
@@ -284,7 +284,7 @@ void ECalDigitisation::FillHistogram()
 
         if (1 == nPfoTargetsTotal && 1 == nPfoTargetsPhotons && isContained)
         {
-            if (m_lowerCosThetaCut < CosTheta && CosTheta < m_upperCosTheraCut)
+            if (m_lowerCosThetaCut < CosTheta && CosTheta < m_upperCosThetaCut)
             {
                 m_histogram->Fill(eCalTotalCaloHitEnergy);
                 m_nEventsECalHist++;
@@ -358,7 +358,7 @@ void ECalDigitisation::RMSFitPercentageRange()
 
             if (sumn < (m_fitPercentage/100) * total)
             {
-                // These variables define the final sums required once we have considered X% of data, anything else is
+                // These variables define the final sums required once we have considered X% of data, anything else is 
                 // continuously overwritten.
                 sumn += yi;
                 sumx += yi * binx;
@@ -385,17 +385,17 @@ void ECalDigitisation::RMSFitPercentageRange()
                 low = m_histogram->GetBinLowEdge(istart);
                 m_fitRangeLow = m_histogram->GetBinLowEdge(istart) + (0.5 * m_histogram->GetBinWidth(istart));
             }
-
+            
             high = m_histogram->GetBinLowEdge(iend);
             rmsmin = localRms;
             m_fitRangeHigh = m_histogram->GetBinLowEdge(iend) + (0.5 * m_histogram->GetBinWidth(iend));
         }
     }
-
+    
     m_rMSFitRange = rmsmin;
-
+    
     std::cout << m_histogram->GetName() << " (" << m_histogram->GetEntries() << " entries), rawrms: " << rawRms << ", rmsx: " << rmsmin
-              << " (" << low << "-" << high << "), low_fit and high_fit " << " (" << m_fitRangeLow << "-" << m_fitRangeHigh
+              << " (" << low << "-" << high << "), low_fit and high_fit " << " (" << m_fitRangeLow << "-" << m_fitRangeHigh 
               << "), << mean: " << mean << std::endl;
 }
 
@@ -498,13 +498,13 @@ void ECalDigitisation::Fit()
             pCanvas->SaveAs(dotCOutputFilename);
             delete pCanvas;
         }
-
+        
         else
         {
             std::cout << "Histogram is empty, no fit possible." << std::endl;
         }
     }
-
+    
     catch (const std::runtime_error& e)
     {
         std::cout << "An exception occurred. " << e.what() << '\n';
@@ -544,7 +544,7 @@ bool ParseCommandLine(int argc, char *argv[], ECalDigitisation &eCalDigitisation
             eCalDigitisation.m_lowerCosThetaCut = atof(optarg);
             break;
         case 'j':
-            eCalDigitisation.m_upperCosTheraCut = atof(optarg);
+            eCalDigitisation.m_upperCosThetaCut = atof(optarg);
             break;
         case 'f':
         case 'h':
@@ -557,8 +557,8 @@ bool ParseCommandLine(int argc, char *argv[], ECalDigitisation &eCalDigitisation
                       << "    -d        (mandatory, output path to send results to)                                             " << std::endl
                       << "    -e value  (optional, fit percentage used for calibration, default 90% of data with narrowest rms) " << std::endl
                       << "    -g        (mandatory, element of the detector being calibrated (Barrel or EndCap))                " << std::endl
-                      << "    -i value  (mandatory, lower abs cos theta cut defining element, default 0)                        " << std::endl
-                      << "    -j value  (mandatory, upper abs cos theta cut defining element, default 1)                        " << std::endl
+                      << "    -i value  (mandatory, lower abs cos theta cut defining element, usually 0)                        " << std::endl
+                      << "    -j value  (mandatory, upper abs cos theta cut defining element, usually 1)                        " << std::endl
                       << std::endl;
             return false;
         }

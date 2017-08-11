@@ -1,6 +1,6 @@
 /**
  *  @file   PandoraAnalysis/include/CalibrationHelper.h
- *
+ * 
  *  @brief  Header file for the calibration helper class.
  */
 
@@ -70,7 +70,7 @@ public:
 
     /**
      *  @brief  Constructor
-     *
+     * 
      *  @param  settings the settings
      */
     CalibrationHelper(const Settings &settings);
@@ -82,7 +82,7 @@ public:
 
     /**
      *  @brief  Produces the calibration data
-     *
+     * 
      *  @param  pLCEvent the lc event
      *  @param  particleVector reconstructed particle vector for the lc event
      *  @param  nPfoTargetsTotal number of total targets
@@ -95,7 +95,7 @@ public:
 
     /**
      *  @brief  Set branch addresses for calibration variables
-     *
+     * 
      *  @param  pTTree tree to set branch addresses to
      */
     void SetBranchAddresses(TTree *pTTree);
@@ -107,7 +107,7 @@ public:
 
     /**
      *  @brief  Set directory for calibration histograms
-     *
+     * 
      *  @param  pTFile directory to set histograms to
      */
     void SetHistogramDirectories(TFile *pTFile);
@@ -125,14 +125,14 @@ public:
 private:
     /**
      *  @brief  Get the minimum number of HCal layers between any calo hit in the ParticleVector and the edge of the detector
-     *
+     * 
      *  @param  pParticleVector to be examined
      */
     int GetMinNHCalLayersFromEdge(const ParticleVector &pParticleVector) const;
 
     /**
      *  @brief  Read and save the calorimeter hit information for a specific collection
-     *
+     * 
      *  @param  pLCEvent the lc event
      *  @param  collectionNames the collection to be read
      *  @param  hitEnergySum the sum of the hit energy for the collection
@@ -141,7 +141,7 @@ private:
 
     /**
      *  @brief  Read and save the simcalorimeter hit information for a specific collection
-     *
+     * 
      *  @param  pLCEvent the lc event
      *  @param  collectionNames the collection to be read
      *  @param  hitEnergySum the sum of the hit energy for the collection
@@ -150,7 +150,7 @@ private:
 
     /**
      *  @brief  Add the direction corrected SimCaloHits and the direction corrections for a particular collection to separate histograms
-     *
+     * 
      *  @param  pLCEvent a collection in the lc event
      *  @param  collectionNames a collection in the lc event
      *  @param  Barrel, Endcap, Other for the HCal collection
@@ -161,7 +161,7 @@ private:
 
     /**
      *  @brief  Add the direction corrected calo hits for a particular collection to a histogram
-     *
+     * 
      *  @param  pLCEvent a collection in the lc event
      *  @param  collectionNames a collection in the lc event
      *  @param  pTH1F histogram to store direction corrected calo hits
@@ -170,14 +170,14 @@ private:
 
     /**
      *  @brief  Get the minimum number of HCal layers between a calo hit and the edge of the detector
-     *
+     * 
      *  @param  pCaloHit to be examined
      */
     int GetNHCalLayersFromEdge(const EVENT::CalorimeterHit *const pCaloHit) const;
 
     /**
      *  @brief  Get the radial distance between a calo hit in the HCal and the edge of the HCal
-     *
+     * 
      *  @param  pCaloHit to be examined
      *  @param  symmetryOrder of the region of the HCal the hit is in i.e. Barrel, Endcap, Ring
      *  @param  phi0 of the region of the HCal the hit is in i.e. Barrel, Endcap, Ring
@@ -185,7 +185,7 @@ private:
     float GetMaximumRadius(const EVENT::CalorimeterHit *const pCaloHit, const unsigned int symmetryOrder, const float phi0) const;
 
     /**
-     *  @brief A helper function to access geometry information via DD4HEP
+     *  @brief A helper function to access geometry information via DD4HEP 
      *
      *  @param includeFlag calorimeter propereties to include
      *  @param excludeFlag calorimeter propereties to exclude

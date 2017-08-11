@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraAnalysis/src/CalibrationHelper.cc
- *
+ * 
  *  @brief  Implementation of the calibration helper class.
- *
+ * 
  *  $Log: $
  */
 
@@ -358,7 +358,7 @@ int CalibrationHelper::GetNHCalLayersFromEdge(const EVENT::CalorimeterHit *const
 
     CHT cht(pCaloHit->getType());
 
-
+  
     if (cht.is(CHT::hcal) != true)
     {
         throw CaloHitException();
@@ -626,7 +626,7 @@ void CalibrationHelper::AddDirectionCorrectedCaloHitEntries(const EVENT::LCEvent
 {
     const dd4hep::rec::LayeredCalorimeterData *pECalEndcapExtension(this->GetExtension((DetType::CALORIMETER | DetType::ELECTROMAGNETIC | DetType::ENDCAP), ( DetType::AUXILIARY | DetType::FORWARD)));
     const float zOfEndCap(static_cast<float>(pECalEndcapExtension->extent[2]/dd4hep::mm));
-
+   
     for (EVENT::LCStrVec::const_iterator iter = collectionNames.begin(), iterEnd = collectionNames.end(); iter != iterEnd; ++iter)
     {
         try

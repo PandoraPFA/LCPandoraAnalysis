@@ -34,6 +34,7 @@ AUX_SOURCE_DIRECTORY( ./src PandoraAnalysis_SRCS )
 SET( PERFORMANCE_PROGRAMS AnalysePerformance
     AnalysePerformanceFull )
 SET( CALIBRATION_PROGRAMS ECalDigitisation_ContainedEvents
+    ECalDigitisation_DirectionCorrectionDistribution
     HCalDigitisation_ContainedEvents
     HCalDigitisation_DirectionCorrectionDistribution
     PandoraPFACalibrate_MipResponse
