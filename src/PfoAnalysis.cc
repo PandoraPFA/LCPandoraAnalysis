@@ -188,6 +188,24 @@ PfoAnalysis::PfoAnalysis() :
                            m_calibrationHelperSettings.m_hCalOtherCollectionsSimCaloHit , 
                            LCStrVec());
 
+     registerInputCollections(LCIO::SIMCALORIMETERHIT,
+                            "ECalBarrelCollectionsSimCaloHit" ,
+                            "Name of the ECal Barrel collection post Mokka, pre digitisation" ,
+                            m_calibrationHelperSettings.m_eCalBarrelCollectionsSimCaloHit ,
+                            LCStrVec());
+
+     registerInputCollections(LCIO::SIMCALORIMETERHIT,
+                            "ECalEndCapCollectionsSimCaloHit" ,
+                            "Name of the ECal EndCap collection post Mokka, pre digitisation" ,
+                            m_calibrationHelperSettings.m_eCalEndCapCollectionsSimCaloHit ,
+                            LCStrVec());
+
+     registerInputCollections(LCIO::SIMCALORIMETERHIT,
+                            "ECalOtherCollectionsSimCaloHit" ,
+                            "Name of the ECal Other collection post Mokka, pre digitisation" ,
+                            m_calibrationHelperSettings.m_eCalOtherCollectionsSimCaloHit ,
+                            LCStrVec());
+
     registerInputCollections(LCIO::SIMCALORIMETERHIT,
                            "MuonCollectionsSimCaloHit" ,
                            "Name of the Muon collection post Mokka, pre digitisation" ,
@@ -318,7 +336,7 @@ void PfoAnalysis::processEvent(EVENT::LCEvent *pLCEvent)
     this->PerformPfoAnalysis();
 
     if (m_pCalibrationHelper)
-        m_pCalibrationHelper->Calibrate(pLCEvent, m_pfoVector, m_nPfoTargetsTotal, m_nPfoTargetsTracks, m_nPfoTargetsNeutralHadrons, m_pfoTargetsEnergyTotal);
+        m_pCalibrationHelper->Calibrate(pLCEvent, m_pfoVector, m_nPfoTargetsTotal, m_nPfoTargetsTracks, m_nPfoTargetsNeutralHadrons, m_nPfoTargetsPhotons, m_pfoTargetsEnergyTotal);
 
     m_pTTree->Fill();
 }

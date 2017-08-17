@@ -48,6 +48,9 @@ public:
     float           m_calibrationAccuracy;  ///< Fractional accuracy target for reconstructed energy
     std::string     m_outputPath;           ///< Output path to send results
     float           m_fitPercentage;        ///< Percentage of continuous data with narrowest range for Gaussian fit
+    std::string     m_element;              ///< Detector component (Barrel or EndCap)
+    float           m_lowerCosThetaCut;     ///< Lower cosTheta cut defining m_element
+    float           m_upperCosThetaCut;     ///< Upper cosTheta cut defining m_element
 
 // Outputs
     float           m_amplitude;            ///< Amplitude of Gaussian fit
@@ -131,7 +134,10 @@ int main(int argc, char **argv)
         data_file << "_____________________________________________________________________________________" << std::endl;
         std::cout << "_____________________________________________________________________________________" << std::endl;
 
-        data_file << "Digitisation of the ECal.                          : " << std::endl << std::endl;
+        data_file << "Digitisation of the ECal " + eCalDigitisation.m_element + "                    : " << std::endl;
+        data_file << "Element                                            : " << eCalDigitisation.m_element << std::endl;
+        data_file << "Lower abs(cosTheta) cut defining element           : " << eCalDigitisation.m_lowerCosThetaCut << std::endl;
+        data_file << "Upper abs(cosTheta) cut defining element           : " << eCalDigitisation.m_upperCosThetaCut << std::endl;
         data_file << "For Photon energy                                  : " << eCalDigitisation.m_trueEnergy << " : /GeV" <<std::endl;
         data_file << "Gaussian fit to ECal calorimeter hit energy has    : " << std::endl;
         data_file << "the following parameters, fit uses 90% data with   : " << std::endl;
@@ -141,7 +147,10 @@ int main(int argc, char **argv)
         data_file << "Standard Deviation                                 : " << eCalDigitisation.m_stdDev << " : " <<std::endl;
         data_file << "The total number of events considered was          : " << eCalDigitisation.m_nEventsECalHist << " : " <<std::endl<<std::endl;
 
-        std::cout << "Digitisation of the ECal.                          : " << std::endl << std::endl;
+        std::cout << "Digitisation of the ECal " + eCalDigitisation.m_element + "                    : " << std::endl;
+        std::cout << "Element                                            : " << eCalDigitisation.m_element << std::endl;
+        std::cout << "Lower abs(cosTheta) cut defining element           : " << eCalDigitisation.m_lowerCosThetaCut << std::endl;
+        std::cout << "Upper abs(cosTheta) cut defining element           : " << eCalDigitisation.m_upperCosThetaCut << std::endl;
         std::cout << "For Photon energy                                  : " << eCalDigitisation.m_trueEnergy << " : /GeV" <<std::endl;
         std::cout << "Gaussian fit to ECal calorimeter hit energy has    : " << std::endl;
         std::cout << "the following parameters, fit uses 90% data with   : " << std::endl;
@@ -173,6 +182,9 @@ ECalDigitisation::ECalDigitisation() :
     m_calibrationAccuracy(0.02),
     m_outputPath(""),
     m_fitPercentage(90.f),
+    m_element(""),
+    m_lowerCosThetaCut(0.f),
+    m_upperCosThetaCut(1.f),
     m_amplitude(std::numeric_limits<float>::max()),
     m_mean(std::numeric_limits<float>::max()),
     m_stdDev(std::numeric_limits<float>::max()),
@@ -228,8 +240,11 @@ void ECalDigitisation::PrepareHistogram()
 
         if (1 == nPfoTargetsTotal && 1 == nPfoTargetsPhotons && isContained)
         {
-            if (eCalTotalCaloHitEnergy > m_maxHistogramEnergy)
-                m_maxHistogramEnergy = eCalTotalCaloHitEnergy;
+            if (m_lowerCosThetaCut < CosTheta && CosTheta < m_upperCosThetaCut)
+            {
+                if (eCalTotalCaloHitEnergy > m_maxHistogramEnergy)
+                    m_maxHistogramEnergy = eCalTotalCaloHitEnergy;
+            }
         }
     }
 }
@@ -238,8 +253,8 @@ void ECalDigitisation::PrepareHistogram()
 
 void ECalDigitisation::CreateHistogram()
 {
-    std::string Name = "CaloHitEnergyECal";
-    std::string Title = "Calorimeter Hit Energy ECal (1==nPfoTargetsTotal && 1==nPfoTargetsPhotons && Contained in ECal)";
+    std::string Name = "CaloHitEnergyECal" + m_element;
+    std::string Title = "Calorimeter Hit Energy ECal " + m_element + " (1==nPfoTargetsTotal && 1==nPfoTargetsPhotons && Contained in ECal)";
     int binNumber = static_cast<int>( m_maxHistogramEnergy / ( m_calibrationAccuracy * m_trueEnergy ) );
     m_histogram = new TH1F(Name.c_str(), Title.c_str(), binNumber, 0., m_maxHistogramEnergy);
     m_histogram->GetXaxis()->SetTitle("Calorimeter Hit Energy / GeV");
@@ -269,8 +284,11 @@ void ECalDigitisation::FillHistogram()
 
         if (1 == nPfoTargetsTotal && 1 == nPfoTargetsPhotons && isContained)
         {
-            m_histogram->Fill(eCalTotalCaloHitEnergy);
-            m_nEventsECalHist++;
+            if (m_lowerCosThetaCut < CosTheta && CosTheta < m_upperCosThetaCut)
+            {
+                m_histogram->Fill(eCalTotalCaloHitEnergy);
+                m_nEventsECalHist++;
+            }
         }
     }
 }
@@ -463,18 +481,18 @@ void ECalDigitisation::Fit()
             m_mean = Gaussian_Fit_Func->GetParameter(1);
             m_stdDev = std::pow(Gaussian_Fit_Func->GetParameter(2),-0.5);
 
-            std::string canvasName = "ECalDigitisation";
-            std::string canvasTitle = "ECal Digitisation";
+            std::string canvasName = m_element + "ECalDigitisation";
+            std::string canvasTitle = m_element + " ECal Digitisation";
             TCanvas *pCanvas = new TCanvas(canvasName.c_str(),canvasTitle.c_str(),200,10,600,500);
             pCanvas->cd();
             m_histogram->GetYaxis()->SetTitle("Entries");
-            std::string xAxisTitle = "Calorimeter Hit Energy in ECal / GeV";
+            std::string xAxisTitle = "Calorimeter Hit Energy in ECal " + m_element + "/ GeV";
             m_histogram->GetXaxis()->SetTitle(xAxisTitle.c_str());
             m_histogram->Draw("");
             Gaussian_Fit_Func->Draw("same");
 
-            TString pngOutputFilename = m_outputPath + "Calorimeter_Hit_Energies_ECal_Digitisation.png";
-            TString dotCOutputFilename = m_outputPath + "Calorimeter_Hit_Energies_ECal_Digitisation.C";
+            TString pngOutputFilename = m_outputPath + "Calorimeter_Hit_Energies_ECal_" + m_element + "_Digitisation.png";
+            TString dotCOutputFilename = m_outputPath + "Calorimeter_Hit_Energies_ECal_" + m_element + "_Digitisation.C";
 
             pCanvas->SaveAs(pngOutputFilename);
             pCanvas->SaveAs(dotCOutputFilename);
@@ -500,7 +518,7 @@ bool ParseCommandLine(int argc, char *argv[], ECalDigitisation &eCalDigitisation
 {
     int c(0);
 
-    while (((c = getopt(argc, argv, "a:b:c:d:e:f")) != -1) || (argc == 1))
+    while (((c = getopt(argc, argv, "a:b:c:d:e:g:i:j:")) != -1) || (argc == 1))
     {
         switch (c)
         {
@@ -519,7 +537,18 @@ bool ParseCommandLine(int argc, char *argv[], ECalDigitisation &eCalDigitisation
         case 'e':
             eCalDigitisation.m_fitPercentage = atof(optarg);
             break;
+        case 'g':
+            eCalDigitisation.m_element = optarg;
+            break;
+        case 'i':
+            eCalDigitisation.m_lowerCosThetaCut = atof(optarg);
+            break;
+        case 'j':
+            eCalDigitisation.m_upperCosThetaCut = atof(optarg);
+            break;
         case 'f':
+        case 'h':
+        case 'k':
         default:
             std::cout << std::endl << "Calibrate " << std::endl
                       << "    -a        (mandatory, input file name(s), can include wildcards if string is in quotes)           " << std::endl
@@ -527,6 +556,9 @@ bool ParseCommandLine(int argc, char *argv[], ECalDigitisation &eCalDigitisation
                       << "    -c value  (optional, fractional accuracy to calibrate CalibrECAL to, default 0.02)                " << std::endl
                       << "    -d        (mandatory, output path to send results to)                                             " << std::endl
                       << "    -e value  (optional, fit percentage used for calibration, default 90% of data with narrowest rms) " << std::endl
+                      << "    -g        (mandatory, element of the detector being calibrated (Barrel or EndCap))                " << std::endl
+                      << "    -i value  (mandatory, lower abs cos theta cut defining element, usually 0)                        " << std::endl
+                      << "    -j value  (mandatory, upper abs cos theta cut defining element, usually 1)                        " << std::endl
                       << std::endl;
             return false;
         }

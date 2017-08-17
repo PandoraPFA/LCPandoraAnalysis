@@ -57,6 +57,9 @@ public:
         LCStrVec    m_hCalBarrelCollectionsSimCaloHit;      ///< Input simcalorimeter hit collection names
         LCStrVec    m_hCalEndCapCollectionsSimCaloHit;      ///< Input simcalorimeter hit collection names
         LCStrVec    m_hCalOtherCollectionsSimCaloHit;       ///< Input simcalorimeter hit collection names
+        LCStrVec    m_eCalBarrelCollectionsSimCaloHit;      ///< Input simcalorimeter hit collection names
+        LCStrVec    m_eCalEndCapCollectionsSimCaloHit;      ///< Input simcalorimeter hit collection names
+        LCStrVec    m_eCalOtherCollectionsSimCaloHit;       ///< Input simcalorimeter hit collection names
         LCStrVec    m_muonCollectionsSimCaloHit;            ///< Input simcalorimeter hit collection names
         LCStrVec    m_bCalCollectionsSimCaloHit;            ///< Input simcalorimeter hit collection names
         LCStrVec    m_lHCalCollectionsSimCaloHit;           ///< Input simcalorimeter hit collection names
@@ -85,9 +88,10 @@ public:
      *  @param  nPfoTargetsTotal number of total targets
      *  @param  nPfoTargetsTracks number of target tracks
      *  @param  nPfoTargetsNeutralHadrons of target neutral hadrons
+     *  @param  nPfoTargetsPhotons of target photons
      *  @param  pfoTargetsEnergyTotal total targets energy
      */
-    void Calibrate(const EVENT::LCEvent *pLCEvent, const ParticleVector &particleVector, const int nPfoTargetsTotal, const int nPfoTargetsTracks, const int nPfoTargetsNeutralHadrons, const float pfoTargetsEnergyTotal);
+    void Calibrate(const EVENT::LCEvent *pLCEvent, const ParticleVector &particleVector, const int nPfoTargetsTotal, const int nPfoTargetsTracks, const int nPfoTargetsNeutralHadrons, const int nPfoTargetsPhotons, const float pfoTargetsEnergyTotal);
 
     /**
      *  @brief  Set branch addresses for calibration variables
@@ -221,6 +225,10 @@ private:
     TH1F           *m_hHCalBarrelDirectionCorrectionSimCaloHit;    ///< AddSimCaloHitEntries setting 1, pass HCal Barrel sim calo hit collections
     TH1F           *m_hHCalEndCapDirectionCorrectionSimCaloHit;    ///< AddSimCaloHitEntries setting 1, pass HCal EndCap sim calo hit collections
     TH1F           *m_hHCalOtherDirectionCorrectionSimCaloHit;     ///< AddSimCaloHitEntries setting 1, pass HCal Other sim calo hit collections
+
+    TH1F           *m_hECalBarrelDirectionCorrectionSimCaloHit;    ///< AddSimCaloHitEntries setting 1, pass ECal Barrel sim calo hit collections
+    TH1F           *m_hECalEndCapDirectionCorrectionSimCaloHit;    ///< AddSimCaloHitEntries setting 1, pass ECal EndCap sim calo hit collections
+    TH1F           *m_hECalOtherDirectionCorrectionSimCaloHit;     ///< AddSimCaloHitEntries setting 1, pass ECal Other sim calo hit collections
 };
 
 } // namespace pandora_analysis
