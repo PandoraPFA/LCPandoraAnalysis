@@ -49,7 +49,6 @@ public:
     float           m_calibrationAccuracy;  ///< Fractional accuracy target for reconstructed energy
     std::string     m_outputPath;           ///< Output path to send results
     float           m_fitPercentage;        ///< Percentage of continuous data with narrowest range for Gaussian fit
-    int             m_numberHCalLayers;     ///< Number of layers in the HCal
     std::string     m_element;              ///< Detector component (Barrel, EndCap or Other)
     float           m_lowerCosThetaCut;     ///< Lower cosTheta cut defining m_element
     float           m_upperCosTheraCut;     ///< Lower cosTheta cut defining m_element
@@ -178,7 +177,6 @@ HCalDigitisation::HCalDigitisation() :
     m_calibrationAccuracy(0.02),
     m_outputPath(""),
     m_fitPercentage(90.f),
-    m_numberHCalLayers(48),
     m_element(""),
     m_lowerCosThetaCut(0.f),
     m_upperCosTheraCut(1.f),
@@ -219,23 +217,22 @@ void HCalDigitisation::Process()
 void HCalDigitisation::PrepareHistogram()
 {
     FloatVector *pfoTargetCosTheta(NULL);
-    float totalCaloHitEnergy, hCalTotalCaloHitEnergy;
-    int nPfoTargetsTotal, nPfoTargetsNeutralHadrons, pfoMinHCalLayerToEdge;
+    float totalCaloHitEnergy, hCalTotalCaloHitEnergy, hCalCaloHitEnergyFromEdge;
+    int nPfoTargetsTotal, nPfoTargetsNeutralHadrons;
 
     m_pTChain->SetBranchAddress("TotalCaloHitEnergy",&totalCaloHitEnergy);
     m_pTChain->SetBranchAddress("HCalTotalCaloHitEnergy",&hCalTotalCaloHitEnergy);
     m_pTChain->SetBranchAddress("nPfoTargetsTotal",&nPfoTargetsTotal);
     m_pTChain->SetBranchAddress("nPfoTargetsNeutralHadrons",&nPfoTargetsNeutralHadrons);
     m_pTChain->SetBranchAddress("pfoTargetCosTheta", &pfoTargetCosTheta);
-    m_pTChain->SetBranchAddress("pfoMinHCalLayerToEdge",&pfoMinHCalLayerToEdge);
-
-    int containedLayerExclusion = ceil(m_numberHCalLayers * 0.1);
+    m_pTChain->SetBranchAddress("hCalCaloHitEnergyFromEdge",&hCalCaloHitEnergyFromEdge);
 
     for (unsigned int i = 0; i < m_pTChain->GetEntries(); i++) 
     {
         m_pTChain->GetEntry(i);
 
-        bool isContained(containedLayerExclusion < pfoMinHCalLayerToEdge && (totalCaloHitEnergy-hCalTotalCaloHitEnergy) < (m_trueEnergy*0.05));
+        float hcalEnergyFractionInLastLayers(totalCaloHitEnergy < std::numeric_limits<float>::epsilon() ? std::numeric_limits<float>::max() : hCalCaloHitEnergyFromEdge/totalCaloHitEnergy);
+        bool isContained(hcalEnergyFractionInLastLayers < 0.05 && (totalCaloHitEnergy-hCalTotalCaloHitEnergy) < (m_trueEnergy*0.05));
 
         if (1 == nPfoTargetsTotal && 1 == nPfoTargetsNeutralHadrons && isContained)
         {
@@ -269,23 +266,22 @@ void HCalDigitisation::CreateHistogram()
 void HCalDigitisation::FillHistogram()
 {
     FloatVector *pfoTargetCosTheta(NULL);
-    float totalCaloHitEnergy, hCalTotalCaloHitEnergy;
-    int nPfoTargetsTotal, nPfoTargetsNeutralHadrons, pfoMinHCalLayerToEdge;
+    float totalCaloHitEnergy, hCalTotalCaloHitEnergy, hCalCaloHitEnergyFromEdge;
+    int nPfoTargetsTotal, nPfoTargetsNeutralHadrons;
 
     m_pTChain->SetBranchAddress("TotalCaloHitEnergy",&totalCaloHitEnergy);
     m_pTChain->SetBranchAddress("HCalTotalCaloHitEnergy",&hCalTotalCaloHitEnergy);
     m_pTChain->SetBranchAddress("nPfoTargetsTotal",&nPfoTargetsTotal);
     m_pTChain->SetBranchAddress("nPfoTargetsNeutralHadrons",&nPfoTargetsNeutralHadrons);
     m_pTChain->SetBranchAddress("pfoTargetCosTheta", &pfoTargetCosTheta);
-    m_pTChain->SetBranchAddress("pfoMinHCalLayerToEdge",&pfoMinHCalLayerToEdge);
-
-    int containedLayerExclusion = ceil(m_numberHCalLayers * 0.1);
+    m_pTChain->SetBranchAddress("hCalCaloHitEnergyFromEdge",&hCalCaloHitEnergyFromEdge);
 
     for (unsigned int i = 0; i < m_pTChain->GetEntries(); i++) 
     {
         m_pTChain->GetEntry(i);
 
-        bool isContained(containedLayerExclusion < pfoMinHCalLayerToEdge && (totalCaloHitEnergy-hCalTotalCaloHitEnergy) < (m_trueEnergy*0.05));
+        float hcalEnergyFractionInLastLayers(totalCaloHitEnergy < std::numeric_limits<float>::epsilon() ? std::numeric_limits<float>::max() : hCalCaloHitEnergyFromEdge/totalCaloHitEnergy);
+        bool isContained(hcalEnergyFractionInLastLayers < 0.05 && (totalCaloHitEnergy-hCalTotalCaloHitEnergy) < (m_trueEnergy*0.05));
 
         if (1 == nPfoTargetsTotal && 1 == nPfoTargetsNeutralHadrons && isContained)
         {
@@ -540,9 +536,6 @@ bool ParseCommandLine(int argc, char *argv[], HCalDigitisation &hCalDigitisation
         case 'e':
             hCalDigitisation.m_fitPercentage = atof(optarg);
             break;
-        case 'f':
-            hCalDigitisation.m_numberHCalLayers = atoi(optarg);
-            break;
         case 'g':
             hCalDigitisation.m_element = optarg;
             break;
@@ -560,7 +553,6 @@ bool ParseCommandLine(int argc, char *argv[], HCalDigitisation &hCalDigitisation
                       << "    -c value  (optional, fractional accuracy to calibrate CalibrHCAL to, default 0.02)                " << std::endl
                       << "    -d        (mandatory, output path to send results to)                                             " << std::endl
                       << "    -e value  (optional, fit percentage used for calibration, default 90% of data with narrowest rms) " << std::endl
-                      << "    -f value  (optional, number of HCal layers in simulation, default 48)                             " << std::endl
                       << "    -g        (mandatory, element of the detector being calibrated (Barrel or EndCap))                " << std::endl
                       << "    -i value  (mandatory, lower abs cos theta cut defining element, default 0)                        " << std::endl
                       << "    -j value  (mandatory, upper abs cos theta cut defining element, default 1)                        " << std::endl
