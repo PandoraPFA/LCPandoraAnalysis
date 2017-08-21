@@ -129,6 +129,14 @@ private:
      *  @param  pParticleVector to be examined
      */
     int GetMinNHCalLayersFromEdge(const ParticleVector &pParticleVector) const;
+    
+    /**
+     *  @brief  Get the calo hit energy in the last hcal layers of the detector 
+     * 
+     *  @param  pLCEvent the lc event
+     *  @param  collectionNames the collection to be read
+     */
+    float GetHCalCaloHitEnergyFromEdge(const EVENT::LCEvent *pLCEvent, const EVENT::LCStrVec &collectionNames) const;
 
     /**
      *  @brief  Read and save the calorimeter hit information for a specific collection
@@ -195,6 +203,7 @@ private:
     const Settings  m_settings;                                    ///< The calibration helper settings
 
     int             m_pfoMinHCalLayerToEdge;                       ///< GetNHCalLayersFromEdge
+    int             m_hCalCaloHitEnergyFromEdge;                   ///< GetHCalCaloHitEnergyFromEdge
 
     float           m_totalCaloHitEnergy;                          ///< Sum outputs from ReadCaloHitEnergies
     float           m_eCalTotalCaloHitEnergy;                      ///< ReadCaloHitEnergies

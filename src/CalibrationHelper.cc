@@ -75,6 +75,7 @@ CalibrationHelper::Settings::Settings()
 CalibrationHelper::CalibrationHelper(const Settings &settings) :
     m_settings(settings),
     m_pfoMinHCalLayerToEdge(0),
+    m_hCalCaloHitEnergyFromEdge(0.f),
     m_totalCaloHitEnergy(0.f),
     m_eCalTotalCaloHitEnergy(0.f),
     m_hCalTotalCaloHitEnergy(0.f),
@@ -116,6 +117,7 @@ CalibrationHelper::~CalibrationHelper()
 void CalibrationHelper::SetBranchAddresses(TTree *pTTree)
 {
     pTTree->Branch("pfoMinHCalLayerToEdge", &m_pfoMinHCalLayerToEdge, "pfoMinHCalLayerToEdge/I");
+    pTTree->Branch("hCalCaloHitEnergyFromEdge", &m_hCalCaloHitEnergyFromEdge, "hCalCaloHitEnergyFromEdge/F");
     pTTree->Branch("TotalCaloHitEnergy", &m_totalCaloHitEnergy, "TotalCaloHitEnergy/F");
     pTTree->Branch("ECalTotalCaloHitEnergy", &m_eCalTotalCaloHitEnergy, "ECalTotalCaloHitEnergy/F");
     pTTree->Branch("HCalTotalCaloHitEnergy", &m_hCalTotalCaloHitEnergy, "HCalTotalCaloHitEnergy/F");
@@ -232,6 +234,7 @@ void CalibrationHelper::WriteHistograms()
 void CalibrationHelper::Clear()
 {
     m_pfoMinHCalLayerToEdge = 0;
+    m_hCalCaloHitEnergyFromEdge = 0.f;
     m_totalCaloHitEnergy = 0.f;
     m_eCalTotalCaloHitEnergy = 0.f;
     m_hCalTotalCaloHitEnergy = 0.f;
@@ -255,6 +258,7 @@ void CalibrationHelper::Calibrate(const EVENT::LCEvent *pLCEvent, const Particle
     const float pfoTargetsEnergyTotal)
 {
     m_pfoMinHCalLayerToEdge = this->GetMinNHCalLayersFromEdge(particleVector);
+    m_hCalCaloHitEnergyFromEdge = this->GetHCalCaloHitEnergyFromEdge(pLCEvent, m_settings.m_hCalCollections);
 
     this->ReadSimCaloHitEnergies(pLCEvent, m_settings.m_eCalCollectionsSimCaloHit, m_eCalTotalSimCaloHitEnergy);
     this->ReadSimCaloHitEnergies(pLCEvent, m_settings.m_hCalBarrelCollectionsSimCaloHit, m_hCalTotalSimCaloHitEnergy);
@@ -348,6 +352,60 @@ int CalibrationHelper::GetMinNHCalLayersFromEdge(const ParticleVector &particleV
         }
     }
     return minNHCalLayersFromEdge;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+float CalibrationHelper::GetHCalCaloHitEnergyFromEdge(const EVENT::LCEvent *pLCEvent, const EVENT::LCStrVec &collectionNames) const
+{
+    float hCalCaloHitEnergyFromEdge(0.f);
+    
+    for (EVENT::LCStrVec::const_iterator iter = collectionNames.begin(), iterEnd = collectionNames.end(); iter != iterEnd; ++iter)
+    {
+        try
+        {
+            const EVENT::LCCollection *pLCCollection = pLCEvent->getCollection(*iter);
+
+            if (NULL != pLCCollection)
+            {
+                const int nElements(pLCCollection->getNumberOfElements());
+
+                for (int iHit = 0; iHit < nElements; ++iHit)
+                {
+                    const CalorimeterHit *pCalorimeterHit = dynamic_cast<const CalorimeterHit*>(pLCCollection->getElementAt(iHit));
+                    const CHT cht(pCalorimeterHit->getType());
+
+                    if (cht.is(CHT::hcal))
+                    {
+                        try
+                        {
+                            const int trialMinHCALLayerToEdge = this->GetNHCalLayersFromEdge(pCalorimeterHit);
+                            
+                            if(trialMinHCALLayerToEdge < 5)
+                            {
+                                const float hitEnergy(pCalorimeterHit->getEnergy());
+                                hCalCaloHitEnergyFromEdge += hitEnergy;                              
+                            }
+                        }
+                        catch (std::out_of_range &e)
+                        {
+                            std::cout << "CalibrationHelper::GetHCalCaloHitEnergyFromEdge: out of range error: " << e.what() <<std::endl;
+                        }
+                        catch (...)
+                        {
+                            std::cout << "CalibrationHelper::GetHCalCaloHitEnergyFromEdge: Unknown exception." <<std::endl;
+                        }
+                    }
+                }
+            }
+        }
+        catch (DataNotAvailableException &)
+        {
+            streamlog_out(DEBUG) << "No Collection : " << (*iter) << std::endl;
+        }
+    }
+    
+    return hCalCaloHitEnergyFromEdge;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
