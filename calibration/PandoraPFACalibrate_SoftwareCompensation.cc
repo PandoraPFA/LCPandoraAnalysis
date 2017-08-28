@@ -496,7 +496,7 @@ void SoftwareCompensation::ReadInputFiles()
         if (devDebug)
             std::cout << "File name : " << fileName << " for energy " << m_trueEnergy << " GeV" << std::endl;
         
-        m_pTChain = new TChain("HitEnergyTree");
+        m_pTChain = new TChain("SoftwareCompensationTrainingTree");
         m_pTChain->Add(fileName.c_str());
         this->SetBranchAddresses();
         int nEventsForThisEnergy(0);
