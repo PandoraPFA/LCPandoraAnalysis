@@ -610,7 +610,7 @@ void SoftwareCompensation::FillHistograms()
         if( (ss >> trueEnergy).fail() )
             throw std::runtime_error("SoftwareCompensation::FillHistograms: Couldn't convert energy string to float !");
         
-        m_pTChain = new TChain("HitEnergyTree");
+        m_pTChain = new TChain("SoftwareCompensationTrainingTree");
         m_pTChain->Add(fileName.c_str());
         this->SetBranchAddresses();
         
