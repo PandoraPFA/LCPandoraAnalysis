@@ -165,6 +165,7 @@ public:
     std::vector<std::string>     m_trueEnergies;               ///< The list of true (mc or beam) energies
     std::string                  m_trueEnergiesStr;            ///< The list of true (mc or beam) energies - as string
     std::string                  m_outputPath;                 ///< Output path to send results
+    std::string                  m_treeName;                   ///< The root tree name
     
     FloatVector                  m_densityBinEdges;            ///< List of energy bin edges (size N)
     FloatVector                  m_densityBins;                ///< List of energy bins (size N-1) 
@@ -361,6 +362,7 @@ SoftwareCompensation::SoftwareCompensation() :
     m_trueEnergies(),
     m_trueEnergiesStr(""),
     m_outputPath(""),
+    m_treeName("SoftwareCompensationTrainingTree"),
     m_densityBinEdges(),
     m_densityBins(),
     m_nMinuitParameters(0),
@@ -492,7 +494,7 @@ void SoftwareCompensation::ReadInputFiles()
         if (devDebug)
             std::cout << "File name : " << fileName << " for energy " << m_trueEnergy << " GeV" << std::endl;
         
-        m_pTChain = new TChain("SoftwareCompensationTrainingTree");
+        m_pTChain = new TChain(m_treeName.c_str());
         m_pTChain->Add(fileName.c_str());
         this->SetBranchAddresses();
         int nEventsForThisEnergy(0);
@@ -610,7 +612,7 @@ void SoftwareCompensation::FillHistograms()
         if( (ss >> trueEnergy).fail() )
             throw std::runtime_error("SoftwareCompensation::FillHistograms: Couldn't convert energy string to float !");
         
-        m_pTChain = new TChain("SoftwareCompensationTrainingTree");
+        m_pTChain = new TChain(m_treeName.c_str());
         m_pTChain->Add(fileName.c_str());
         this->SetBranchAddresses();
         
@@ -854,7 +856,7 @@ bool ParseCommandLine(int argc, char *argv[], SoftwareCompensation &softwareComp
 {
     int c(0);
 
-    while (((c = getopt(argc, argv, "d:e:f:g")) != -1) || (argc == 1))
+    while (((c = getopt(argc, argv, "d:e:f:gt:")) != -1) || (argc == 1))
     {
         switch (c)
         {
@@ -871,6 +873,9 @@ bool ParseCommandLine(int argc, char *argv[], SoftwareCompensation &softwareComp
         case 'g':
             softwareCompensation.m_minimizeUsingTrueEnergy = true;
             break;
+        case 't':
+            softwareCompensation.m_treeName = optarg;
+            break;
         case 'h':
         default:
             std::cout << std::endl << "PandoraPFA_SoftwareCompensation " << std::endl
@@ -878,6 +883,7 @@ bool ParseCommandLine(int argc, char *argv[], SoftwareCompensation &softwareComp
                       << "    -e energies  (mandatory, input energies comma separated, i.e '10:20:30:40:50:60')                           " << std::endl
                       << "    -f pattern   (mandatory, input file pattern. Should contains ${energy} key, i.e ./File_${energy}.root)      " << std::endl
                       << "    -g           (if specified, the minimization will use the true (mc or beam) energy instead of reconstructed)" << std::endl
+                      << "    -t treename  (mandatory, the tree name to look in root files, usually SoftwareCompensationTrainingTree)     " << std::endl
                       << std::endl;
             return false;
         }
