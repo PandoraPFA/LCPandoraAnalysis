@@ -373,6 +373,13 @@ float CalibrationHelper::GetHCalCaloHitEnergyFromEdge(const EVENT::LCEvent *pLCE
                 for (int iHit = 0; iHit < nElements; ++iHit)
                 {
                     const CalorimeterHit *pCalorimeterHit = dynamic_cast<const CalorimeterHit*>(pLCCollection->getElementAt(iHit));
+                    
+                    if (NULL == pCalorimeterHit)
+                    {
+                        streamlog_out(ERROR) << "Collection type mismatch " << (*iter) << " expected to contain objects of type CalorimeterHit " << std::endl;
+                        throw;
+                    }
+                    
                     const CHT cht(pCalorimeterHit->getType());
 
                     if (cht.is(CHT::hcal))
