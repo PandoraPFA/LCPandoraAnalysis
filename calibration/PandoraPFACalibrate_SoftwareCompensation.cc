@@ -749,7 +749,7 @@ TCanvas *SoftwareCompensation::DrawPlots(const std::vector<T*> &plots, TLegend *
 
 void SoftwareCompensation::SetBranchAddresses()
 {
-    m_pTChain->SetBranchAddress("EnergyOfPfo",&m_pfoEnergy);
+    m_pTChain->SetBranchAddress("RawEnergyOfCluster",&m_pfoEnergy);
     m_pTChain->SetBranchAddress("HitEnergies",&m_hitEnergies);
     m_pTChain->SetBranchAddress("CellSize0",&m_cellSize0);
     m_pTChain->SetBranchAddress("CellSize1", &m_cellSize1);
