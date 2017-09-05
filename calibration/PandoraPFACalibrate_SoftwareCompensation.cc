@@ -217,7 +217,7 @@ private:
     
 private:
     TChain         *m_pTChain;                ///< Chain of root files
-    float           m_pfoEnergy;              ///< Pfo energy
+    float           m_rawClusterEnergy;       ///< Raw cluster energy
     FloatVector    *m_hitEnergies;            ///< All hit energies (ECal + HCal + Muon)
     FloatVector    *m_cellSize0;              ///< Cell sizes 0
     FloatVector    *m_cellSize1;              ///< Cell sizes 1
@@ -316,7 +316,7 @@ int main(int argc, char **argv)
 
 Event::Event(const SoftwareCompensation &softwareCompensation) :
     m_trueEnergy(softwareCompensation.m_trueEnergy),
-    m_reconstructedEnergy(softwareCompensation.m_pfoEnergy),
+    m_reconstructedEnergy(softwareCompensation.m_rawClusterEnergy),
     m_eCalEnergy(0.f),
     m_hCalBinEnergies(),
     m_hCalHitEnergies()
@@ -371,7 +371,7 @@ SoftwareCompensation::SoftwareCompensation() :
     m_softCompFinalParameters(),
     m_eventVector(),
     m_pTChain(NULL),
-    m_pfoEnergy(0.f),
+    m_rawClusterEnergy(0.f),
     m_hitEnergies(NULL),
     m_cellSize0(NULL),
     m_cellSize1(NULL),
@@ -433,7 +433,7 @@ bool SoftwareCompensation::SkipCurrentEvent() const
     if(m_hitEnergies->empty())
         return true;
         
-    const bool invalidSingleParticle(m_pfoEnergy <= 0);
+    const bool invalidSingleParticle(m_rawClusterEnergy <= 0);
     
     if(invalidSingleParticle)
         return true;
@@ -749,7 +749,7 @@ TCanvas *SoftwareCompensation::DrawPlots(const std::vector<T*> &plots, TLegend *
 
 void SoftwareCompensation::SetBranchAddresses()
 {
-    m_pTChain->SetBranchAddress("RawEnergyOfCluster",&m_pfoEnergy);
+    m_pTChain->SetBranchAddress("RawEnergyOfCluster",&m_rawClusterEnergy);
     m_pTChain->SetBranchAddress("HitEnergies",&m_hitEnergies);
     m_pTChain->SetBranchAddress("CellSize0",&m_cellSize0);
     m_pTChain->SetBranchAddress("CellSize1", &m_cellSize1);
