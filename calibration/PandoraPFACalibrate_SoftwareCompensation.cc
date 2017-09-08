@@ -63,11 +63,16 @@ public:
     Event(const SoftwareCompensation &softwareCompensation);
   
 public:
+    int            m_firstPseudoLayer;        ///< Pseudolayer at the IP
     float          m_trueEnergy;              ///< The true (mc or beam) kaon0L energy (unit GeV)
     float          m_reconstructedEnergy;     ///< The kaon0L reconstructed energy (unit GeV)
     float          m_eCalEnergy;              ///< Sum of the kaon0L ecal hit energies 
     FloatVector    m_hCalBinEnergies;         ///< HCal hit energies
     FloatVector    m_hCalHitEnergies;         ///< HCal hit energy bins
+    IntVector      m_caloHitPseudoLayers;     ///< Pseudolayers for the calorimeter hits
+    IntVector      m_caloHitIsIsolated;       ///< Is calorimeter hit isolated
+    IntVector      m_caloHitType;             ///< Type of calorimeter hits
+    FloatVector    m_caloHitEnergies;         ///< Energy of the calorimeter hits
 };
 
 typedef std::vector<Event>       EventVector;
@@ -145,7 +150,23 @@ public:
      *  @return           the compensated energy
      */
     double GetCompensatedEnergy(const Event &event, const double *params, double pfoEnergy);
-    
+
+    /**
+     *  @brief Apply the CleanClusters logic to the cluster energy as it appears in the LCContent library
+     *
+     *  @param  event                 the event to consider
+     *  @param  clusterHadronicEnergy the hadronic energy of the cluster
+     */
+    void CleanCluster(const Event &event, double &correctedHadronicEnergy);
+
+    /**
+     *  @brief Find the hadronic energy in a given pseudolayer
+     *
+     *  @param  event       the event to consider
+     *  @param  pseudoLayer the pseudoLayer to consider
+     */
+   float GetHadronicEnergyInLayer(const Event &event, const unsigned int pseudoLayer) const;
+
     /**
      *  @brief  Draw the list of plots on a canvas
      *  
@@ -166,7 +187,8 @@ public:
     std::string                  m_trueEnergiesStr;            ///< The list of true (mc or beam) energies - as string
     std::string                  m_outputPath;                 ///< Output path to send results
     std::string                  m_treeName;                   ///< The root tree name
-    
+
+    int                          m_firstPseudoLayer;           ///< Pseudolayers at the IP
     FloatVector                  m_densityBinEdges;            ///< List of energy bin edges (size N)
     FloatVector                  m_densityBins;                ///< List of energy bins (size N-1) 
     int                          m_nMinuitParameters;          ///< The number of minuit parameters (9)
@@ -174,7 +196,7 @@ public:
     DoubleVector                 m_softCompGuessParameters;    ///< The guess parameters for software compensation provided to the ROOT minimizer (9)
     DoubleVector                 m_softCompFinalParameters;    ///< The final software compensation parameters after minimization (9)
     EventVector                  m_eventVector;                ///< The event list after reading input data
-    
+
 private:
     /**
      *  @brief  Set the TChain branch addresses
@@ -223,9 +245,14 @@ private:
     FloatVector    *m_cellSize1;              ///< Cell sizes 1
     FloatVector    *m_cellThickness;          ///< Cell thicknesses
     IntVector      *m_hitType;                ///< Hit types (ECal, HCal or Muon)
+    IntVector      *m_caloHitPseudoLayers;    ///< Pseudolayers of the calorimeter hits
+    IntVector      *m_caloHitIsIsolated;      ///< Is calorimeter hit isolated
 
     float           m_trueEnergy;             ///< The true energy while reading input files 
-    
+    float           m_minCleanHitEnergy;          ///< Min calo hit hadronic energy to consider cleaning hit/cluster
+    float           m_minCleanHitEnergyFraction;  ///< Min fraction of cluster energy represented by hit to consider cleaning
+    float           m_minCleanCorrectedHitEnergy; ///< Min value of new hit hadronic energy estimate after cleaning
+
     TGraph         *m_gChi2Evolution;         ///< The chi2 evolution graph
     TH1FVector      m_hECalEnergyVector;      ///< The list of ECal total hit energy plots (1 per true energy)
     TProfileVector  m_hHCalEnergyVector;      ///< The list of HCal hit energy sum plots (1 per true energy)
@@ -315,11 +342,16 @@ int main(int argc, char **argv)
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 Event::Event(const SoftwareCompensation &softwareCompensation) :
+    m_firstPseudoLayer(0),
     m_trueEnergy(softwareCompensation.m_trueEnergy),
     m_reconstructedEnergy(softwareCompensation.m_rawClusterEnergy),
     m_eCalEnergy(0.f),
     m_hCalBinEnergies(),
-    m_hCalHitEnergies()
+    m_hCalHitEnergies(),
+    m_caloHitPseudoLayers(),
+    m_caloHitIsIsolated(),
+    m_caloHitType(),
+    m_caloHitEnergies()
 {
     const unsigned int nHits(softwareCompensation.m_hitEnergies->size());
     
@@ -332,7 +364,12 @@ Event::Event(const SoftwareCompensation &softwareCompensation) :
         const float hitEnergy(softwareCompensation.m_hitEnergies->at(i));
         const int hitType(softwareCompensation.m_hitType->at(i));
         const bool invalidEnergy(hitEnergy <= 0 || hitEnergy >= 10000);
-        
+
+        m_caloHitPseudoLayers.push_back(softwareCompensation.m_caloHitPseudoLayers->at(i));
+        m_caloHitIsIsolated.push_back(softwareCompensation.m_caloHitIsIsolated->at(i));
+        m_caloHitEnergies.push_back(hitEnergy);
+        m_caloHitType.push_back(hitType);
+
         if (invalidEnergy)
             continue;
         
@@ -363,6 +400,7 @@ SoftwareCompensation::SoftwareCompensation() :
     m_trueEnergiesStr(""),
     m_outputPath(""),
     m_treeName("SoftwareCompensationTrainingTree"),
+    m_firstPseudoLayer(0),
     m_densityBinEdges(),
     m_densityBins(),
     m_nMinuitParameters(0),
@@ -377,7 +415,12 @@ SoftwareCompensation::SoftwareCompensation() :
     m_cellSize1(NULL),
     m_cellThickness(NULL),
     m_hitType(NULL),
+    m_caloHitPseudoLayers(NULL),
+    m_caloHitIsIsolated(NULL),
     m_trueEnergy(0.f),
+    m_minCleanHitEnergy(0.5f),
+    m_minCleanHitEnergyFraction(0.01f),
+    m_minCleanCorrectedHitEnergy(0.1f),
     m_gChi2Evolution(NULL),
     m_hECalEnergyVector(),
     m_hHCalEnergyVector(),
@@ -749,12 +792,15 @@ TCanvas *SoftwareCompensation::DrawPlots(const std::vector<T*> &plots, TLegend *
 
 void SoftwareCompensation::SetBranchAddresses()
 {
+    m_pTChain->SetBranchAddress("FirstPseudoLayer",&m_firstPseudoLayer);
     m_pTChain->SetBranchAddress("RawEnergyOfCluster",&m_rawClusterEnergy);
     m_pTChain->SetBranchAddress("HitEnergies",&m_hitEnergies);
     m_pTChain->SetBranchAddress("CellSize0",&m_cellSize0);
     m_pTChain->SetBranchAddress("CellSize1", &m_cellSize1);
     m_pTChain->SetBranchAddress("CellThickness", &m_cellThickness);
     m_pTChain->SetBranchAddress("HitType", &m_hitType);
+    m_pTChain->SetBranchAddress("PseudoLayer", &m_caloHitPseudoLayers);
+    m_pTChain->SetBranchAddress("IsIsolated", &m_caloHitIsIsolated);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -819,7 +865,7 @@ double SoftwareCompensation::GetCompensatedEnergy(const Event &event, const doub
     static const double MAX_EXP_ARG(std::log(std::numeric_limits<double>::max()));
     double compensatedEnergy(0);
     compensatedEnergy += static_cast<double>(event.m_eCalEnergy);
-    
+
     if(params[8]*pfoEnergy >= MAX_EXP_ARG)
         throw std::runtime_error("Beyond numeric limits !");
     
@@ -839,7 +885,76 @@ double SoftwareCompensation::GetCompensatedEnergy(const Event &event, const doub
         compensatedEnergy += compensatedHCalEnergy;    
     }
     
+    this->CleanCluster(event, compensatedEnergy);
     return compensatedEnergy;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void SoftwareCompensation::CleanCluster(const Event &event, double &clusterHadronicEnergy)
+{
+    const int firstPseudoLayer(event.m_firstPseudoLayer);
+    const float clusterHadronicEnergy(event.m_reconstructedEnergy);
+    
+    for (unsigned int hit = 0; hit < event.m_caloHitEnergies.size(); hit++)
+    {
+        const unsigned int pseudoLayer(event.m_caloHitPseudoLayers.at(hit));
+        const int isIsolated(event.m_caloHitIsIsolated.at(hit));
+        const int hitType(event.m_caloHitType.at(hit));
+
+        if (hitType != 1 || isIsolated == 1) continue; 
+
+        const float hitHadronicEnergy(event.m_caloHitEnergies.at(hit));
+
+        if ((hitHadronicEnergy > m_minCleanHitEnergy) && (hitHadronicEnergy / clusterHadronicEnergy > m_minCleanHitEnergyFraction))
+        {
+            float energyInPreviousLayer(0.f);
+
+            if (pseudoLayer > firstPseudoLayer)
+            {
+                energyInPreviousLayer = this->GetHadronicEnergyInLayer(event, pseudoLayer - 1);
+            }
+
+            float energyInNextLayer(0.f);
+
+            if (pseudoLayer < std::numeric_limits<unsigned int>::max())
+            {
+                energyInNextLayer = this->GetHadronicEnergyInLayer(event, pseudoLayer + 1);
+            }
+
+            const float energyInCurrentLayer = this->GetHadronicEnergyInLayer(event, pseudoLayer);
+            float energyInAdjacentLayers(energyInPreviousLayer + energyInNextLayer);
+
+            if (pseudoLayer > firstPseudoLayer)
+                energyInAdjacentLayers /= 2.f;
+
+            float newHitHadronicEnergy(energyInAdjacentLayers - energyInCurrentLayer + hitHadronicEnergy);
+            newHitHadronicEnergy = std::max(newHitHadronicEnergy, m_minCleanCorrectedHitEnergy);
+
+            if (newHitHadronicEnergy < hitHadronicEnergy)
+                clusterHadronicEnergy += newHitHadronicEnergy - hitHadronicEnergy;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+float SoftwareCompensation::GetHadronicEnergyInLayer(const Event &event, const unsigned int pseudoLayer) const
+{
+    float hadronicEnergy(0.f);
+
+    for (unsigned int hit = 0; hit < event.m_caloHitEnergies.size(); hit++)
+    {
+        const unsigned int activePseudoLayer(event.m_caloHitPseudoLayers.at(hit));
+        const float hitHadronicEnergy(event.m_caloHitEnergies.at(hit));
+        const int isIsolated(event.m_caloHitIsIsolated.at(hit));
+
+        if (pseudoLayer == activePseudoLayer && isIsolated == 0) 
+        {
+            hadronicEnergy += hitHadronicEnergy;
+        }
+    }
+    return hadronicEnergy;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
