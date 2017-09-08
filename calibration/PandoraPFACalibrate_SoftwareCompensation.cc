@@ -891,7 +891,7 @@ double SoftwareCompensation::GetCompensatedEnergy(const Event &event, const doub
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void SoftwareCompensation::CleanCluster(const Event &event, double &clusterHadronicEnergy)
+void SoftwareCompensation::CleanCluster(const Event &event, double &correctedHadronicEnergy)
 {
     const int firstPseudoLayer(event.m_firstPseudoLayer);
     const float clusterHadronicEnergy(event.m_reconstructedEnergy);
@@ -932,7 +932,7 @@ void SoftwareCompensation::CleanCluster(const Event &event, double &clusterHadro
             newHitHadronicEnergy = std::max(newHitHadronicEnergy, m_minCleanCorrectedHitEnergy);
 
             if (newHitHadronicEnergy < hitHadronicEnergy)
-                clusterHadronicEnergy += newHitHadronicEnergy - hitHadronicEnergy;
+                correctedHadronicEnergy += newHitHadronicEnergy - hitHadronicEnergy;
         }
     }
 }
