@@ -1,10 +1,10 @@
 \documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
 \usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
-\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ...
 %\geometry{landscape}                		% Activate for for rotated page geometry
 %\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
 \usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
-								% TeX will automatically convert eps --> pdf in pdflatex		
+								% TeX will automatically convert eps --> pdf in pdflatex
 \usepackage{amssymb}
 \usepackage{amsmath}
 
@@ -51,11 +51,11 @@ These studies were developed in the context of simulation of ILD (ILD\_o1\_v06) 
 
 To ensure accurate results from the simulation of the high energy physics events at a future electron positron collider it is necessary to accurately define a number of constants used in both the simulation and reconstruction.  The calibration procedure described here addresses the setting of the calibration constants used in both the digitisation processor (ILDCaloDigi or NewLDCCaloDigi) and PandoraPFA.
 
-The purpose of the constants used in the digitisation processor is twofold: (i) To set a series of constants that accurately estimate the amount of energy deposited in the absorber material of the sampling calorimeter being simulated based on the measured energy despots in the active material and (ii) to set the MIP scale used in the digitisers.  
+The purpose of the constants used in the digitisation processor is twofold: (i) To set a series of constants that accurately estimate the amount of energy deposited in the absorber material of the sampling calorimeter being simulated based on the measured energy despots in the active material and (ii) to set the MIP scale used in the digitisers.
 
 It should be noted that the MIP scale only needs setting in the digitisers if you wish to apply the realistic digitisation options in ILDCaloDigi.  In such a case the MIP scale is needed to apply a dynamic range to the readout electronics in the calorimeters.
 
-The purpose of the constants used within the particle flow algorithm PandoraPFA is to set the different energy scales for electromagnetic and hadronic particle showers.  There are a total of four constants applied, which set the electromagnetic and hadronic energy scales in both the electromagnetic calorimeter (ECal) and the hadronic calorimeter (HCal).  The constants need not be the same for both calorimeters due to the different atomic structures of the calorimeters. 
+The purpose of the constants used within the particle flow algorithm PandoraPFA is to set the different energy scales for electromagnetic and hadronic particle showers.  There are a total of four constants applied, which set the electromagnetic and hadronic energy scales in both the electromagnetic calorimeter (ECal) and the hadronic calorimeter (HCal).  The constants need not be the same for both calorimeters due to the different atomic structures of the calorimeters.
 
 A detailed list of the calibration constants being defined in this procedure for the digitiser and for PandoraPFA can be found in table \ref{table1} and table \ref{table2} respectively.
 
@@ -67,17 +67,17 @@ A detailed list of the calibration constants being defined in this procedure for
 Constant & Description \\
 \hline
 CalibrECAL 		& Converts the SimCalorimeterHit energy deposit (active material) \\
-                                  & into a CalorimeterHit energy deposition (active material and \\ 
+                                  & into a CalorimeterHit energy deposition (active material and \\
                                   & absorber material) in units of GeV in the ECal \\
 CalibECALMIP		& Sets the MIP energy scale in the ECal (for digitisation)\\
 CalibrHCALBarrel 	& Converts the SimCalorimeterHit energy deposit (active material) \\
-                                  & into a CalorimeterHit energy deposition (active material and \\ 
+                                  & into a CalorimeterHit energy deposition (active material and \\
                                   & absorber material) in units of GeV in the HCal barrel \\
 CalibrHCALEndcap 	& Converts the SimCalorimeterHit energy deposit (active material) \\
-                                  & into a CalorimeterHit energy deposition (active material and \\ 
+                                  & into a CalorimeterHit energy deposition (active material and \\
                                   & absorber material) in units of GeV in the HCal endcap \\
 CalibrHCALOther 	& Converts the SimCalorimeterHit energy deposit (active material) \\
-                                  & into a CalorimeterHit energy deposition (active material and \\ 
+                                  & into a CalorimeterHit energy deposition (active material and \\
                                   & absorber material) in units of GeV in the HCal other (i.e. ring) \\
 CalibHCALMIP		& Sets the MIP energy scale in the HCal (for digitisation)\\
 \hline
@@ -117,15 +117,15 @@ A series of executable files have been produced to determine the values that eac
 
 \section{Calibration Files}
 
-These executables calibrate the simulation and reconstruction using single particle events of known particle type and fixed particle energy.  Therefore, before performing any analysis with the sector model you have to simulate and reconstruct photons, muons and long-lived neutral kaons.  After running PandoraPFA in the Marlin framework, the MarlinPandora processor, on these single particle events, you must run the PfoAnalysis processor and save the output root files.  These are to be used as inputs for the calibration executables.   
+These executables calibrate the simulation and reconstruction using single particle events of known particle type and fixed particle energy.  Therefore, before performing any analysis with the sector model you have to simulate and reconstruct photons, muons and long-lived neutral kaons.  After running PandoraPFA in the Marlin framework, the MarlinPandora processor, on these single particle events, you must run the PfoAnalysis processor and save the output root files.  These are to be used as inputs for the calibration executables.
 
 To collect the relevant calibration information within the PfoAnalysis processor a series of extra parameters must be specified in the xml steering file in comparison to the default PandoraAnalysis setup.  These include the sim calo hit collections produced from GEANT (via Mokka) and the calorimeter hit collections produced from the digitisation stage.  You must also specify the CollectCalibrationDetails flag and some extra missing geometry information from the gear file.  An example Marlin steering file set up for collecting all calibration information using this processor is shown in PandoraAnalysis/scripts/PandoraAnalysisCalibration.xml.
 
-An example steering file that is set up to run the PfoAnalysis processor and collect the calibration information referenced above can be found in scripts/PandoraAnalysisCalibration.xml. 
+An example steering file that is set up to run the PfoAnalysis processor and collect the calibration information referenced above can be found in scripts/PandoraAnalysisCalibration.xml.
 
-For the default ILD sector model it is recommended that you use 10 GeV photon samples, 10 GeV muon samples (this is a MIP definition and should not be varied) and 20 GeV long-lived neutral kaon samples.  
+For the default ILD sector model it is recommended that you use 10 GeV photon samples, 10 GeV muon samples (this is a MIP definition and should not be varied) and 20 GeV long-lived neutral kaon samples.
 
-The increase in energy for the kaon samples is suggested as these samples are used in general for calibrating parameters relating to the HCal and we ensure that, for a typical event, the bulk of the energy is deposited in the HCal and not in the ECal.  Of course there will be some energy deposited in the ECal for certain events, but selection cuts on events used in calibration executables accounts for any effects that this may have on the calibration.  
+The increase in energy for the kaon samples is suggested as these samples are used in general for calibrating parameters relating to the HCal and we ensure that, for a typical event, the bulk of the energy is deposited in the HCal and not in the ECal.  Of course there will be some energy deposited in the ECal for certain events, but selection cuts on events used in calibration executables accounts for any effects that this may have on the calibration.
 
 \section{Digitisation}
 
@@ -213,7 +213,7 @@ CalibrHCALOther is set to be equal to CalibrHCALEndcap multiplied by the ratio o
 
 The realistic digitisation variables are set as follows, CalibHCALMIP is set to be the peak value in the direction corrected SimCalorimeterHit energy distribution for the HCal barrel and CalibECALMIP is set to be the peak value in the direction corrected SimCalorimeterHit energy distribution for the ECal.  Note: There is some ambiguity about choosing the MIP scale in the HCal based entirely on the Barrel, but from experience the peaks in the distributions are very similar for both the Barrel and EndCap so the choice doesn't matter.  If these differ significantly in your studies then you should reevaluate this procedure.
 
-No iteration is required at this stage.  
+No iteration is required at this stage.
 
 \section{PandoraPFACalibration}
 
@@ -264,12 +264,12 @@ Inputs:
 \item Number of HCal layers for the detector being simulated.  This is the number of layers in the HCal being simulated.  This is needed to define a contained event.
 \end{enumerate}
 
-This binary forms the 2D histogram of ECalToHad energy vs HCalToHad energy.  A line of best fit is applied to the data set, once a cut is applied to remove leakage effects and the intercepts of this best fit are used to rescale ECal/HCalToHadGeVCalibration until both intercepts match the available energy of the kaonL being simulated.  Again this requires iteration.  
+This binary forms the 2D histogram of ECalToHad energy vs HCalToHad energy.  A line of best fit is applied to the data set, once a cut is applied to remove leakage effects and the intercepts of this best fit are used to rescale ECal/HCalToHadGeVCalibration until both intercepts match the available energy of the kaonL being simulated.  Again this requires iteration.
 
 ECalToHadGeVCalibration and HCalToHadGeVCalibration are independently rescaled respectively by:
 
 \begin{equation}
-\frac{\text{True KaonL Energy}}{\text{ECalToHad PFO Energy Intercept}} \text{ and } \frac{\text{True KaonL Energy}}{\text{HCalToHad PFO Energy Intercept}} 
+\frac{\text{True KaonL Energy}}{\text{ECalToHad PFO Energy Intercept}} \text{ and } \frac{\text{True KaonL Energy}}{\text{HCalToHad PFO Energy Intercept}}
 \end{equation}
 
 The ECalToHad and HCalToHad PFO energy intercepts are generated by the binary.  Iteration involves rescaling ECalToHadGeVCalibration and HCalToHadGeVCalibration and then rerunning then rerunning the kaonL samples through Marlin again.  The calibration constants are then rescaled again and this continues until the ECalToHad and HCalToHad PFO energy intercepts fall within the desired accuracy targeted from the PandoraPFA stage.
@@ -290,11 +290,11 @@ Inputs:
 
 This binary performs a Gaussian fit to total PFO energy, once both ECal/HCalToHad have been independently rescaled.  The mean of this Gaussian fit is fixed and the ideal rescaling constants (one for ECalToHad one for HCalToHad) minimise the standard deviation of that Gaussian fit.  The scale factors produced for the ideal fit, which are generated by the script, are used to rescale ECal/HCalToHadGeVCalibration independently.
 
-Iteration involves rescaling ECalToHadGeVCalibration and HCalToHadGeVCalibration and then rerunning the kaonL samples through Marlin again.  The calibration constants are then rescaled again and this continues until the rescaling factors produced by this method are both equal to unity within the errors defined to be the desired accuracy of the PandoraPFA stage.  
+Iteration involves rescaling ECalToHadGeVCalibration and HCalToHadGeVCalibration and then rerunning the kaonL samples through Marlin again.  The calibration constants are then rescaled again and this continues until the rescaling factors produced by this method are both equal to unity within the errors defined to be the desired accuracy of the PandoraPFA stage.
 
 \subsection{PandoraPFACalibration\_HadronicEnergyGaussianFit}
 
-This script is run on the root file outputs for the single fixed kaonL energy.  It is used for applying Gaussian fits to reconstructed kaonL PFO energy, for events contained within the HCal.  
+This script is run on the root file outputs for the single fixed kaonL energy.  It is used for applying Gaussian fits to reconstructed kaonL PFO energy, for events contained within the HCal.
 
 Such events can also be used for the implementation of non-linearity corrections designed to force a linear relationship between simulated and reconstructed kaon samples across a range of different simulated energies, however, by default it is not recommended that you used these non-linearity corrections in your simulation.
 
@@ -310,6 +310,29 @@ Inputs:
 \end{enumerate}
 
 This binary produces the Gaussian fit to and histogram of PFO energy for the kaonL data.  A text file contains the mean, standard deviation and amplitude of the gaussian fit is also produced.  It would be the mean and true energy used as inputs for non linearities if they were implemented.
+
+\subsection{PandoraPFACalibration\_SoftwareCompensation}
+
+This script is run on root files produced by the software compensation training algorithm in the LCContent library. These root files have to be produced for different single kaon0L energies depending on the energy range of particles you will observe in your detector. For the ILC experiment, we recommand to use single kaon0L energies from 10 GeV to 100 GeV by step of 10 GeV. This script is used to re-calculate the software compensation weights used for hadronic energy corrections in the LCContent library. \\
+
+Inputs:
+\begin{enumerate}
+  \item The kaon0L root file pattern. For example, if your files look like SCTraining\_10GeV.root, SCTraining\_20GeV.root, ... then you must specify SCTraining\_\%\{energy\}GeV.root. The pattern \%\{energy\} will be replaced by the specified energies (see next input)
+  \item The input kaon0L energies. It must be provided as a single string join with the character ':'. For example if you use energies from 10 GeV to 100 GeV by step of 10 GeV, you must pass the string 10:20:30:40:50:60:70:80:90:100. These energies will replace the pattern in the \%\{energy\} of the previous input.
+  \item Output path to send the calibration text file and the output plot to.
+  \item The tree name in kaon0L root files.
+  \item Whether you want to use the raw cluster energy instead of the true kaon0L energy in the $\chi^2$ computation. This option has been introduced for testing purpose only, do not use it.
+\end{enumerate}
+
+This binary uses the Minuit (Migrad) minimizer to minimize a $\chi^2$ and re-optimize the software 9 compensation weights. The text file output contains the new re-optimized weights and information on user inputs. The obtained weights may be replaced in the Pandora settings xml file in the xml element provided for that purpose :
+
+\begin{verbatim}
+<SoftwareCompensation>
+  <SoftwareCompensationWeights>
+    ... put your weights here ...
+  </SoftwareCompensationWeights>
+</SoftwareCompensation>
+\end{verbatim}
 
 %------------------------------------------------
 % Calibration Run Order
@@ -331,4 +354,4 @@ It is important to ensure that this calibration procedure is applied in the corr
 
 If you do not require the realistic options in the ILDCaloDigi processor the procedure is the same, just omitting step 1.
 
-\end{document}  
+\end{document}
