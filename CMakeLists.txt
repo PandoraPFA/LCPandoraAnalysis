@@ -42,6 +42,7 @@ SET( CALIBRATION_PROGRAMS ECalDigitisation_ContainedEvents
     PandoraPFACalibrate_HadronicScale_ChiSquareMethod
     PandoraPFACalibrate_HadronicScale_TotalEnergyMethod
     PandoraPFACalibrate_HadronicEnergyGaussianFit
+    PandoraPFACalibrate_SoftwareCompensation
     RescaleEnergies 
     SimCaloHitEnergyDistribution )
 SET( PROGRAMS ${PERFORMANCE_PROGRAMS} ${CALIBRATION_PROGRAMS} )
