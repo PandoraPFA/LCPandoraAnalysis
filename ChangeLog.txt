@@ -1,4 +1,15 @@
 --------------------------------------------------------------------------------------------------------------------------------------------
+TAG v02-00-00
+--------------------------------------------------------------------------------------------------------------------------------------------
+Modified package to interface with DD4HEP.  Added script for training 
+of software compensation technique energy. Documentation for use of 
+software compensation technique added.  Added variable to calibration 
+helper to use in leakage calculation for calibration purposes.  The 
+three ECal detector regions are now separately addressed for 
+calibration purposes.  Add Travis CI functionality.  Select license: 
+GPLv3.  
+
+--------------------------------------------------------------------------------------------------------------------------------------------
 TAG v01-02-01
 --------------------------------------------------------------------------------------------------------------------------------------------
 Minor changes to code allowing for building with c++ 11.  Requested for ilcsoft v01-17-10.
