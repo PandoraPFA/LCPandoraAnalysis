@@ -30,6 +30,9 @@ class TTree;
 class PfoAnalysis : public marlin::Processor
 {
 public:
+    PfoAnalysis(const PfoAnalysis&) = delete;
+    PfoAnalysis& operator=(const PfoAnalysis&) = delete;
+  
     /**
      *  @brief  Default constructor
      */
@@ -123,11 +126,11 @@ private:
     int                 m_nRunSum;                              ///< 
     int                 m_nEvtSum;                              ///< 
 
-    std::string         m_inputPfoCollection;                   ///< 
-    std::string         m_mcParticleCollection;                 ///< 
+    std::string         m_inputPfoCollection{};                 ///< 
+    std::string         m_mcParticleCollection{};               ///< 
 
     int                 m_printing;                             ///< 
-    std::string         m_rootFile;                             ///< 
+    std::string         m_rootFile{};                           ///< 
 
     int                 m_lookForQuarksWithMotherZ;             ///< 
 
@@ -135,8 +138,8 @@ private:
     float               m_mcPfoSelectionMomentum;               ///< 
     float               m_mcPfoSelectionLowEnergyNPCutOff;      ///< 
 
-    ParticleVector      m_pfoVector;                            ///< 
-    MCParticleVector    m_pfoTargetVector;                      ///< 
+    ParticleVector      m_pfoVector{};                          ///< 
+    MCParticleVector    m_pfoTargetVector{};                    ///< 
 
     int                 m_nPfosTotal;                           ///< 
     int                 m_nPfosNeutralHadrons;                  ///< 
@@ -157,21 +160,21 @@ private:
     float               m_pfoMassTotal;                         ///< 
 
     typedef std::vector<float> FloatVector;
-    FloatVector         m_pfoEnergies;                          ///< 
-    FloatVector         m_pfoPx;                                ///< 
-    FloatVector         m_pfoPy;                                ///< 
-    FloatVector         m_pfoPz;                                ///< 
-    FloatVector         m_pfoCosTheta;                          ///< 
+    FloatVector         m_pfoEnergies{};                        ///< 
+    FloatVector         m_pfoPx{};                              ///< 
+    FloatVector         m_pfoPy{};                              ///< 
+    FloatVector         m_pfoPz{};                              ///< 
+    FloatVector         m_pfoCosTheta{};                        ///< 
 
-    FloatVector         m_pfoTargetEnergies;                    ///< 
-    FloatVector         m_pfoTargetPx;                          ///< 
-    FloatVector         m_pfoTargetPy;                          ///< 
-    FloatVector         m_pfoTargetPz;                          ///< 
-    FloatVector         m_pfoTargetCosTheta;                    ///< 
+    FloatVector         m_pfoTargetEnergies{};                  ///< 
+    FloatVector         m_pfoTargetPx{};                        ///< 
+    FloatVector         m_pfoTargetPy{};                        ///< 
+    FloatVector         m_pfoTargetPz{};                        ///< 
+    FloatVector         m_pfoTargetCosTheta{};                  ///< 
 
     typedef std::vector<int> IntVector;
-    IntVector           m_pfoPdgCodes;                          ///< 
-    IntVector           m_pfoTargetPdgCodes;                    ///< 
+    IntVector           m_pfoPdgCodes{};                        ///< 
+    IntVector           m_pfoTargetPdgCodes{};                  ///< 
 
     int                 m_nPfoTargetsTotal;                     ///< 
     int                 m_nPfoTargetsNeutralHadrons;            ///< 
@@ -195,10 +198,10 @@ private:
     float               m_thrust;                               ///< 
     int                 m_qPdg;                                 ///< 
 
-    TFile              *m_pTFile;                               ///< 
-    TTree              *m_pTTree;                               ///< 
-    TH1F               *m_hPfoEnergySum;                        ///< 
-    TH1F               *m_hPfoEnergySumL7A;                     ///< 
+    TFile              *m_pTFile{};                             ///< 
+    TTree              *m_pTTree{};                             ///< 
+    TH1F               *m_hPfoEnergySum{};                      ///< 
+    TH1F               *m_hPfoEnergySumL7A{};                   ///< 
 
     int                                             m_collectCalibrationDetails;        ///< Whether to collect calibration details
     pandora_analysis::CalibrationHelper            *m_pCalibrationHelper;               ///< The address of the calibration helper
