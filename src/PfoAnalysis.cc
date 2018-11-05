@@ -535,18 +535,27 @@ void PfoAnalysis::MakeQuarkVariables(EVENT::LCEvent *pLCEvent)
             const int absPdgCode(std::abs(pMCParticle->getPDG()));
 
             // By default, the primary quarks are the ones without any parents
-            if (!m_lookForQuarksWithMotherZ)
+            if (0 == m_lookForQuarksWithMotherZ)
             {
                 if ((absPdgCode >= 1) && (absPdgCode <= 6) && pMCParticle->getParents().empty())
                     mcQuarkVector.push_back(pMCParticle);
             }
-            else
+            else if (1 == m_lookForQuarksWithMotherZ)
             {
                 // For MC files generated in the SLIC environment, the primary quarks have parents; the mother should be the Z-boson
                 if ((absPdgCode >= 1) && (absPdgCode <= 6))
                 {
                     if ((pMCParticle->getParents().size() == 1) && ((pMCParticle->getParents())[0]->getPDG() == 23))
                         mcQuarkVector.push_back(pMCParticle);
+                }
+            }
+            else if (2 == m_lookForQuarksWithMotherZ)
+            {
+                // 2018 MC production: uds(bs) samples have been re-produced with Whizard 2.
+                // MC history has been changed and follow the condition below
+                if (!(pMCParticle->getParents().empty()) && (pMCParticle->getParents())[0]->getParents().empty())
+                {
+                    mcQuarkVector.push_back(pMCParticle);
                 }
             }
         }
