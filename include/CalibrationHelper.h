@@ -46,27 +46,30 @@ public:
          */
         Settings();
 
-        LCStrVec    m_eCalCollections;                      ///< Input calorimeter hit collection names
-        LCStrVec    m_hCalCollections;                      ///< Input calorimeter hit collection names
-        LCStrVec    m_muonCollections;                      ///< Input calorimeter hit collection names
-        LCStrVec    m_bCalCollections;                      ///< Input calorimeter hit collection names
-        LCStrVec    m_lHCalCollections;                     ///< Input calorimeter hit collection names
-        LCStrVec    m_lCalCollections;                      ///< Input calorimeter hit collection names
+        LCStrVec    m_eCalCollections{};                      ///< Input calorimeter hit collection names
+        LCStrVec    m_hCalCollections{};                      ///< Input calorimeter hit collection names
+        LCStrVec    m_muonCollections{};                      ///< Input calorimeter hit collection names
+        LCStrVec    m_bCalCollections{};                      ///< Input calorimeter hit collection names
+        LCStrVec    m_lHCalCollections{};                     ///< Input calorimeter hit collection names
+        LCStrVec    m_lCalCollections{};                      ///< Input calorimeter hit collection names
 
-        LCStrVec    m_eCalCollectionsSimCaloHit;            ///< Input simcalorimeter hit collection names
-        LCStrVec    m_hCalBarrelCollectionsSimCaloHit;      ///< Input simcalorimeter hit collection names
-        LCStrVec    m_hCalEndCapCollectionsSimCaloHit;      ///< Input simcalorimeter hit collection names
-        LCStrVec    m_hCalOtherCollectionsSimCaloHit;       ///< Input simcalorimeter hit collection names
-        LCStrVec    m_eCalBarrelCollectionsSimCaloHit;      ///< Input simcalorimeter hit collection names
-        LCStrVec    m_eCalEndCapCollectionsSimCaloHit;      ///< Input simcalorimeter hit collection names
-        LCStrVec    m_eCalOtherCollectionsSimCaloHit;       ///< Input simcalorimeter hit collection names
-        LCStrVec    m_muonCollectionsSimCaloHit;            ///< Input simcalorimeter hit collection names
-        LCStrVec    m_bCalCollectionsSimCaloHit;            ///< Input simcalorimeter hit collection names
-        LCStrVec    m_lHCalCollectionsSimCaloHit;           ///< Input simcalorimeter hit collection names
-        LCStrVec    m_lCalCollectionsSimCaloHit;            ///< Input simcalorimeter hit collection names
+        LCStrVec    m_eCalCollectionsSimCaloHit{};            ///< Input simcalorimeter hit collection names
+        LCStrVec    m_hCalBarrelCollectionsSimCaloHit{};      ///< Input simcalorimeter hit collection names
+        LCStrVec    m_hCalEndCapCollectionsSimCaloHit{};      ///< Input simcalorimeter hit collection names
+        LCStrVec    m_hCalOtherCollectionsSimCaloHit{};       ///< Input simcalorimeter hit collection names
+        LCStrVec    m_eCalBarrelCollectionsSimCaloHit{};      ///< Input simcalorimeter hit collection names
+        LCStrVec    m_eCalEndCapCollectionsSimCaloHit{};      ///< Input simcalorimeter hit collection names
+        LCStrVec    m_eCalOtherCollectionsSimCaloHit{};       ///< Input simcalorimeter hit collection names
+        LCStrVec    m_muonCollectionsSimCaloHit{};            ///< Input simcalorimeter hit collection names
+        LCStrVec    m_bCalCollectionsSimCaloHit{};            ///< Input simcalorimeter hit collection names
+        LCStrVec    m_lHCalCollectionsSimCaloHit{};           ///< Input simcalorimeter hit collection names
+        LCStrVec    m_lCalCollectionsSimCaloHit{};            ///< Input simcalorimeter hit collection names
     };
 
     typedef std::vector<const EVENT::ReconstructedParticle *> ParticleVector;
+    
+    CalibrationHelper(const CalibrationHelper&) = delete;
+    CalibrationHelper& operator=(const CalibrationHelper&) = delete;
 
     /**
      *  @brief  Constructor

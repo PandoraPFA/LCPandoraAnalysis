@@ -535,18 +535,27 @@ void PfoAnalysis::MakeQuarkVariables(EVENT::LCEvent *pLCEvent)
             const int absPdgCode(std::abs(pMCParticle->getPDG()));
 
             // By default, the primary quarks are the ones without any parents
-            if (!m_lookForQuarksWithMotherZ)
+            if (0 == m_lookForQuarksWithMotherZ)
             {
                 if ((absPdgCode >= 1) && (absPdgCode <= 6) && pMCParticle->getParents().empty())
                     mcQuarkVector.push_back(pMCParticle);
             }
-            else
+            else if (1 == m_lookForQuarksWithMotherZ)
             {
                 // For MC files generated in the SLIC environment, the primary quarks have parents; the mother should be the Z-boson
                 if ((absPdgCode >= 1) && (absPdgCode <= 6))
                 {
                     if ((pMCParticle->getParents().size() == 1) && ((pMCParticle->getParents())[0]->getPDG() == 23))
                         mcQuarkVector.push_back(pMCParticle);
+                }
+            }
+            else if (2 == m_lookForQuarksWithMotherZ)
+            {
+                // 2018 MC production: uds(bs) samples have been re-produced with Whizard 2.
+                // MC history has been changed and follow the condition below
+                if (!(pMCParticle->getParents().empty()) && (pMCParticle->getParents())[0]->getParents().empty())
+                {
+                    mcQuarkVector.push_back(pMCParticle);
                 }
             }
         }
@@ -636,9 +645,9 @@ void PfoAnalysis::PerformPfoAnalysis()
     float momTot[3] = {0.f, 0.f, 0.f};
 
     // Extract quantities relating to reconstructed pfos
-    for (ParticleVector::const_iterator iter = m_pfoVector.begin(), iterEnd = m_pfoVector.end(); iter != iterEnd; ++iter)
+    for (ParticleVector::const_iterator piter = m_pfoVector.begin(), piterEnd = m_pfoVector.end(); piter != piterEnd; ++piter)
     {
-        const EVENT::ReconstructedParticle *pPfo = *iter;
+        const EVENT::ReconstructedParticle *pPfo = *piter;
 
         ++m_nPfosTotal;
         m_pfoEnergyTotal += pPfo->getEnergy();
@@ -665,9 +674,9 @@ void PfoAnalysis::PerformPfoAnalysis()
             float cellEnergySum(0.f);
             const EVENT::ClusterVec &clusterVec(pPfo->getClusters());
 
-            for (EVENT::ClusterVec::const_iterator iter = clusterVec.begin(), iterEnd = clusterVec.end(); iter != iterEnd; ++iter)
+            for (EVENT::ClusterVec::const_iterator cliter = clusterVec.begin(), cliterEnd = clusterVec.end(); cliter != cliterEnd; ++cliter)
             {
-                const EVENT::CalorimeterHitVec &calorimeterHitVec((*iter)->getCalorimeterHits());
+                const EVENT::CalorimeterHitVec &calorimeterHitVec((*cliter)->getCalorimeterHits());
 
                 for (EVENT::CalorimeterHitVec::const_iterator hitIter = calorimeterHitVec.begin(), hitIterEnd = calorimeterHitVec.end(); hitIter != hitIterEnd; ++hitIter)
                 {
