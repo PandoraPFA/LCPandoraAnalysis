@@ -185,18 +185,6 @@ GeVToMIP::~GeVToMIP()
 
 void GeVToMIP::MakeHistograms()
 {
-    m_hECalDirectionCorrectedCaloHitEnergy = new TH1F("ECalDirectionCorrectedCaloHitEnergy", "ECalDirectionCorrectedCaloHitEnergy : 1==nPfoTargetsTotal && 1==nPfoTargetsTracks", 500, 0., 0.1);
-    m_hECalDirectionCorrectedCaloHitEnergy->GetXaxis()->SetTitle("Direction Corrected Calo Hit Energy in ECal");
-    m_hECalDirectionCorrectedCaloHitEnergy->GetYaxis()->SetTitle("Entries");
-
-    m_hHCalDirectionCorrectedCaloHitEnergy = new TH1F("HCalDirectionCorrectedCaloHitEnergy", "HCalDirectionCorrectedCaloHitEnergy : 1==nPfoTargetsTotal && 1==nPfoTargetsTracks", 500, 0., 0.1);
-    m_hHCalDirectionCorrectedCaloHitEnergy->GetXaxis()->SetTitle("Direction Corrected Calo Hit Energy in HCal");
-    m_hHCalDirectionCorrectedCaloHitEnergy->GetYaxis()->SetTitle("Entries");
-
-    m_hMuonDirectionCorrectedCaloHitEnergy = new TH1F("MuonDirectionCorrectedCaloHitEnergy", "MuonDirectionCorrectedCaloHitEnergy : 1==nPfoTargetsTotal && 1==nPfoTargetsTracks", 500, 0., 1.0);
-    m_hMuonDirectionCorrectedCaloHitEnergy->GetXaxis()->SetTitle("Direction Corrected Calo Hit Energy in Muon Chamber");
-    m_hMuonDirectionCorrectedCaloHitEnergy->GetYaxis()->SetTitle("Entries");
-
     unsigned int found_slash = m_inputMuonRootFiles.find_last_of("/");
     std::string path = m_inputMuonRootFiles.substr(0,found_slash);
     std::string file = m_inputMuonRootFiles.substr(found_slash+1);
@@ -226,13 +214,46 @@ void GeVToMIP::MakeHistograms()
                 TH1F *i_hMuonDirectionCorrectedCaloHitEnergy = (TH1F*) i_file->Get("MuonDirectionCorrectedCaloHitEnergy");
 
                 if (i_hECalDirectionCorrectedCaloHitEnergy!=NULL)
-                    m_hECalDirectionCorrectedCaloHitEnergy->Add(i_hECalDirectionCorrectedCaloHitEnergy,1.0);
+                {
+                    if (m_hECalDirectionCorrectedCaloHitEnergy!=NULL)
+                    {
+                        m_hECalDirectionCorrectedCaloHitEnergy->Add(i_hECalDirectionCorrectedCaloHitEnergy,1.0);
+                    }
+                    else
+                    {
+                        gROOT->cd();
+                        m_hECalDirectionCorrectedCaloHitEnergy = (TH1F*)i_hECalDirectionCorrectedCaloHitEnergy->Clone("ECalDirectionCorrectedCaloHitEnergy");
+                        i_file->cd();
+                    }
+                }
 
                 if (i_hHCalDirectionCorrectedCaloHitEnergy!=NULL)
-                    m_hHCalDirectionCorrectedCaloHitEnergy->Add(i_hHCalDirectionCorrectedCaloHitEnergy,1.0);
+                {
+                    if (m_hHCalDirectionCorrectedCaloHitEnergy!=NULL)
+                    {
+                        m_hHCalDirectionCorrectedCaloHitEnergy->Add(i_hHCalDirectionCorrectedCaloHitEnergy,1.0);
+                    }
+                    else
+                    {
+                        gROOT->cd();
+                        m_hHCalDirectionCorrectedCaloHitEnergy = (TH1F*)i_hHCalDirectionCorrectedCaloHitEnergy->Clone("HCalDirectionCorrectedCaloHitEnergy");
+                        i_file->cd();
+                    }
+                }
 
                 if (i_hMuonDirectionCorrectedCaloHitEnergy!=NULL)
-                    m_hMuonDirectionCorrectedCaloHitEnergy->Add(i_hMuonDirectionCorrectedCaloHitEnergy,1.0);
+                {
+                    if (m_hMuonDirectionCorrectedCaloHitEnergy!=NULL)
+                    {
+                        m_hMuonDirectionCorrectedCaloHitEnergy->Add(i_hMuonDirectionCorrectedCaloHitEnergy,1.0);
+                    }
+                    else
+                    {
+                        gROOT->cd();
+                        m_hMuonDirectionCorrectedCaloHitEnergy = (TH1F*)i_hMuonDirectionCorrectedCaloHitEnergy->Clone("MuonDirectionCorrectedCaloHitEnergy");
+                        i_file->cd();
+                    }
+                }
 
                 delete i_hECalDirectionCorrectedCaloHitEnergy;
                 delete i_hHCalDirectionCorrectedCaloHitEnergy;
@@ -241,6 +262,13 @@ void GeVToMIP::MakeHistograms()
             }
         }
     }
+
+    if (m_hECalDirectionCorrectedCaloHitEnergy==NULL)
+        m_hECalDirectionCorrectedCaloHitEnergy = new TH1F();
+    if (m_hHCalDirectionCorrectedCaloHitEnergy==NULL)
+        m_hHCalDirectionCorrectedCaloHitEnergy = new TH1F();
+    if (m_hMuonDirectionCorrectedCaloHitEnergy==NULL)
+        m_hMuonDirectionCorrectedCaloHitEnergy = new TH1F();
 
     m_hECalDirectionCorrectedCaloHitEnergy->Sumw2();
     m_hHCalDirectionCorrectedCaloHitEnergy->Sumw2();

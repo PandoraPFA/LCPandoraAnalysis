@@ -98,6 +98,16 @@ PfoAnalysis::PfoAnalysis() :
                             m_lookForQuarksWithMotherZ,
                             int(0));
 
+    registerProcessorParameter("NBinsMuonCaloHitEnergyHist",
+                            "Number of bins in MuonDirectionCorrectedCaloHitEnergy histogram",
+                            m_calibrationHelperSettings.m_nBinsMuonCaloHitEnergyHist,
+                            int(500));
+
+    registerProcessorParameter("XUpperValueMuonCaloHitEnergyHist",
+                            "Upper value of x-range of MuonDirectionCorrectedCaloHitEnergy histogram",
+                            m_calibrationHelperSettings.m_xUpperValueMuonCaloHitEnergyHist,
+                            float(1.0));
+
     registerProcessorParameter("MCPfoSelectionRadius",
                             "MC pfo selection radius",
                             m_mcPfoSelectionRadius,
