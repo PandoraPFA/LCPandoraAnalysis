@@ -186,7 +186,7 @@ void CalibrationHelper::CreateHistograms()
     m_hHCalDirectionCorrectedCaloHitEnergy->GetXaxis()->SetTitle("Direction Corrected Calo Hit Energy in HCal");
     m_hHCalDirectionCorrectedCaloHitEnergy->GetYaxis()->SetTitle("Entries");
 
-    m_hMuonDirectionCorrectedCaloHitEnergy = new TH1F("MuonDirectionCorrectedCaloHitEnergy", "1==nPfoTargetsTotal && 1==nPfoTargetsTracks", 500, 0., 1.0);
+    m_hMuonDirectionCorrectedCaloHitEnergy = new TH1F("MuonDirectionCorrectedCaloHitEnergy", "1==nPfoTargetsTotal && 1==nPfoTargetsTracks", m_settings.m_nBinsMuonCaloHitEnergyHist, 0., m_settings.m_xUpperValueMuonCaloHitEnergyHist);
     m_hMuonDirectionCorrectedCaloHitEnergy->GetXaxis()->SetTitle("Direction Corrected Calo Hit Energy in Muon Chamber");
     m_hMuonDirectionCorrectedCaloHitEnergy->GetYaxis()->SetTitle("Entries");
 }
