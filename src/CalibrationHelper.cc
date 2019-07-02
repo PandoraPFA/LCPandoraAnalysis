@@ -65,7 +65,9 @@ public:
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-CalibrationHelper::Settings::Settings()
+CalibrationHelper::Settings::Settings() :
+    m_nBinsMuonCaloHitEnergyHist(std::numeric_limits<int>::max()),
+    m_xUpperValueMuonCaloHitEnergyHist(std::numeric_limits<float>::max())
 {
 }
 
