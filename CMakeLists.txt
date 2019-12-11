@@ -10,9 +10,9 @@ PROJECT( PandoraAnalysis )
 
 
 # project version
-SET( PandoraAnalysis_VERSION_MAJOR 02 )
-SET( PandoraAnalysis_VERSION_MINOR 00 )
-SET( PandoraAnalysis_VERSION_PATCH 00 )
+SET( PandoraAnalysis_VERSION_MAJOR 2 )
+SET( PandoraAnalysis_VERSION_MINOR 0 )
+SET( PandoraAnalysis_VERSION_PATCH 1 )
 
 
 ### CMAKE ###################################################################
